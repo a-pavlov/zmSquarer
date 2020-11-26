@@ -1,0 +1,2 @@
+# zmSquarer
+Squarer for ZoneMinder
