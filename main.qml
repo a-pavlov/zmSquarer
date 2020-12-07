@@ -6,13 +6,16 @@ import DesktopVideoProducer 0.1
 
 Window {
     visible: true
-    width: 1920
-    height: 1080
+    //width: 1920
+    //height: 1080
+    width: 480
+    height: 320
 
-    DesktopVideoProducer {
-        id: videoProducer
-        url: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
-    }
+
+    //DesktopVideoProducer {
+    //    id: videoProducer
+    //    url: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
+    //}
 /*
     DesktopVideoProducer {
         id: videoProducer2
@@ -63,14 +66,14 @@ Window {
     //    id: grid
     //    columns: 3
 
-        VideoOutput {
+        /*VideoOutput {
             id: output1
             //anchors.fill: parent
             anchors.left: parent
             width: parent.width/3
             height:parent.height/3
             source: videoProducer
-        }
+        }*/
 /*
         VideoOutput {
             id: output2

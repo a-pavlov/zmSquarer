@@ -1,4 +1,4 @@
-QT += testlib
+QT += testlib network
 
 SOURCES = main.cpp \
     test.cpp \

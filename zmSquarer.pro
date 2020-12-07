@@ -1,11 +1,9 @@
 TEMPLATE = app
 
-QT += qml quick multimedia widgets
+QT += qml quick multimedia widgets network
 
 SOURCES += main.cpp \
-    DesktopVideoProducer.cpp \
-    src/rbuffer.cpp \
-    src/rsplitter.cpp
+    DesktopVideoProducer.cpp
 
 RESOURCES += qml.qrc \
     image.qrc
@@ -19,8 +17,8 @@ QML_IMPORT_PATH =
 
 # Default rules for deployment.
 include(src/motion/motion.pri)
+include(src/http_parser/http_parser.pri)
+include(src/src.pri)
 
 HEADERS += \
-    DesktopVideoProducer.h \
-    src/rbuffer.h \
-    src/rsplitter.h
+    DesktopVideoProducer.h

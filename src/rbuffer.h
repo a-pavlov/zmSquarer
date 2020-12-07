@@ -10,17 +10,22 @@ private:
     std::vector<char> buffer;
     rbuffer_size used;
     rbuffer_size content_length;
+    long frameIndex;
 public:
     static const rbuffer_size NETCAM_RBUFFSIZE;
     static rbuffer_size RBUF_MEM_STEP;
 
     RBuffer();
-    void checkBufferSize(rbuffer_size numBytes);
+    char* checkBufferSize(rbuffer_size numBytes);
     rbuffer_size append(const char* src, rbuffer_size srcSize);
     void clear();
 
     rbuffer_size getUsed() const {
         return used;
+    }
+
+    void expandUsed(rbuffer_size size) {
+        used += size;
     }
 
     rbuffer_size getSize() const {
@@ -63,6 +68,15 @@ public:
     char getChar(size_t pos) const {
         assert(pos < buffer.size());
         return buffer[pos];
+    }
+
+    void setFrameIndex(long index) {
+        assert(index > frameIndex);
+        frameIndex = index;
+    }
+
+    long getFrameIndex() const {
+        return frameIndex;
     }
 };
 

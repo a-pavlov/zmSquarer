@@ -1,6 +1,7 @@
 #include "test.h"
 #include <QTest>
 #include <QList>
+#include <QUrl>
 
 #include "string.h"
 
@@ -8,6 +9,15 @@
 #include "rsplitter.h"
 
 Test::Test(QObject *parent) : QObject(parent) {
+}
+
+void Test::testUrl() {
+    QUrl url("http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root");
+    QCOMPARE(url.host(), QString("192.168.100.12"));
+    QCOMPARE(url.port(), -1);
+    QCOMPARE(url.path(), "/zm/cgi-bin/nph-zms");
+    QCOMPARE(url.query(), "mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root");
+    QCOMPARE(url.scheme(), "http");
 }
 
 void Test::testAlgorithm() {
@@ -138,4 +148,23 @@ void Test::testRSplitterMatchBetweenBuffers() {
     QCOMPARE(lrb->getContentLength(), 6);
     QCOMPARE(strncmp("XXXX", crb->getPtr(), crb->getContentLength()), 0);
     QCOMPARE(strncmp("info_1", lrb->getPtr(), lrb->getContentLength()), 0);
+}
+
+void Test::testRSplitterMatchNewIface() {
+    RSplitter rsplitter(std::string(""));
+    RBuffer::RBUF_MEM_STEP = 10;
+    rsplitter.setPattern("[ZM]");
+    char data1[] = "quite long data buffer[ZM]test data remain";
+    QSharedPointer<RBuffer> cb = rsplitter.getCurrentRBuffer();
+    char* ptr = cb->checkBufferSize(strlen(data1));
+    memcpy(ptr, data1, strlen(data1));
+    cb->expandUsed(strlen(data1));
+    QCOMPARE(cb->getUnmarkedSize(), strlen(data1));
+    rsplitter.processCB(cb);
+    QSharedPointer<RBuffer> lrb = rsplitter.getLatestRBuffer();
+    QSharedPointer<RBuffer> crb = rsplitter.getCurrentRBuffer();
+    QVERIFY(!crb.isNull());
+    QVERIFY(!lrb.isNull());
+    QCOMPARE(lrb->getContentLength(), strlen("quite long data buffer"));
+    QCOMPARE(crb->getContentLength(), strlen("test data remain"));
 }

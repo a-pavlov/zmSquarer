@@ -8,6 +8,8 @@
 #include <QList>
 #include <QMutex>
 #include <QSharedPointer>
+#include <QTime>
+
 #include "rbuffer.h"
 
 class RSplitter : public QObject
@@ -15,9 +17,10 @@ class RSplitter : public QObject
     Q_OBJECT
 public:
     typedef std::vector<char>::size_type size_type;
-    explicit RSplitter(const std::string& pattern, QObject *parent = nullptr);
+    explicit RSplitter(const std::string& pattern, QObject *parent = nullptr);    
     virtual ~RSplitter();
     virtual void read(char* data, size_t size);
+    void setPattern(const QString&);
     const char* getPattern() const {
         return &pattern[0];
     }
@@ -35,6 +38,8 @@ public:
 
         return QSharedPointer<RBuffer>();
     }
+
+    void processCB(QSharedPointer<RBuffer>);
 private:
     std::vector<char> pattern;
     int currentRBuf;
@@ -42,6 +47,9 @@ private:
     int latestRBuf;
     QList<QSharedPointer<RBuffer>> rbuffers;
     QMutex switchBufferMutex;
+    long frameCounter;
+    QTime frameTime;
+    QList<int> timeouts;
 signals:
 
 public slots:

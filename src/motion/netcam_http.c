@@ -366,6 +366,9 @@ int netcam_read_first_header(netcam_context_ptr netcam)
     char *header;
     char *boundary;
 
+    MOTION_LOG(ERR, TYPE_NETCAM, NO_ERRNO
+        ,_("Send %s"), netcam->connect_request);
+
     /* Send the initial command to the camera. */
     if (send(netcam->sock, netcam->connect_request,
              strlen(netcam->connect_request), 0) < 0) {
@@ -684,6 +687,8 @@ int netcam_connect(netcam_context_ptr netcam, int err_flag)
 
     char port[15];
     sprintf(port,"%u",netcam->connect_port);
+
+    MOTION_LOG(INF, TYPE_NETCAM, NO_ERRNO,_("connecting to %s port %d"), netcam->connect_host, netcam->connect_port);
 
     /* Lookup the hostname given in the netcam URL. */
     if ((ret = getaddrinfo(netcam->connect_host, port, NULL, &ai)) != 0) {

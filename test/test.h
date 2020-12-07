@@ -11,6 +11,7 @@ public:
 
 private slots:
     void testAlgorithm();
+    void testUrl();
     void testRBuffer();
     void testRBufferMemStep();
     void testRSplitterTrivial();
@@ -19,6 +20,7 @@ private slots:
     void testRSplitterWholeMatchTrivial();
     void testRSplitterMultiplePatternMatches();
     void testRSplitterMatchBetweenBuffers();
+    void testRSplitterMatchNewIface();
 };
 
 #endif // RANGETEST_H
