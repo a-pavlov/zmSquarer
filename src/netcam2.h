@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QUrl>
+#include <QThread>
 #include "rsplitter.h"
 
 class QTcpSocket;
@@ -12,7 +13,10 @@ class NetCam : public QObject {
     Q_OBJECT
 public:
     explicit NetCam(const QString& url, QObject *parent = nullptr);
-    void start();
+    ~NetCam();
+    RSplitter& splitter() {
+        return rsp;
+    }
 private:
       static int url_callback(http_parser* p, const char* c, unsigned long len);
       static int header_field_callback(http_parser* p, const char* c, unsigned long len);
@@ -33,6 +37,26 @@ private:
 signals:
 
 public slots:
+      void start();
 };
+
+class NetCamThread : public QThread {
+    Q_OBJECT
+signals:
+    void resultReady(const QString &s);
+public slots:
+    void createDT();
+};
+
+class Controller: public QObject {
+    Q_OBJECT
+private:
+    QList<NetCam*> netcams;
+    ~Controller();
+public slots:
+    void test();
+};
+
+
 
 #endif // NETCAM_H

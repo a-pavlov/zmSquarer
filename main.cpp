@@ -2,10 +2,14 @@
 #include <QQmlApplicationEngine>
 #include <QTcpSocket>
 #include <QDebug>
+#include <QTimer>
 
 #include"DesktopVideoProducer.h"
 #include "http_parser.h"
 #include "netcam2.h"
+#include "zmsqapplication.h"
+#include "camcontroller.h"
+#include "camvideoproducer.h"
 
 int my_url_callback_(http_parser* p, const char* c, unsigned long len) {
     qDebug() << "on url " << QString::fromLatin1(c, len);
@@ -29,11 +33,20 @@ int my_headers_complete_(http_parser* p) {
 
 
 int main(int argc, char *argv[]) {
-    DesktopVideoProducer::registerQmlType();    
+    DesktopVideoProducer::registerQmlType();
+    CamVideoProducer::registerQmlType();
+    QThread* nt = new QThread();
+    QObject::connect(nt, &QThread::started, [](){
+       qDebug() << "network thread started " << QThread::currentThread()->currentThreadId();
+    });
 
-    //для возможности вызова QApplication::desktop() QGuiApplication недостаточно
-    //QGuiApplication app(argc, argv);
-    QApplication app(argc, argv);
+    nt->start();
+    CamController* cc = new CamController();
+    cc->moveToThread(nt);
+
+    ZMSQApplication app(argc, argv, nt, cc);
+
+    qDebug() << "app thread id " << app.thread()->currentThreadId();
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
@@ -110,8 +123,31 @@ int main(int argc, char *argv[]) {
     //socket->connectToHost(url.host(), url.port()!=-1?url.port():80);
     //qDebug() << "connect to " << url.host() << " port " << (url.port()!=-1?url.port():80);
 
-    NetCam netcam("http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root");
-    netcam.start();
+    //NetCam* netcam = new NetCam("http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root");
+    //NetCam* netcam2 = new NetCam("http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root");
+    //netcam->moveToThread(nct);
+    //QObject::connect(nct, &QThread::started, netcam, &NetCam::start);
+    //QObject::connect(nct, &QThread::started, netcam2, &NetCam::start);
+    //QObject::connect(nct, &QThread::finished, netcam, &QObject::deleteLater);
+    //QObject::connect(nct, &QThread::finished, netcam2, &QObject::deleteLater);
+    //netcam->moveToThread(nct);
+    //netcam2->moveToThread(nct);    
 
+    //QObject::connect(nct, &QThread::started, [](){
+    //    qDebug() << " started " << QThread::currentThread()->currentThreadId();
+    //});
+
+    //QTimer timer;
+    //timer.moveToThread(nct);
+    //QObject::connect(&timer, &QTimer::timeout, [=](){
+    //    QMetaObject::invokeMethod(nct, "createDT", Qt::QueuedConnection);
+    //});
+
+    //QObject::connect(&timer, SIGNAL(timeout()), ctr, SLOT(test()), Qt::QueuedConnection);
+
+    //QObject::connect(&timer, SIGNAL(timeout()), nct, SLOT(createDT()), Qt::QueuedConnection);
+    //timer.start(20000);
+
+   // QMetaObject::invokeMethod(nct, "createDT", Qt::QueuedConnection);
     return app.exec();
 }

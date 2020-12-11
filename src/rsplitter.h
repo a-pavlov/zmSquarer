@@ -39,6 +39,8 @@ public:
         return QSharedPointer<RBuffer>();
     }
 
+    QSharedPointer<RBuffer> getOutputBuffer();
+
     void processCB(QSharedPointer<RBuffer>);
 private:
     std::vector<char> pattern;

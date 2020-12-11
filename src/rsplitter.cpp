@@ -6,7 +6,7 @@ RSplitter::RSplitter(const std::string& p, QObject *parent) :
     QObject(parent)
     , pattern(p.begin(), p.end())
     , currentRBuf(0)
-    , outputRBuf(-1)
+    , outputRBuf(2)
     , latestRBuf(-1)
     , frameCounter(0) {
     rbuffers.append(QSharedPointer<RBuffer>(new RBuffer()));
@@ -99,4 +99,18 @@ void RSplitter::setPattern(const QString& p) {
     std::string str = p.toStdString();
     std::vector<char> newPattern(str.begin(), str.end());
     pattern.swap(newPattern);
+}
+
+QSharedPointer<RBuffer> RSplitter::getOutputBuffer() {
+    QMutexLocker ml(&switchBufferMutex);
+
+    if (latestRBuf == -1) {
+        return QSharedPointer<RBuffer>();
+    }
+
+    int buf = latestRBuf;
+    latestRBuf = outputRBuf;
+    outputRBuf = buf;
+    Q_ASSERT(outputRBuf != -1);
+    return rbuffers[outputRBuf];
 }

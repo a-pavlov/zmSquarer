@@ -7,6 +7,7 @@
 #include <QDesktopWidget>
 #include <QDebug>
 #include <QDir>
+#include "zmsqapplication.h"
 
 extern "C" {
 #include "motion.h"
@@ -57,6 +58,9 @@ QString DesktopVideoProducer::url() const {
 }
 
 QString DesktopVideoProducer::setUrl(const QString& u) {
+    ZMSQApplication* app = static_cast<ZMSQApplication*>(QApplication::instance());
+    qDebug() << "video producer set url " << u << " thread ";
+    app->startNetCam(u);
     urlCurrent = u.toStdString();
     if (ctx != nullptr) {
         ctx->event_stop = 1;

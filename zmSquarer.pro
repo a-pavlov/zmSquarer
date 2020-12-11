@@ -3,7 +3,8 @@ TEMPLATE = app
 QT += qml quick multimedia widgets network
 
 SOURCES += main.cpp \
-    DesktopVideoProducer.cpp
+    DesktopVideoProducer.cpp \
+    zmsqapplication.cpp
 
 RESOURCES += qml.qrc \
     image.qrc
@@ -21,4 +22,5 @@ include(src/http_parser/http_parser.pri)
 include(src/src.pri)
 
 HEADERS += \
-    DesktopVideoProducer.h
+    DesktopVideoProducer.h \
+    zmsqapplication.h
