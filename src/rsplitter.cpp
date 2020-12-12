@@ -15,9 +15,13 @@ RSplitter::RSplitter(const std::string& p, QObject *parent) :
 }
 
 RSplitter::~RSplitter() {
-    qDebug() << "average timeout msec: " << std::accumulate(timeouts.begin(), timeouts.end(), 0)/timeouts.size();
-    qDebug() << "max timeout msec:     " <<  *std::max_element(timeouts.begin(), timeouts.end());
-    qDebug() << "min timeout msec:     " <<  *std::min_element(timeouts.begin(), timeouts.end());
+    if (!timeouts.isEmpty()) {
+        qDebug() << "average timeout msec: " << std::accumulate(timeouts.begin(), timeouts.end(), 0)/timeouts.size();
+        qDebug() << "max timeout msec:     " <<  *std::max_element(timeouts.begin(), timeouts.end());
+        qDebug() << "min timeout msec:     " <<  *std::min_element(timeouts.begin(), timeouts.end());
+    } else {
+        qDebug() << "no statistics are available";
+    }
 }
 
 void RSplitter::read(char* data, size_t size) {
@@ -60,7 +64,9 @@ void RSplitter::processCB(QSharedPointer<RBuffer> prbuf) {
                 QTime currentTime = QTime::currentTime();
 
                 qDebug() << "frame " << frameCounter << " content length " << prbuf->getContentLength() << " timeout msec: " << frameTime.msecsTo(currentTime);
-                timeouts.append(frameTime.msecsTo(currentTime));
+                if (timeouts.size() < 1000) {
+                    timeouts.append(frameTime.msecsTo(currentTime));
+                }
                 frameTime = currentTime;
                 // swith buffers, set remaining to the unmarked amount and continue
                 switchBufferMutex.lock();
