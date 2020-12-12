@@ -39,7 +39,7 @@ QString CamVideoProducer::url() const {
 QString CamVideoProducer::setUrl(const QString& u) {
     ZMSQApplication* app = static_cast<ZMSQApplication*>(QApplication::instance());
     qDebug() << "video producer set url " << u << " thread ";
-    netCam = app->startNetCam(u);
+    netCam = app->getCamController().startCam(u);
     urlCurrent = u.toStdString();
     return u;
 }
@@ -100,7 +100,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         if (soi_position > 0) {
             data = (unsigned char*)ptr->getPtr() + soi_position;
             length -= soi_position;
-            qDebug() << "correction to " << soi_position;
+            //qDebug() << "correction to " << soi_position;
 
             //memmove(netcam->receiving->ptr, netcam->receiving->ptr + soi_position,
             //        netcam->receiving->used - soi_position);
@@ -113,13 +113,13 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
     }
 
 
-    qDebug() << "image size " << length;
+    //qDebug() << "image size " << length;
     QImage screenImage; //("/home/inkpot/dev/" + frames.at(currentFrame++ % frames.size()));
     bool res = screenImage.loadFromData(data, length, "JPG");
 
 
     if (res) {
-        qDebug() << "image loaded";
+        //qDebug() << "image loaded";
     } else {
         qDebug() << "error on image loading";
     }

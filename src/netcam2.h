@@ -12,7 +12,7 @@ struct http_parser;
 class NetCam : public QObject {
     Q_OBJECT
 public:
-    explicit NetCam(const QString& url, QObject *parent = nullptr);
+    explicit NetCam(QObject *parent = nullptr);
     ~NetCam();
     RSplitter& splitter() {
         return rsp;
@@ -37,26 +37,7 @@ private:
 signals:
 
 public slots:
-      void start();
+      void start(const QString&);
 };
-
-class NetCamThread : public QThread {
-    Q_OBJECT
-signals:
-    void resultReady(const QString &s);
-public slots:
-    void createDT();
-};
-
-class Controller: public QObject {
-    Q_OBJECT
-private:
-    QList<NetCam*> netcams;
-    ~Controller();
-public slots:
-    void test();
-};
-
-
 
 #endif // NETCAM_H

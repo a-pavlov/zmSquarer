@@ -42,8 +42,7 @@ int NetCam::headers_complete(http_parser* p) {
     return 0;
 }
 
-NetCam::NetCam(const QString& u, QObject *parent) : QObject(parent)
-    , url(u)
+NetCam::NetCam(QObject *parent) : QObject(parent)
     , headersEndOffset(0)
     , headerBytesRead(0)
     , headersBuffer(1024)
@@ -60,7 +59,8 @@ NetCam::~NetCam() {
     }
 }
 
-void NetCam::start() {
+void NetCam::start(const QString& str) {
+    QUrl url(str);
     qDebug() << "netcam th id " << thread()->currentThreadId();
     socket = new QTcpSocket;
 
@@ -141,7 +141,7 @@ void NetCam::start() {
 
     QObject::connect(socket, &QTcpSocket::disconnected, [=] () {
         qDebug()<< "DISCONNECTED ";
-        //socket->deleteLater();
+        socket->deleteLater();
     });
 
     QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
@@ -151,21 +151,4 @@ void NetCam::start() {
     });
 
     socket->connectToHost(url.host(), 80);
-}
-
-void NetCamThread::createDT() {
-    qDebug() << "ct " << QThread::currentThreadId();
-    qDebug() << "create DT " << "str" << " thread " << thread()->currentThreadId();
-}
-
-void Controller::test() {
-    qDebug() << "controller test " << thread()->currentThreadId();
-    netcams.append(new NetCam("http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"));
-    netcams.back()->start();
-}
-
-Controller::~Controller() {
-    for(NetCam* pn: netcams) {
-       pn->deleteLater();
-    }
 }

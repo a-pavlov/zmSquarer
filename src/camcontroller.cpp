@@ -1,16 +1,24 @@
 #include "camcontroller.h"
 #include "netcam2.h"
 
+#include <QDebug>
+
 CamController::CamController(QObject *parent) : QObject(parent)
 {
-
+    networkThread.start();
 }
 
-void CamController::startCam(const QString& url) {
-    pn = new NetCam("http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root");
-    pn->start();
+CamController::~CamController() {
+    qDebug() << "cam controller stop";
+    networkThread.quit();
+    networkThread.wait();
 }
 
-NetCam* CamController::getNetCam() {
-    return pn;
+NetCam* CamController::startCam(const QString& url) {
+    NetCam* cam = new NetCam();
+    cam->moveToThread(&networkThread);
+    connect(&networkThread, &QThread::finished, cam, &QObject::deleteLater);
+    //connect(this, &CamController::startCam, cam, &NetCam::start);
+    QMetaObject::invokeMethod(cam, "start", Qt::QueuedConnection, Q_ARG(QString, url));
+    return cam;
 }

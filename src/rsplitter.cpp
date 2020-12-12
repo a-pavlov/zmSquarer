@@ -15,9 +15,9 @@ RSplitter::RSplitter(const std::string& p, QObject *parent) :
 }
 
 RSplitter::~RSplitter() {
-    qDebug() << "average " << std::accumulate(timeouts.begin(), timeouts.end(), 0)/timeouts.size();
-    qDebug() << "max     " <<  *std::max_element(timeouts.begin(), timeouts.end());
-    qDebug() << "min     " <<  *std::min_element(timeouts.begin(), timeouts.end());
+    qDebug() << "average timeout msec: " << std::accumulate(timeouts.begin(), timeouts.end(), 0)/timeouts.size();
+    qDebug() << "max timeout msec:     " <<  *std::max_element(timeouts.begin(), timeouts.end());
+    qDebug() << "min timeout msec:     " <<  *std::min_element(timeouts.begin(), timeouts.end());
 }
 
 void RSplitter::read(char* data, size_t size) {

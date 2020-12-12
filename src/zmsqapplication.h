@@ -2,24 +2,22 @@
 #define ZMSQAPPLICATION_H
 
 #include <QApplication>
-
-class QThread;
-class CamController;
-class NetCam;
+#include "camcontroller.h"
 
 class ZMSQApplication : public QApplication {
     Q_OBJECT
     Q_DISABLE_COPY(ZMSQApplication)
 
 public:
-   ZMSQApplication(int &argc, char **argv, QThread*, CamController*);
+   ZMSQApplication(int &argc, char **argv);
    ~ZMSQApplication();
    explicit ZMSQApplication();
    int exec();
-   NetCam* startNetCam(const QString&);
+   CamController& getCamController() {
+       return camCtrl;
+   }
 private:
-   QThread* networkThread;
-   CamController* camCtrl;
+   CamController camCtrl;
 private slots:
    void cleanup();
 };

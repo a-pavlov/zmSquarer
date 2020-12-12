@@ -2,15 +2,14 @@ import QtQuick 2.2
 import QtQuick.Window 2.1
 import QtMultimedia 5.0
 import QtQuick.Layouts 1.11
-import DesktopVideoProducer 0.1
 import CamVideoProducer 0.1
 
 Window {
     visible: true
-    //width: 1920
-    //height: 1080
-    width: 480
-    height: 320
+    width: 1920
+    height: 1080
+    //width: 480
+    //height: 320
 
 
     CamVideoProducer {
@@ -75,6 +74,7 @@ Window {
             height:parent.height/3
             source: videoProducer
         }
+
 /*
         VideoOutput {
             id: output2
