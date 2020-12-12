@@ -76,7 +76,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
     QSharedPointer<RBuffer> ptr = netCam->splitter().getOutputBuffer();
 
     if (ptr.isNull()) {
-        qDebug() << "output buffer is null";
+        qDebug() << "output buffer is null, no the new frame is available";
         return;
     }
 

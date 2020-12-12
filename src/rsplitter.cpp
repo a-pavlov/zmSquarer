@@ -110,10 +110,12 @@ void RSplitter::setPattern(const QString& p) {
 QSharedPointer<RBuffer> RSplitter::getOutputBuffer() {
     QMutexLocker ml(&switchBufferMutex);
 
-    if (latestRBuf == -1) {
+    // return null if no ready buffer or last output time greater than frame time - no new frame arrived
+    if (latestRBuf == -1 || (!outputTime.isNull() && outputTime > frameTime)) {
         return QSharedPointer<RBuffer>();
     }
 
+    outputTime = QTime::currentTime();
     int buf = latestRBuf;
     latestRBuf = outputRBuf;
     outputRBuf = buf;

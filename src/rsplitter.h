@@ -51,6 +51,7 @@ private:
     QMutex switchBufferMutex;
     long frameCounter;
     QTime frameTime;
+    QTime outputTime;
     QList<int> timeouts;
 signals:
 
