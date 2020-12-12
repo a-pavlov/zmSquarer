@@ -10,6 +10,7 @@ private:
     std::vector<char> buffer;
     rbuffer_size used;
     rbuffer_size content_length;
+    rbuffer_size soi_position;
     long frameIndex;
 public:
     static const rbuffer_size NETCAM_RBUFFSIZE;
@@ -78,6 +79,13 @@ public:
     long getFrameIndex() const {
         return frameIndex;
     }
+
+    rbuffer_size getSoiPos() const {
+        return soi_position;
+    }
+
+    // must be separated util function
+    void calculateSoiPosition();
 };
 
 #endif // BUFFER_H

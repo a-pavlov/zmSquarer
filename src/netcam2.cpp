@@ -66,15 +66,13 @@ void NetCam::start(const QString& str) {
 
     QObject::connect(socket, &QTcpSocket::connected,[=](){
        qDebug() << "connected";
-       qDebug() << "connect string ";
        QByteArray array;
        array.append("GET ")
                .append(url.path().toStdString().c_str())
                .append("?")
                .append(url.query().toStdString().c_str())
-               .append(" HTTP/1.0\r\nHost: 192.168.100.12\r\nUser-Agent: Motion-netcam/4.3.1+git20201114-dc670f5\r\nConnection: close\r\n\r\n");
+               .append(" HTTP/1.0\r\nHost: " + url.host() + "\r\nUser-Agent: zmSquarer-netcam/0.1\r\nConnection: close\r\n\r\n");
 
-       //QString request = "GET " + url.path() + "?" + url.query() + " HTTP/1.0\nHost: 192.168.100.12\nUser-Agent: Motion-netcam/4.3.1+git20201114-dc670f5\nConnection: close\n\n";
        qDebug() << "request " << array.constData();
        socket->write(array.constData(), array.size());
     });

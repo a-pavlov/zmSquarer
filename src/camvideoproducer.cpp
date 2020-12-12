@@ -87,7 +87,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
 
 
     unsigned char* data = (unsigned char*)ptr->getPtr();
-    int length = ptr->getContentLength();
+    /*int length = ptr->getContentLength();
     char *ptr_buffer;
 
     ptr_buffer = (char*)memmem(ptr->getPtr(), ptr->getContentLength(), "\xff\xd8", 2);
@@ -111,11 +111,12 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         //    motion_log(LOG_INFO, 0, "SOI found , position %d",
         //               __FUNCTION__, soi_position);
     }
+    */
 
 
     //qDebug() << "image size " << length;
     QImage screenImage; //("/home/inkpot/dev/" + frames.at(currentFrame++ % frames.size()));
-    bool res = screenImage.loadFromData(data, length, "JPG");
+    bool res = screenImage.loadFromData(data + ptr->getSoiPos(), ptr->getContentLength() - ptr->getSoiPos(), "JPG");
 
 
     if (res) {

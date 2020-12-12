@@ -61,12 +61,14 @@ void RSplitter::processCB(QSharedPointer<RBuffer> prbuf) {
                 // expand content length with position of the boundary
                 prbuf->setContentLength(static_cast<size_t>(patternFirstMatchPos));
                 prbuf->setFrameIndex(++frameCounter);
+                prbuf->calculateSoiPosition();
                 QTime currentTime = QTime::currentTime();
 
                 qDebug() << "frame " << frameCounter << " content length " << prbuf->getContentLength() << " timeout msec: " << frameTime.msecsTo(currentTime);
                 if (timeouts.size() < 1000) {
                     timeouts.append(frameTime.msecsTo(currentTime));
                 }
+
                 frameTime = currentTime;
                 // swith buffers, set remaining to the unmarked amount and continue
                 switchBufferMutex.lock();

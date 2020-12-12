@@ -55,6 +55,7 @@ RBuffer::rbuffer_size RBuffer::append(const char* src, rbuffer_size srcSize) {
 void RBuffer::clear() {
     used = 0;
     content_length = 0;
+    soi_position = 0;
 }
 
 int RBuffer::findCharacter(char c) const {
@@ -63,5 +64,15 @@ int RBuffer::findCharacter(char c) const {
     }
 
     return -1;
+}
+
+void RBuffer::calculateSoiPosition() {
+    Q_ASSERT(content_length > 0);
+    soi_position = 0;
+    char *ptr_buffer = (char*)memmem(&buffer[0], content_length, "\xff\xd8", 2);
+
+    if (ptr_buffer != nullptr) {
+        soi_position = ptr_buffer - &buffer[0];
+    }
 }
 
