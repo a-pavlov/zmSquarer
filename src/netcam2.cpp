@@ -102,14 +102,14 @@ void NetCam::start(const QString& str) {
                     http_parser_init(&parser, HTTP_RESPONSE); /* initialise parser */
                     http_parser_settings settings;
                     http_parser_settings_init(&settings);
-                    settings.on_url = &NetCam::url_callback;
-                    settings.on_header_field = &NetCam::header_field_callback;
-                    settings.on_header_value = &NetCam::header_value_callback;
+                    settings.on_url = (http_data_cb)&NetCam::url_callback;
+                    settings.on_header_field = (http_data_cb)&NetCam::header_field_callback;
+                    settings.on_header_value = (http_data_cb)&NetCam::header_value_callback;
                     settings.on_headers_complete = &NetCam::headers_complete;
                     size_t nparsed = http_parser_execute(&parser, &settings, &headersBuffer[0], headersBuffer.size());
                     qDebug() << "parsed " << nparsed << " input " << headersBuffer.size() << " last header value pos " << lastHeaderValueOffset;
                     qDebug() << "remain " << headersBuffer.size() - lastHeaderValueOffset;
-                    qDebug() << QString::fromLocal8Bit(&headersBuffer[lastHeaderValueOffset], qMin(20ul, headersBuffer.size() - lastHeaderValueOffset));
+                    qDebug() << QString::fromLocal8Bit(&headersBuffer[lastHeaderValueOffset], qMin<size_t>(20ul, headersBuffer.size() - lastHeaderValueOffset));
                     Q_ASSERT(headersEndOffset < headersBuffer.size());
                     // calculate the rest of data in the buffer and write it to target
                     Q_ASSERT(hdrKeys.size() == hdrValues.size());

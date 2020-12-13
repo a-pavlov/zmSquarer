@@ -9,7 +9,7 @@ RESOURCES += qml.qrc \
 
 QMAKE_CFLAGS += -Dsysconfdir=\"xxx\"
 QMAKE_CXXFLAGS += -Dsysconfdir=\"xxx\"
-LIBS += -lpthread -ljpeg
+#LIBS += -lpthread -ljpeg
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
