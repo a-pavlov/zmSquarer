@@ -64,7 +64,8 @@ void RSplitter::processCB(QSharedPointer<RBuffer> prbuf) {
                 prbuf->calculateSoiPosition();
                 QTime currentTime = QTime::currentTime();
 
-                qDebug() << "frame " << frameCounter << " content length " << prbuf->getContentLength() << " timeout msec: " << frameTime.msecsTo(currentTime);
+                //qDebug() << "frame " << frameCounter << " content length " << prbuf->getContentLength() << " timeout msec: " << frameTime.msecsTo(currentTime);
+
                 if (timeouts.size() < 1000) {
                     timeouts.append(frameTime.msecsTo(currentTime));
                 }

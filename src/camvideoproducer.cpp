@@ -21,7 +21,7 @@ void CamVideoProducer::registerQmlType() {
 
 CamVideoProducer::CamVideoProducer(QObject *parent )
     : QObject( parent ), _surface( 0 ), netCam(nullptr) {
-    startTimer( 1000 / 15 ); //15 fps
+    startTimer( 1000 / 10 ); //15 fps
 }
 
 CamVideoProducer::~CamVideoProducer() {

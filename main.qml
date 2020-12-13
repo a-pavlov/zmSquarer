@@ -16,43 +16,43 @@ Window {
         id: videoProducer
         url: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
     }
-/*
-    DesktopVideoProducer {
+
+    CamVideoProducer {
         id: videoProducer2
         url: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=2&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
     }
 
-    DesktopVideoProducer {
+    CamVideoProducer {
         id: videoProducer3
         url: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=3&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
     }
 
-    DesktopVideoProducer {
+    CamVideoProducer {
         id: videoProducer7
         url: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=7&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
     }
 
-    DesktopVideoProducer {
+    CamVideoProducer {
         id: videoProducer8
         url: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=8&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
     }
 
-    DesktopVideoProducer {
+    CamVideoProducer {
         id: videoProducer9
         url: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=9&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
     }
 
 
-    DesktopVideoProducer {
+    CamVideoProducer {
         id: videoProducer22
         url: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=22&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
     }
 
-    DesktopVideoProducer {
+    CamVideoProducer {
         id: videoProducer23
         url: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=23&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
     }
-*/
+
 
     /*MediaPlayer {
         id: mp        
@@ -68,14 +68,15 @@ Window {
 
         VideoOutput {
             id: output1
-            anchors.fill: parent
+            //anchors.fill: parent
             //anchors.left: parent
+            anchors.left: parent
             width: parent.width/3
             height:parent.height/3
             source: videoProducer
         }
 
-/*
+
         VideoOutput {
             id: output2
             anchors.top: output1.top
@@ -93,6 +94,7 @@ Window {
             height:parent.height/3
             source: videoProducer3
         }
+
 
         VideoOutput {
             id: output7
@@ -137,6 +139,6 @@ Window {
             width: parent.width/3
             height:parent.height/3
             source: videoProducer23
-        }*/
+        }
     //}
 }
