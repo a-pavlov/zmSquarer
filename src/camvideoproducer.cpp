@@ -99,7 +99,6 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
     //    qDebug() << "write " << bytes;
     //}
 
-#ifdef Q_OS_WIN
     int width, height, jpegSubsamp, jpegColorspace;
     TJPF pf = TJPF_BGRX;
 
@@ -137,9 +136,8 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         qDebug() << "unable to decompress header " << err;
     }
 
-#else
 
-    //qDebug() << "image size " << length;
+    /*
     qDebug() << "incoming size " << ptr->getContentLength() - ptr->getSoiPos();
     QImage screenImage; //("/home/inkpot/dev/" + frames.at(currentFrame++ % frames.size()));
 
@@ -162,6 +160,6 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         //передадим полученный кадр на отрисовку
         _surface->present( QVideoFrame( screenImage ) );
     }
-#endif
+*/
 
 }

@@ -18,6 +18,10 @@ win32 {
     include(winconf.pri)
 }
 
+unix:!macx {
+  include(unixconf.pri)
+}
+
 #include(src/motion/motion.pri)
 include(src/http_parser/http_parser.pri)
 include(src/src.pri)
