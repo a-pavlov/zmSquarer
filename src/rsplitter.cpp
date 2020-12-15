@@ -8,7 +8,8 @@ RSplitter::RSplitter(const std::string& p, QObject *parent) :
     , currentRBuf(0)
     , outputRBuf(2)
     , latestRBuf(-1)
-    , frameCounter(0) {
+    , frameCounter(0)
+    , lastBufferSize(-1) {
     rbuffers.append(QSharedPointer<RBuffer>(new RBuffer()));
     rbuffers.append(QSharedPointer<RBuffer>(new RBuffer()));
     rbuffers.append(QSharedPointer<RBuffer>(new RBuffer()));
@@ -36,7 +37,7 @@ void RSplitter::processCB(QSharedPointer<RBuffer> prbuf) {
     size_t remaining = prbuf->getUnmarkedSize();
 
     while(remaining > 0) {
-        int ppos = prbuf->findCharacter(pattern[0]);
+        int ppos = (lastBufferSize != -1 && (prbuf->getUsed() < (lastBufferSize*9/10)))?-1:prbuf->findCharacter(pattern[0]);
 
         //qDebug() <<  "remaining " << remaining << " pattern starting position " << ppos;
 
@@ -62,6 +63,7 @@ void RSplitter::processCB(QSharedPointer<RBuffer> prbuf) {
                 prbuf->setContentLength(static_cast<size_t>(patternFirstMatchPos));
                 prbuf->setFrameIndex(++frameCounter);
                 prbuf->calculateSoiPosition();
+                lastBufferSize = prbuf->getContentLength();
                 QTime currentTime = QTime::currentTime();
 
                 //qDebug() << "frame " << frameCounter << " content length " << prbuf->getContentLength() << " timeout msec: " << frameTime.msecsTo(currentTime);

@@ -53,6 +53,7 @@ private:
     QTime frameTime;
     QTime outputTime;
     QList<int> timeouts;
+    int lastBufferSize;
 signals:
 
 public slots:
