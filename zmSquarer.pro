@@ -14,6 +14,10 @@ QMAKE_CXXFLAGS += -Dsysconfdir=\"xxx\"
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
+win32 {
+    include(winconf.pri)
+}
+
 #include(src/motion/motion.pri)
 include(src/http_parser/http_parser.pri)
 include(src/src.pri)

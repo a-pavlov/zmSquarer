@@ -27,7 +27,7 @@ RSplitter::~RSplitter() {
 
 void RSplitter::read(char* data, size_t size) {
     qDebug() << Q_FUNC_INFO << " size " << size;
-    if (size <= 0) return;    
+    if (size <= 0) return;
     QSharedPointer<RBuffer> prbuf = rbuffers[currentRBuf];
     prbuf->append(data, size);
     processCB(prbuf);
@@ -78,6 +78,7 @@ void RSplitter::processCB(QSharedPointer<RBuffer> prbuf) {
                 int accum = latestRBuf!=-1?latestRBuf:1;
                 latestRBuf = currentRBuf;
                 currentRBuf = accum;
+                //qDebug() << "latest " << latestRBuf << " current " << currentRBuf;
                 switchBufferMutex.unlock();
                 prbuf = rbuffers[currentRBuf];
                 prbuf->clear();
@@ -124,6 +125,7 @@ QSharedPointer<RBuffer> RSplitter::getOutputBuffer() {
     int buf = latestRBuf;
     latestRBuf = outputRBuf;
     outputRBuf = buf;
+    //qDebug() << "output rbuff " << outputRBuf;
     Q_ASSERT(outputRBuf != -1);
     return rbuffers[outputRBuf];
 }

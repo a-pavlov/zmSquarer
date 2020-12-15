@@ -4,6 +4,11 @@
 #include <QAbstractVideoSurface>
 #include <QVideoSurfaceFormat>
 
+
+extern "C" {
+#include <turbojpeg.h>
+}
+
 class NetCam;
 
 class CamVideoProducer : public QObject {
@@ -35,6 +40,9 @@ private:
     QStringList frames;
     std::string urlCurrent;
     NetCam* netCam;
+    std::vector<unsigned char> buffer;
+    int counter;
+    tjhandle _jpegDecompressor;
 signals:
     void urlChanged();
 };

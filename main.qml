@@ -55,7 +55,7 @@ Window {
 
 
     /*MediaPlayer {
-        id: mp        
+        id: mp
         //source: "/home/inkpot/Downloads/BigBuckBunny_512kb.mp4"
         source: "http://192.168.100.12/zm/cgi-bin/nph-zms?mode=jpeg&monitor=1&scale=100&maxfps=30&buffer=1000&user=admin&pass=root"
         autoPlay: true
@@ -75,7 +75,6 @@ Window {
             height:parent.height/3
             source: videoProducer
         }
-
 
         VideoOutput {
             id: output2

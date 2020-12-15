@@ -14,6 +14,9 @@
 #include "netcam2.h"
 
 
+#include <stdio.h>
+
+
 void CamVideoProducer::registerQmlType() {
     qmlRegisterType<CamVideoProducer>(
         "CamVideoProducer", 0, 1, "CamVideoProducer" );
@@ -22,10 +25,13 @@ void CamVideoProducer::registerQmlType() {
 CamVideoProducer::CamVideoProducer(QObject *parent )
     : QObject( parent ), _surface( 0 ), netCam(nullptr) {
     startTimer( 1000 / 10 ); //15 fps
+    counter = 0;
+    _jpegDecompressor = tjInitDecompress();
 }
 
 CamVideoProducer::~CamVideoProducer() {
     closeSurface();
+    tjDestroy(_jpegDecompressor);
 }
 
 QAbstractVideoSurface* CamVideoProducer::videoSurface() const {
@@ -80,69 +86,82 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         return;
     }
 
-    //Получим screenshot и преобразуем в формат подходящий для QVideoFrame
-    //QPixmap screenPixmap = screen->grabWindow( desktop->screen()->winId() );
-    //QImage screenImage("/home/inkpot/dev/QmlVideoProducer/test.jpg");//screenPixmap.toImage();
-    //qDebug() << frames.at(currentFrame++ % frames.size());
-
+    if (ptr->getContentLength() < 100) {
+        return;
+    }
 
     unsigned char* data = (unsigned char*)ptr->getPtr();
-    /*int length = ptr->getContentLength();
-    char *ptr_buffer;
 
-    ptr_buffer = (char*)memmem(ptr->getPtr(), ptr->getContentLength(), "\xff\xd8", 2);
+    //FILE* f = fopen(QString("c:\\dev\\img\\file_%1.jpg").arg(++counter).toStdString().c_str(), "wb+");
+    //if (f != nullptr) {
+    //    int bytes  = fwrite(ptr->getPtr() + ptr->getSoiPos(), ptr->getContentLength() - ptr->getSoiPos(), 1, f);
+    //    fclose(f);
+    //    qDebug() << "write " << bytes;
+    //}
 
-    if (ptr_buffer != NULL) {
-        size_t soi_position = 0;
+#ifdef Q_OS_WIN
+    int width, height, jpegSubsamp, jpegColorspace;
+    TJPF pf = TJPF_BGRX;
 
-        soi_position = ptr_buffer - ptr->getPtr();
-
-        if (soi_position > 0) {
-            data = (unsigned char*)ptr->getPtr() + soi_position;
-            length -= soi_position;
-            //qDebug() << "correction to " << soi_position;
-
-            //memmove(netcam->receiving->ptr, netcam->receiving->ptr + soi_position,
-            //        netcam->receiving->used - soi_position);
-            //netcam->receiving->used -= soi_position;
+    if (tjDecompressHeader3(_jpegDecompressor, data + ptr->getSoiPos(), ptr->getContentLength() - ptr->getSoiPos(), &width, &height, &jpegSubsamp, &jpegColorspace) == 0) {
+        if (buffer.empty()) {
+            buffer.resize(width * height * tjPixelSize[pf]);
+            //qDebug() << "resize img buffer to " << width * height * tjPixelSize[TJPF_RGBX];
+        } else {
+            //qDebug() << "buffer size is ok";
         }
 
-        // if (debug_level > CAMERA_INFO)
-        //    motion_log(LOG_INFO, 0, "SOI found , position %d",
-        //               __FUNCTION__, soi_position);
-    }
-    */
+        if (tjDecompress2(_jpegDecompressor,data + ptr->getSoiPos(), ptr->getContentLength() - ptr->getSoiPos(), &buffer[0], width, 0/*pitch*/, height, pf, TJFLAG_FASTDCT | TJFLAG_NOREALLOC) == 0) {
+           QImage screenImage(&buffer[0], width, height, tjPixelSize[pf]*width, QImage::Format_RGB32);
+           QVideoFrame::PixelFormat pixelFormat = QVideoFrame::pixelFormatFromImageFormat( screenImage.format() );
 
+           //если формат кадра по какой-то причине поменялся (или это первый кадр)-
+           //выполним повторную (первичную) инициализацию surface
+           if( screenImage.size() != _format.frameSize() ||
+               pixelFormat != _format.pixelFormat() )
+           {
+               closeSurface();
+               _format =
+                   QVideoSurfaceFormat( screenImage.size(),
+                                        pixelFormat );
+               _surface->start( _format );
+           }
+
+           //передадим полученный кадр на отрисовку
+           _surface->present( QVideoFrame( screenImage ) );
+        } else {
+            qDebug() << "unable to decompress image";
+        }
+    } else {
+        int err = tjGetErrorCode(_jpegDecompressor);
+        qDebug() << "unable to decompress header " << err;
+    }
+
+#else
 
     //qDebug() << "image size " << length;
+    qDebug() << "incoming size " << ptr->getContentLength() - ptr->getSoiPos();
     QImage screenImage; //("/home/inkpot/dev/" + frames.at(currentFrame++ % frames.size()));
+
     bool res = screenImage.loadFromData(data + ptr->getSoiPos(), ptr->getContentLength() - ptr->getSoiPos(), "JPG");
-
-
     if (res) {
-        //qDebug() << "image loaded";
-    } else {
-        qDebug() << "error on image loading";
-    }
+        QVideoFrame::PixelFormat pixelFormat = QVideoFrame::pixelFormatFromImageFormat( screenImage.format() );
 
-    if (screenImage.isNull()) {
-        qDebug() << "null";
-    }
-    QVideoFrame::PixelFormat pixelFormat =
-        QVideoFrame::pixelFormatFromImageFormat( screenImage.format() );
+        //если формат кадра по какой-то причине поменялся (или это первый кадр)-
+        //выполним повторную (первичную) инициализацию surface
+        if( screenImage.size() != _format.frameSize() ||
+            pixelFormat != _format.pixelFormat() )
+        {
+            closeSurface();
+            _format =
+                QVideoSurfaceFormat( screenImage.size(),
+                                     pixelFormat );
+            _surface->start( _format );
+        }
 
-    //если формат кадра по какой-то причине поменялся (или это первый кадр)-
-    //выполним повторную (первичную) инициализацию surface
-    if( screenImage.size() != _format.frameSize() ||
-        pixelFormat != _format.pixelFormat() )
-    {
-        closeSurface();
-        _format =
-            QVideoSurfaceFormat( screenImage.size(),
-                                 pixelFormat );
-        _surface->start( _format );
+        //передадим полученный кадр на отрисовку
+        _surface->present( QVideoFrame( screenImage ) );
     }
+#endif
 
-    //передадим полученный кадр на отрисовку
-    _surface->present( QVideoFrame( screenImage ) );
 }
