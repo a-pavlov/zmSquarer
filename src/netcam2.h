@@ -21,11 +21,11 @@ private:
       static int url_callback(http_parser* p, const char* c, unsigned long len);
       static int header_field_callback(http_parser* p, const char* c, unsigned long len);
       static int header_value_callback(http_parser* p, const char* c, unsigned long len);
-      static int headers_complete(http_parser* p);      
+      static int headers_complete(http_parser* p);
       QTcpSocket* socket;
       QUrl url;
       size_t headersEndOffset;
-      quint64 headerBytesRead;
+      size_t headerBytesRead;
       std::vector<char> headersBuffer;
       QStringList hdrKeys;
       QStringList hdrValues;

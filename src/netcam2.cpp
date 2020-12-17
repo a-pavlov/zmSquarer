@@ -83,16 +83,14 @@ void NetCam::start(const QString& str) {
 
         while(bytesAvailable > 0) {
             if (headerBytesRead < headersBuffer.size()) {
-                qint64 bytesToRead = qMin(static_cast<quint64>(bytesAvailable), headersBuffer.size() - headerBytesRead);
-                qDebug() << "bytes to read " << bytesToRead;
-                // read to headers
-                qint64 readBytes = socket->read(&headersBuffer[0] + headerBytesRead, bytesToRead);
-                qDebug() << "read bytes " << readBytes;
+                size_t bytesToRead = qMin(static_cast<size_t>(bytesAvailable), headersBuffer.size() - headerBytesRead);
+                qint64 readBytes = socket->read(&headersBuffer[0] + headerBytesRead, static_cast<qint64>(bytesToRead));
+
                 if (readBytes == -1) {
                     // error
                 }
 
-                headerBytesRead += readBytes;
+                headerBytesRead += static_cast<size_t>(readBytes);
                 bytesAvailable -= readBytes;
 
                 if (headerBytesRead == headersBuffer.size()) {
@@ -128,9 +126,9 @@ void NetCam::start(const QString& str) {
             } else {
                 QSharedPointer<RBuffer> buf = this->rsp.getCurrentRBuffer();
                 Q_ASSERT(!buf.isNull());
-                char* ptr = buf->checkBufferSize(bytesAvailable);
+                char* ptr = buf->checkBufferSize(static_cast<size_t>(bytesAvailable));
                 socket->read(ptr, bytesAvailable);
-                buf->expandUsed(bytesAvailable);
+                buf->expandUsed(static_cast<size_t>(bytesAvailable));
                 rsp.processCB(buf);
                 bytesAvailable = 0;
             }

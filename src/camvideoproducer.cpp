@@ -82,7 +82,6 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         return;
     }
 
-
     QSharedPointer<RBuffer> ptr = netCam->splitter().getOutputBuffer();
 
     // check we have the new buffer
@@ -90,7 +89,9 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         return;
     }
 
-    unsigned char* data = (unsigned char*)ptr->getPtr();
+    Q_ASSERT(ptr->getContentLength() > ptr->getSoiPos());
+    const unsigned char* data = reinterpret_cast<const unsigned char*>(ptr->getPtr() + ptr->getSoiPos());
+    const unsigned long length = static_cast<unsigned long>(ptr->getContentLength() - ptr->getSoiPos());
 
     //FILE* f = fopen(QString("c:\\dev\\img\\file_%1.jpg").arg(++counter).toStdString().c_str(), "wb+");
     //if (f != nullptr) {
@@ -100,18 +101,19 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
     //}
 #ifdef WITH_TURBOJPEG
     int width, height, jpegSubsamp, jpegColorspace;
-    TJPF pf = TJPF_BGRX;
+    const TJPF pf = TJPF_BGRX;
 
-    if (tjDecompressHeader3(_jpegDecompressor, data + ptr->getSoiPos()
-                            , static_cast<unsigned long>(ptr->getContentLength() - ptr->getSoiPos())
+    if (tjDecompressHeader3(_jpegDecompressor
+                            , data
+                            , length
                             , &width
                             , &height
                             , &jpegSubsamp
                             , &jpegColorspace) == 0) {
         buffer.resize(static_cast<size_t>(width * height * tjPixelSize[pf]));
         if (tjDecompress2(_jpegDecompressor
-                          , data + ptr->getSoiPos()
-                          , static_cast<unsigned long>(ptr->getContentLength() - ptr->getSoiPos())
+                          , data
+                          , length
                           , &buffer[0]
                           , width
                           , 0/*pitch*/
