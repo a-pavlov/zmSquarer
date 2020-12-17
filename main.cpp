@@ -6,7 +6,7 @@
 
 
 int main(int argc, char *argv[]) {
-    CamVideoProducer::registerQmlType();    
+    CamVideoProducer::registerQmlType();
     ZMSQApplication app(argc, argv);
     qDebug() << "app thread id " << app.thread()->currentThreadId();
     QQmlApplicationEngine engine;

@@ -26,12 +26,16 @@ CamVideoProducer::CamVideoProducer(QObject *parent )
     : QObject( parent ), _surface( 0 ), netCam(nullptr) {
     startTimer( 1000 / 10 ); //15 fps
     counter = 0;
+#ifdef WITH_TURBOJPEG
     _jpegDecompressor = tjInitDecompress();
+#endif
 }
 
 CamVideoProducer::~CamVideoProducer() {
     closeSurface();
+#ifdef WITH_TURBOJPEG
     tjDestroy(_jpegDecompressor);
+#endif
 }
 
 QAbstractVideoSurface* CamVideoProducer::videoSurface() const {
@@ -81,12 +85,8 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
 
     QSharedPointer<RBuffer> ptr = netCam->splitter().getOutputBuffer();
 
+    // check we have the new buffer
     if (ptr.isNull()) {
-        qDebug() << "output buffer is null, no the new frame is available";
-        return;
-    }
-
-    if (ptr->getContentLength() < 100) {
         return;
     }
 
@@ -98,27 +98,31 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
     //    fclose(f);
     //    qDebug() << "write " << bytes;
     //}
-
+#ifdef WITH_TURBOJPEG
     int width, height, jpegSubsamp, jpegColorspace;
     TJPF pf = TJPF_BGRX;
 
-    if (tjDecompressHeader3(_jpegDecompressor, data + ptr->getSoiPos(), ptr->getContentLength() - ptr->getSoiPos(), &width, &height, &jpegSubsamp, &jpegColorspace) == 0) {
-        if (buffer.empty()) {
-            buffer.resize(width * height * tjPixelSize[pf]);
-            //qDebug() << "resize img buffer to " << width * height * tjPixelSize[TJPF_RGBX];
-        } else {
-            //qDebug() << "buffer size is ok";
-        }
-
-        if (tjDecompress2(_jpegDecompressor,data + ptr->getSoiPos(), ptr->getContentLength() - ptr->getSoiPos(), &buffer[0], width, 0/*pitch*/, height, pf, TJFLAG_FASTDCT | TJFLAG_NOREALLOC) == 0) {
+    if (tjDecompressHeader3(_jpegDecompressor, data + ptr->getSoiPos()
+                            , static_cast<unsigned long>(ptr->getContentLength() - ptr->getSoiPos())
+                            , &width
+                            , &height
+                            , &jpegSubsamp
+                            , &jpegColorspace) == 0) {
+        buffer.resize(static_cast<size_t>(width * height * tjPixelSize[pf]));
+        if (tjDecompress2(_jpegDecompressor
+                          , data + ptr->getSoiPos()
+                          , static_cast<unsigned long>(ptr->getContentLength() - ptr->getSoiPos())
+                          , &buffer[0]
+                          , width
+                          , 0/*pitch*/
+                          , height
+                          , pf
+                          , TJFLAG_FASTDCT | TJFLAG_NOREALLOC) == 0) {
            QImage screenImage(&buffer[0], width, height, tjPixelSize[pf]*width, QImage::Format_RGB32);
            QVideoFrame::PixelFormat pixelFormat = QVideoFrame::pixelFormatFromImageFormat( screenImage.format() );
 
-           //если формат кадра по какой-то причине поменялся (или это первый кадр)-
-           //выполним повторную (первичную) инициализацию surface
            if( screenImage.size() != _format.frameSize() ||
-               pixelFormat != _format.pixelFormat() )
-           {
+               pixelFormat != _format.pixelFormat() ) {
                closeSurface();
                _format =
                    QVideoSurfaceFormat( screenImage.size(),
@@ -126,7 +130,6 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
                _surface->start( _format );
            }
 
-           //передадим полученный кадр на отрисовку
            _surface->present( QVideoFrame( screenImage ) );
         } else {
             qDebug() << "unable to decompress image";
@@ -135,9 +138,9 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         int err = tjGetErrorCode(_jpegDecompressor);
         qDebug() << "unable to decompress header " << err;
     }
+#else
 
 
-    /*
     qDebug() << "incoming size " << ptr->getContentLength() - ptr->getSoiPos();
     QImage screenImage; //("/home/inkpot/dev/" + frames.at(currentFrame++ % frames.size()));
 
@@ -160,6 +163,5 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         //передадим полученный кадр на отрисовку
         _surface->present( QVideoFrame( screenImage ) );
     }
-*/
-
+#endif
 }

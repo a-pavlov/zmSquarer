@@ -4,10 +4,11 @@
 #include <QAbstractVideoSurface>
 #include <QVideoSurfaceFormat>
 
-
+#ifdef WITH_TURBOJPEG
 extern "C" {
-#include <turbojpeg.h>
+    #include <turbojpeg.h>
 }
+#endif
 
 class NetCam;
 
@@ -42,7 +43,9 @@ private:
     NetCam* netCam;
     std::vector<unsigned char> buffer;
     int counter;
+#ifdef WITH_TURBOJPEG
     tjhandle _jpegDecompressor;
+#endif
 signals:
     void urlChanged();
 };
