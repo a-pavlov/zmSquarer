@@ -4,6 +4,8 @@
 #include <QApplication>
 #include "camcontroller.h"
 
+class QNetworkAccessManager;
+
 class ZMSQApplication : public QApplication {
     Q_OBJECT
     Q_DISABLE_COPY(ZMSQApplication)
@@ -16,8 +18,13 @@ public:
    CamController& getCamController() {
        return camCtrl;
    }
+
+   QNetworkAccessManager* getNetMan() {
+       return netman;
+   }
 private:
    CamController camCtrl;
+   QNetworkAccessManager* netman;
 private slots:
    void cleanup();
 };
