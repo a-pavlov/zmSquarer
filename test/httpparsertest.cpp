@@ -50,9 +50,9 @@ void HttpParserTest::test() {
     http_parser_init(&parser, HTTP_RESPONSE); /* initialise parser */
     http_parser_settings settings;
     http_parser_settings_init(&settings);
-    settings.on_url = my_url_callback;
-    settings.on_header_field = my_header_field_callback;
-    settings.on_header_value = my_header_value_callback;
+    settings.on_url = (http_data_cb)my_url_callback;
+    settings.on_header_field = (http_data_cb)my_header_field_callback;
+    settings.on_header_value = (http_data_cb)my_header_value_callback;
     settings.on_headers_complete = my_headers_complete;
 
     size_t nparsed = http_parser_execute(&parser, &settings, buf, strlen(buf));

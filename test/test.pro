@@ -4,7 +4,9 @@ SOURCES = main.cpp \
     test.cpp \
     ../src/rbuffer.cpp \
     ../src/rsplitter.cpp \
-    httpparsertest.cpp
+    ../src/zmdata.cpp \
+    httpparsertest.cpp \
+    zmclienttest.cpp
 
 INCLUDEPATH += ../src
 
@@ -15,4 +17,9 @@ HEADERS += \
     test.h \
     ../src/rbuffer.h \
     ../src/rsplitter.h \
-    httpparsertest.h
+    ../src/zmdata.h \
+    httpparsertest.h \
+    zmclienttest.h
+
+RESOURCES += \
+    res.qrc

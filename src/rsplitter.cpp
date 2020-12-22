@@ -2,9 +2,8 @@
 #include <algorithm>
 #include  <QDebug>
 
-RSplitter::RSplitter(const std::string& p, QObject *parent) :
+RSplitter::RSplitter(QObject *parent) :
     QObject(parent)
-    , pattern(p.begin(), p.end())
     , currentRBuf(0)
     , outputRBuf(2)
     , latestRBuf(-1)

@@ -62,9 +62,10 @@ void Test::testRBufferMemStep() {
 }
 
 void Test::testRSplitterTrivial() {
-    RSplitter rsplitter(std::string("test"));
+    RSplitter rsplitter;
+    rsplitter.setPattern(QString("test"));
     RBuffer::RBUF_MEM_STEP = RBuffer::NETCAM_RBUFFSIZE;
-    QCOMPARE(std::string("test"), std::string(rsplitter.getPattern()));
+    QCOMPARE(QString("test"), QString(std::string(rsplitter.getPattern().begin(), rsplitter.getPattern().end()).c_str()));
     char data[] = "xxxxxxxxx";
     rsplitter.read(data, strlen(data));
     QSharedPointer<RBuffer> crb = rsplitter.getCurrentRBuffer();
@@ -78,7 +79,8 @@ void Test::testRSplitterTrivial() {
 }
 
 void Test::testRPSplitterNoMatchPartial() {
-    RSplitter rsplitter(std::string("[ZM]"));
+    RSplitter rsplitter;
+    rsplitter.setPattern(QString("[ZM]"));
     RBuffer::RBUF_MEM_STEP = RBuffer::NETCAM_RBUFFSIZE;
     char data[] = "some information here [ZMI]";
     rsplitter.read(data, strlen(data));
@@ -88,7 +90,8 @@ void Test::testRPSplitterNoMatchPartial() {
 }
 
 void Test::testRSplitterMatchNotEnoughBufferNotMatchNext() {
-    RSplitter rsplitter(std::string("[ZM]"));
+    RSplitter rsplitter;
+    rsplitter.setPattern(QString("[ZM]"));
     RBuffer::RBUF_MEM_STEP = RBuffer::NETCAM_RBUFFSIZE;
     char data[] = "some information here [ZM";
     rsplitter.read(data, strlen(data));
@@ -103,7 +106,8 @@ void Test::testRSplitterMatchNotEnoughBufferNotMatchNext() {
 }
 
 void Test::testRSplitterWholeMatchTrivial() {
-    RSplitter rsplitter(std::string("[ZM]"));
+    RSplitter rsplitter;
+    rsplitter.setPattern(QString("[ZM]"));
     RBuffer::RBUF_MEM_STEP = RBuffer::NETCAM_RBUFFSIZE;
     char data[] = "info[ZM]";
     QVERIFY(rsplitter.getLatestRBuffer().isNull());
@@ -119,7 +123,8 @@ void Test::testRSplitterWholeMatchTrivial() {
 }
 
 void Test::testRSplitterMultiplePatternMatches() {
-    RSplitter rsplitter(std::string("[ZM]"));
+    RSplitter rsplitter;
+    rsplitter.setPattern(QString("[ZM]"));
     RBuffer::RBUF_MEM_STEP = RBuffer::NETCAM_RBUFFSIZE;
     char data[] = "info_1[ZM]info_2[ZM]info_3[ZM]info_4_bf";
     rsplitter.read(data, strlen(data));
@@ -134,7 +139,8 @@ void Test::testRSplitterMultiplePatternMatches() {
 }
 
 void Test::testRSplitterMatchBetweenBuffers() {
-    RSplitter rsplitter(std::string("[ZM]"));
+    RSplitter rsplitter;
+    rsplitter.setPattern(QString("[ZM]"));
     RBuffer::RBUF_MEM_STEP = RBuffer::NETCAM_RBUFFSIZE;
     char data1[] = "info_1[";
     char data2[] = "ZM]XXXX";
@@ -151,7 +157,7 @@ void Test::testRSplitterMatchBetweenBuffers() {
 }
 
 void Test::testRSplitterMatchNewIface() {
-    RSplitter rsplitter(std::string(""));
+    RSplitter rsplitter;
     RBuffer::RBUF_MEM_STEP = 10;
     rsplitter.setPattern("[ZM]");
     char data1[] = "quite long data buffer[ZM]test data remain";

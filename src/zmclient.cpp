@@ -40,7 +40,7 @@ QString ZMClient::getMonitors(const QString &url) {
         reply->ignoreSslErrors(errors);
     });
 
-    QObject::connect(reply, &QNetworkReply::finished, [reply,this]() {
+    QObject::connect(reply, &QNetworkReply::finished, [reply]() {
         //ZMAPIRequest* originator = dynamic_cast<ZMAPIRequest*>(reply->request().originatingObject());
         //Q_ASSERT(originator != nullptr);
         QByteArray buffer = reply->readAll();

@@ -2,8 +2,7 @@ TEMPLATE = app
 
 QT += qml quick multimedia widgets network
 
-SOURCES += main.cpp \
-    zmclient.cpp
+SOURCES += main.cpp
 
 RESOURCES += qml.qrc \
     image.qrc
@@ -27,5 +26,4 @@ unix:!macx {
 include(src/http_parser/http_parser.pri)
 include(src/src.pri)
 
-HEADERS += \
-    zmclient.h
+HEADERS +=

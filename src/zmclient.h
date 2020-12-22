@@ -2,6 +2,7 @@
 #define ZMCLIENT_H
 
 #include <QObject>
+#include "zmdata.h"
 
 
 /**
@@ -26,6 +27,7 @@ public:
     Q_INVOKABLE QString getMonitors(const QString& url);
 
 signals:
+    void monitors(const QList<ZMMonitor>);
 
 public slots:
 };

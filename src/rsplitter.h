@@ -12,17 +12,16 @@
 
 #include "rbuffer.h"
 
-class RSplitter : public QObject
-{
+class RSplitter : public QObject {
     Q_OBJECT
 public:
     typedef std::vector<char>::size_type size_type;
-    explicit RSplitter(const std::string& pattern, QObject *parent = nullptr);    
+    explicit RSplitter(QObject *parent = nullptr);
     virtual ~RSplitter();
     virtual void read(char* data, size_t size);
     void setPattern(const QString&);
-    const char* getPattern() const {
-        return &pattern[0];
+    const std::vector<char>& getPattern() const {
+        return pattern;
     }
 
     QSharedPointer<RBuffer> getCurrentRBuffer() {

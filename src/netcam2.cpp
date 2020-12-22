@@ -47,8 +47,7 @@ NetCam::NetCam(QObject *parent) : QObject(parent)
     , headerBytesRead(0)
     , headersBuffer(1024)
     , lastHeaderValueOffset(0)
-    , getCLValue(false)
-    , rsp("") {
+    , getCLValue(false) {
 }
 
 NetCam::~NetCam() {

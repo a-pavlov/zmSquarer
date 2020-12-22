@@ -3,10 +3,12 @@
 
 #include "test.h"
 #include "httpparsertest.h"
+#include "zmclienttest.h"
 
 int main(int argc, char *argv[]) {
-    QCoreApplication app(argc, argv);    
+    QCoreApplication app(argc, argv);
     Test test;
     HttpParserTest htest;
-    return QTest::qExec(&test, argc, argv) | QTest::qExec(&htest, argc, argv);
+    ZMClientTest zmctest;
+    return QTest::qExec(&test, argc, argv) | QTest::qExec(&htest, argc, argv) | QTest::qExec(&zmctest, argc, argv);
 }
