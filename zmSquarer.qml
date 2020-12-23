@@ -4,15 +4,23 @@ import QtQuick.Layouts 1.12
 import QtQuick.Window 2.1
 import ZMClient 0.1
 
-
 ApplicationWindow {
     id: wnd
     visible: true
     width: 640
     height: 480
 
+
     ZMClient {
         id: zmc
+        onMonitors: {
+            monmod.clean()
+            monmod.addAll(mons)
+            btnUrl.text = qsTr("Check")
+            btnUrl.enabled = true
+            btnUrl.checkMode = true
+            zmUrlProgress.visible = false
+        }
     }
 
     GroupBox {
@@ -36,25 +44,21 @@ ApplicationWindow {
 
                 Button {
                     id: btnUrl
+                    property bool checkMode: true
                     enabled: zmUrl.text.length > 0
                     text: qsTr("Check")
                     onClicked: {
-                        text = qsTr("Cancel")
-                        zmUrl.enabled = false
-                        zmUrlProgress.visible = true
-                    }
-                }
+                        if (checkMode) {
+                            text = qsTr("Cancel")
+                            zmc.getMonitors(zmUrl.text + "/zm/api/monitors.json")
+                        } else {
+                            text = qsTr("Check")
+                        }
 
-                Button {
-                    id: btnTest
-                    enabled: true
-                    text: qsTr("Test")
-                    onClicked: {
-                        //text = qsTr("Cancel")
-                        //zmUrl.enabled = false
-                        //zmUrlProgress.visible = true
-                        console.log("start test")
-                        zmc.getMonitors("http://192.168.100.12/zm/api/monitors.json")
+                        console.log("check " + checkMode)
+                        zmUrl.enabled = checkMode
+                        zmUrlProgress.visible = checkMode
+                        checkMode = !checkMode
                     }
                 }
             }
@@ -64,6 +68,22 @@ ApplicationWindow {
                 visible: false
                 width: parent.width
                 indeterminate: true
+            }
+
+            Label {
+                id: title
+                text: qsTr("Monitors")
+            }
+
+            ListView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                model: monmod
+
+                delegate: Text {
+                    id: monid
+                    text: id + ": " + name
+                }
             }
         }
     }

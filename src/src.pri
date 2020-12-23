@@ -7,7 +7,8 @@ HEADERS +=  $$PWD/rbuffer.h\
             $$PWD/camvideoproducer.h\
             $$PWD/zmdata.h \
             $$PWD/zmsqapplication.h\
-            $$PWD/zmclient.h
+            $$PWD/zmclient.h\
+            $$PWD/monitor_model.h
 
 SOURCES +=  $$PWD/rbuffer.cpp\
             $$PWD/rsplitter.cpp\
@@ -16,4 +17,5 @@ SOURCES +=  $$PWD/rbuffer.cpp\
             $$PWD/camvideoproducer.cpp\
             $$PWD/zmdata.cpp \
             $$PWD/zmsqapplication.cpp\
-            $$PWD/zmclient.cpp
+            $$PWD/zmclient.cpp\
+            $$PWD/monitor_model.cpp

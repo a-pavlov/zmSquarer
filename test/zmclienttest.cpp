@@ -21,6 +21,6 @@ void ZMClientTest::testMonitors() {
     QCOMPARE(monitors[0].function, "Monitor");
     QCOMPARE(monitors[0].host, "http://192.168.100.6:8899/onvif/device_service");
     QCOMPARE(monitors[0].path, "rtsp://admin:admin@192.168.100.6:554/user=admin_password=6QNMIQGe_channel=1_stream=0.sdp?real_stream");
-    QCOMPARE(monitors[0].width, 1920);
-    QCOMPARE(monitors[0].height, 1080);
+    QCOMPARE(monitors[0].size.width(), 1920);
+    QCOMPARE(monitors[0].size.height(), 1080);
 }

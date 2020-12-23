@@ -22,12 +22,13 @@ public:
 class ZMClient : public QObject {
     Q_OBJECT
 public:
+    static void registerMetaType();
     static void registerQmlType();
     explicit ZMClient(QObject *parent = nullptr);
     Q_INVOKABLE QString getMonitors(const QString& url);
 
 signals:
-    void monitors(const QList<ZMMonitor>);
+    void monitors(const QList<ZMMonitor>& mons);
 
 public slots:
 };

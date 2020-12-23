@@ -28,7 +28,22 @@ ZMMonitor ZMMonitor::fromJson(const QJsonObject& doc) {
     res.function = doc.value("Function").toString();
     res.host = doc.value("Host").toString();
     res.path = doc.value("Path").toString();
-    res.width = doc.value("Width").toString().toInt();
-    res.height = doc.value("Height").toString().toInt();
+    res.size = QSize(doc.value("Width").toString().toInt(), doc.value("Height").toString().toInt());
     return res;
 }
+
+ZMMonitor::ZMMonitor() {
+
+}
+
+ZMMonitor::ZMMonitor(const ZMMonitor& zmmon) {
+    id = zmmon.id;
+    name = zmmon.name;
+    function = zmmon.function;
+    host = zmmon.host;
+    path = zmmon.path;
+    name = zmmon.name;
+    size = zmmon.size;
+}
+
+ZMMonitor::~ZMMonitor(){}

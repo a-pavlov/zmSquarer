@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QJsonDocument>
+#include <QSize>
 
 struct ZMMonitor {
       QString id;
@@ -10,10 +11,14 @@ struct ZMMonitor {
       QString function;
       QString host;
       QString path;
-      qint32 width;
-      qint32 height;
+      QSize size;
+      ZMMonitor();
+      ZMMonitor(const ZMMonitor&);
+      ~ZMMonitor();
       static QList<ZMMonitor> fromJson(const QJsonDocument&);
       static ZMMonitor fromJson(const QJsonObject&);
 };
+
+Q_DECLARE_METATYPE(ZMMonitor);
 
 #endif // ZMDATA_H

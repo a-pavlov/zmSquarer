@@ -9,6 +9,10 @@
 
 ZMAPIRequest::ZMAPIRequest() {}
 
+void ZMClient::registerMetaType() {
+    qRegisterMetaType<QList<ZMMonitor> >("<QList<ZMMonitor>>");
+}
+
 void ZMClient::registerQmlType() {
     qmlRegisterType<ZMClient>(
         "ZMClient", 0, 1, "ZMClient" );
@@ -40,11 +44,13 @@ QString ZMClient::getMonitors(const QString &url) {
         reply->ignoreSslErrors(errors);
     });
 
-    QObject::connect(reply, &QNetworkReply::finished, [reply]() {
+    QObject::connect(reply, &QNetworkReply::finished, [reply, this]() {
         //ZMAPIRequest* originator = dynamic_cast<ZMAPIRequest*>(reply->request().originatingObject());
         //Q_ASSERT(originator != nullptr);
         QByteArray buffer = reply->readAll();
-        qDebug() << buffer.size();
+        QList<ZMMonitor> mons = ZMMonitor::fromJson(QJsonDocument::fromJson(buffer));
+        qDebug() << "monitors " << mons.size() << " data size bytes " << buffer.size();
+        emit monitors(mons);
         reply->deleteLater();
     });
 
