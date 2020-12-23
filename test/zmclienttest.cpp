@@ -16,4 +16,11 @@ void ZMClientTest::testMonitors() {
     file.close();
     QList<ZMMonitor> monitors = ZMMonitor::fromJson(doc);
     QCOMPARE(monitors.size(), 15);
+    QCOMPARE(monitors[0].id, "1");
+    QCOMPARE(monitors[0].name, "Front");
+    QCOMPARE(monitors[0].function, "Monitor");
+    QCOMPARE(monitors[0].host, "http://192.168.100.6:8899/onvif/device_service");
+    QCOMPARE(monitors[0].path, "rtsp://admin:admin@192.168.100.6:554/user=admin_password=6QNMIQGe_channel=1_stream=0.sdp?real_stream");
+    QCOMPARE(monitors[0].width, 1920);
+    QCOMPARE(monitors[0].height, 1080);
 }
