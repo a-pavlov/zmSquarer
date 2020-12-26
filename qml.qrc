@@ -1,10 +1,10 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
-        <file>zmSquarer.qml</file>
-        <file>square_1.qml</file>
-        <file>square_2.qml</file>
-        <file>square_3.qml</file>
-        <file>square_4.qml</file>
+        <file alias="main.qml">qml/main.qml</file>
+        <file alias="zmSquarer.qml">qml/zmSquarer.qml</file>
+        <file alias="square_1.qml">qml/square_1.qml</file>
+        <file alias="square_2.qml">qml/square_2.qml</file>
+        <file alias="square_3.qml">qml/square_3.qml</file>
+        <file alias="square_4.qml">qml/square_4.qml</file>
     </qresource>
 </RCC>

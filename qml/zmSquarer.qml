@@ -91,8 +91,6 @@ ApplicationWindow {
                     onTextChanged: {
                         zmc.setUrl(text)
                     }
-
-
                 }
 
                 Button {
