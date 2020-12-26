@@ -6,5 +6,10 @@
         <file alias="square_2.qml">qml/square_2.qml</file>
         <file alias="square_3.qml">qml/square_3.qml</file>
         <file alias="square_4.qml">qml/square_4.qml</file>
+        <file alias="square_5.qml">qml/square_5.qml</file>
+        <file alias="square_6.qml">qml/square_6.qml</file>
+        <file alias="square_7.qml">qml/square_7.qml</file>
+        <file alias="square_8.qml">qml/square_8.qml</file>
+        <file alias="square_9.qml">qml/square_9.qml</file>
     </qresource>
 </RCC>
