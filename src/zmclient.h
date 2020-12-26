@@ -25,12 +25,15 @@ public:
     static void registerMetaType();
     static void registerQmlType();
     explicit ZMClient(QObject *parent = nullptr);
-    Q_INVOKABLE QString getMonitors(const QString& url);
-
+    Q_INVOKABLE void setUrl(const QString& url);
+    Q_INVOKABLE QString getMonitors();
+    Q_INVOKABLE QString getMonitorUrl(int monId) const;
 signals:
     void monitors(const QList<ZMMonitor>& mons);
 
 public slots:
+private:
+    QString url;
 };
 
 #endif // ZMCLIENT_H

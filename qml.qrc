@@ -2,5 +2,9 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>zmSquarer.qml</file>
+        <file>square_1.qml</file>
+        <file>square_2.qml</file>
+        <file>square_3.qml</file>
+        <file>square_4.qml</file>
     </qresource>
 </RCC>

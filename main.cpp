@@ -15,12 +15,13 @@ int main(int argc, char *argv[]) {
 
     ZMClient::registerMetaType();
     ZMClient::registerQmlType();
+    MonitorModel::registerQmlType();
     ZMSQApplication app(argc, argv);
-    MonitorModel monmod;
+    //MonitorModel monmod;
     qDebug() << "app thread id " << app.thread()->currentThreadId();
     QQmlApplicationEngine engine;
     //engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
-    engine.rootContext()->setContextProperty("monmod", &monmod);
+    //engine.rootContext()->setContextProperty("monmod", &monmod);
     engine.load(QUrl(QStringLiteral("qrc:///zmSquarer.qml")));
     return app.exec();
 }

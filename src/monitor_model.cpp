@@ -1,16 +1,23 @@
 #include "monitor_model.h"
 #include <QDebug>
+#include <QtQml/qqml.h>
+
+void MonitorModel::registerQmlType() {
+    qmlRegisterType<MonitorModel>(
+        "MonitorModel", 0, 1, "MonitorModel" );
+}
 
 MonitorModel::MonitorModel(QObject* parent)
     : QAbstractListModel(parent) {}
 
 QHash<int, QByteArray> MonitorModel::roleNames() const {
     QHash<int, QByteArray> roles;
-    roles[IdRole]    = "id";
+    roles[IdRole]       = "mid";
     roles[NameRole]     = "name";
     roles[HostRole]     = "host";
-    roles[PathRole] = "path";
-    roles[SizeRole] = "size";
+    roles[PathRole]     = "path";
+    roles[SizeRole]     = "size";
+    roles[CheckedRole]  = "selected";
     return roles;
 }
 
@@ -21,6 +28,7 @@ int MonitorModel::rowCount(const QModelIndex&) const {
 QVariant MonitorModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid()) return QVariant();
     Q_ASSERT(index.row() < monitors.size());
+    Q_ASSERT(monitors.size() == checked.size());
     const ZMMonitor& mon = monitors.at(index.row());
     switch(role) {
         case Qt::DisplayRole: return mon.name;
@@ -28,7 +36,8 @@ QVariant MonitorModel::data(const QModelIndex& index, int role) const {
         case NameRole: return mon.name;
         case HostRole: return mon.host;
         case PathRole: return mon.path;
-        case SizeRole: return mon.size;
+        case SizeRole: return QString::number(mon.size.width()) + "x" + QString::number(mon.size.height());
+        case CheckedRole: return checked.at(index.row());
     default:
         break;
     }
@@ -36,6 +45,16 @@ QVariant MonitorModel::data(const QModelIndex& index, int role) const {
     return QVariant();
 }
 
+bool MonitorModel::setData(const QModelIndex& index, const QVariant &value, int role/* = Qt::EditRole*/) {
+    if (index.isValid() && (index.row() >= 0 && index.row() < rowCount() && index.column() >= 0)) {
+        if (role == CheckedRole) {
+            checked[index.row()] = value.toBool();
+            return true;
+        }
+    }
+
+    return false;
+}
 
 QModelIndex MonitorModel::getIndex(const QString& id) const {
     for(int i = 0; i < monitors.size(); ++i) {
@@ -55,7 +74,9 @@ void MonitorModel::add(const ZMMonitor& mon) {
     beginInsertRows(QModelIndex(), monitors.size(), monitors.size());
     qDebug() << "add " << mon.name;
     monitors << mon;
+    while(checked.size() < monitors.size()) checked.append(false);
     endInsertRows();
+    emit dataIncoming(monitors.size());
 }
 
 void MonitorModel::addAll(const QList<ZMMonitor>& monitors) {
@@ -68,6 +89,15 @@ void MonitorModel::onMonitors(const QList<ZMMonitor>& monitors) {
     foreach (const ZMMonitor& mon, monitors) {
         add(mon);
     }
+}
+
+QString MonitorModel::getCheckedMonId(int row) const {
+    Q_ASSERT(row < rowCount());
+    return checked.at(row)?monitors.at(row).id:QString("");
+}
+
+int MonitorModel::getCheckedCount() const {
+    return static_cast<int>(std::count_if(checked.begin(), checked.end(), [](bool i) {return i; }));
 }
 
 /*

@@ -47,6 +47,7 @@ QString CamVideoProducer::url() const {
 }
 
 QString CamVideoProducer::setUrl(const QString& u) {
+    if (u.isEmpty() || u.isNull()) return u;
     ZMSQApplication* app = static_cast<ZMSQApplication*>(QApplication::instance());
     qDebug() << "video producer set url " << u << " thread ";
     netCam = app->getCamController().startCam(u);

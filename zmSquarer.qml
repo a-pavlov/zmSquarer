@@ -3,13 +3,13 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.1
 import ZMClient 0.1
+import MonitorModel 0.1
 
 ApplicationWindow {
     id: wnd
     visible: true
     width: 640
     height: 480
-
 
     ZMClient {
         id: zmc
@@ -23,13 +23,60 @@ ApplicationWindow {
         }
     }
 
+    MonitorModel {
+        id: monmod
+        onDataIncoming: {
+            monsList.visible = mc>0
+            monsTitle.visible = mc>0
+            monsStart.visible = mc>0
+        }
+    }
+
+    ListModel {
+       id: lm
+       ListElement {
+           name: "Bill Smith"
+           mid: "555 3264"
+           selected: false
+           size: "s11"
+       }
+       ListElement {
+           name: "John Brown"
+           mid: "555 8426"
+           selected: false
+           size: "s11"
+       }
+       ListElement {
+           name: "Sam Wise"
+           mid: "555 0473"
+           selected: false
+           size: "s11"
+       }
+       ListElement {
+           name: "Sam Wise"
+           mid: "555 0473"
+           selected: true
+           size: "s11"
+       }
+       ListElement {
+           name: "Sam Wise"
+           mid: "555 0473"
+           selected: true
+           size: "s11"
+       }
+       ListElement {
+           name: "Sam Wise"
+           mid: "555 0473"
+           selected: false
+           size: "s11"
+       }
+   }
+
     GroupBox {
         anchors.centerIn: parent
         title: qsTr("Setup connection")
 
         ColumnLayout {
-            anchors.fill: parent
-
             Label {
                 id: lb
                 text: qsTr("Enter ZM url with scheme")
@@ -40,6 +87,12 @@ ApplicationWindow {
                 TextField {
                     id: zmUrl
                     placeholderText: qsTr("http://")
+                    text: "http://192.168.100.13"
+                    onTextChanged: {
+                        zmc.setUrl(text)
+                    }
+
+
                 }
 
                 Button {
@@ -50,7 +103,7 @@ ApplicationWindow {
                     onClicked: {
                         if (checkMode) {
                             text = qsTr("Cancel")
-                            zmc.getMonitors(zmUrl.text + "/zm/api/monitors.json")
+                            zmc.getMonitors()
                         } else {
                             text = qsTr("Check")
                         }
@@ -71,20 +124,91 @@ ApplicationWindow {
             }
 
             Label {
-                id: title
+                id: monsTitle
+                visible: false
                 text: qsTr("Monitors")
             }
 
-            ListView {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                model: monmod
-
-                delegate: Text {
-                    id: monid
-                    text: id + ": " + name
+            Component {
+                id: monDelegate
+                Item {
+                    Layout.fillWidth: true
+                    height: 80
+                    Column {
+                        Text { text: '<b>Id:</b> '      + mid }
+                        Text { text: '<b>Size:</b> '    + size }
+                        CheckBox {
+                            text: name
+                            checked: selected
+                            onClicked: {
+                                console.log("current model value " + model.selected)
+                                model.selected = checked
+                                console.log("select to " + checked);
+                            }
+                         }
+                    }
                 }
             }
+
+            ListView {
+                id: monsList
+                Layout.fillWidth: true
+                height: 200
+                visible: false
+                //model: lm
+                model: monmod
+                flickableDirection: Flickable.VerticalFlick
+                boundsBehavior: Flickable.StopAtBounds
+                delegate: monDelegate
+                clip: true
+
+                highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
+
+                ScrollBar.vertical: ScrollBar {
+                    active: true
+                }
+            }
+
+            Button {
+                id: monsStart
+                text: qsTr("Start")
+                property string componentName: ""
+                onClicked: {
+
+                    switch(monmod.getCheckedCount()) {
+                    case 1: componentName = "square_1.qml"; break;
+                    case 2: componentName = "square_2.qml"; break;
+                    case 3: componentName = "square_3.qml"; break;
+                    case 4: componentName = "square_4.qml"; break;
+                    default:
+                        console.log("Does not supported yet");
+                        break;
+                    }
+
+                    console.log("component name is " + componentName)
+                    if (componentName !== "") {
+                        var component = Qt.createComponent(componentName);
+                        if (component.status === Component.Ready) {
+                            var item = component.createObject(wnd);
+                            var counter = 0;
+                            for(var i = 0; i < monmod.rowCount(); ++i) {
+                                var monId = monmod.getCheckedMonId(i);
+                                if (monId !== "") {
+                                    switch(counter++) {
+                                        case 0: item.url_1 = zmc.getMonitorUrl(monId); break;
+                                        case 1: item.url_2 = zmc.getMonitorUrl(monId); break;
+                                        case 2: item.url_3 = zmc.getMonitorUrl(monId); break;
+                                        case 3: item.url_4 = zmc.getMonitorUrl(monId); break;
+                                        default: break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                visible: false
+            }
         }
-    }
+     }
 }
