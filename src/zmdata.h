@@ -12,6 +12,8 @@ struct ZMMonitor {
       QString host;
       QString path;
       QSize size;
+      QString status;
+      QString captureFPS;
       ZMMonitor();
       ZMMonitor(const ZMMonitor&);
       ~ZMMonitor();

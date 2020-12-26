@@ -20,6 +20,8 @@ public:
         HostRole,
         PathRole,
         SizeRole,
+        StatusRole,
+        CaptureFPSRole,
         CheckedRole
     };
 

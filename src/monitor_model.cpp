@@ -12,12 +12,14 @@ MonitorModel::MonitorModel(QObject* parent)
 
 QHash<int, QByteArray> MonitorModel::roleNames() const {
     QHash<int, QByteArray> roles;
-    roles[IdRole]       = "mid";
-    roles[NameRole]     = "name";
-    roles[HostRole]     = "host";
-    roles[PathRole]     = "path";
-    roles[SizeRole]     = "size";
-    roles[CheckedRole]  = "selected";
+    roles[IdRole]           = "mid";
+    roles[NameRole]         = "name";
+    roles[HostRole]         = "host";
+    roles[PathRole]         = "path";
+    roles[SizeRole]         = "size";
+    roles[StatusRole]       = "monStatus";
+    roles[CaptureFPSRole]   = "captureFPS";
+    roles[CheckedRole]      = "selected";
     return roles;
 }
 
@@ -31,13 +33,15 @@ QVariant MonitorModel::data(const QModelIndex& index, int role) const {
     Q_ASSERT(monitors.size() == checked.size());
     const ZMMonitor& mon = monitors.at(index.row());
     switch(role) {
-        case Qt::DisplayRole: return mon.name;
-        case IdRole: return mon.id;
-        case NameRole: return mon.name;
-        case HostRole: return mon.host;
-        case PathRole: return mon.path;
-        case SizeRole: return QString::number(mon.size.width()) + "x" + QString::number(mon.size.height());
-        case CheckedRole: return checked.at(index.row());
+        case Qt::DisplayRole:   return mon.name;
+        case IdRole:            return mon.id;
+        case NameRole:          return mon.name;
+        case HostRole:          return mon.host;
+        case PathRole:          return mon.path;
+        case SizeRole:          return QString::number(mon.size.width()) + "x" + QString::number(mon.size.height());
+        case StatusRole:        return mon.status;
+        case CaptureFPSRole:    return mon.captureFPS;
+        case CheckedRole:       return checked.at(index.row());
     default:
         break;
     }

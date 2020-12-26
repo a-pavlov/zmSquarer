@@ -133,17 +133,24 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     height: 80
                     Column {
-                        Text { text: '<b>Id:</b> '      + mid }
-                        Text { text: '<b>Size:</b> '    + size }
+                        spacing: 2
+                        Row {
+                            spacing: 2
+                            Text { text: '<b>Id:</b> '      + mid }
+                            Text { text: '<b>Name:</b> '    + name }
+                        }
                         CheckBox {
-                            text: name
+                            text: monStatus
                             checked: selected
                             onClicked: {
-                                console.log("current model value " + model.selected)
                                 model.selected = checked
-                                console.log("select to " + checked);
                             }
-                         }
+                        }
+                        Row {
+                            spacing: 2
+                            Text { text: '<i>Capture FPS:</i> ' + captureFPS }
+                            Text { text: '<i>Size:</i> ' + size }
+                        }
                     }
                 }
             }

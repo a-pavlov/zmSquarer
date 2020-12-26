@@ -14,7 +14,7 @@ QList<ZMMonitor> ZMMonitor::fromJson(const QJsonDocument& doc) {
     qDebug() << "array size " << jsonArray.size();
     for(QJsonArray::const_iterator itr = jsonArray.constBegin(); itr != jsonArray.end(); ++itr) {
         if (itr->isObject()) {
-            res.append(ZMMonitor::fromJson(itr->toObject()["Monitor"].toObject()));
+            res.append(ZMMonitor::fromJson(itr->toObject()));
         }
     }
 
@@ -23,12 +23,16 @@ QList<ZMMonitor> ZMMonitor::fromJson(const QJsonDocument& doc) {
 
 ZMMonitor ZMMonitor::fromJson(const QJsonObject& doc) {
     ZMMonitor res;
-    res.id = doc.value("Id").toString();
-    res.name = doc.value("Name").toString();
-    res.function = doc.value("Function").toString();
-    res.host = doc.value("Host").toString();
-    res.path = doc.value("Path").toString();
-    res.size = QSize(doc.value("Width").toString().toInt(), doc.value("Height").toString().toInt());
+    QJsonObject mon = doc["Monitor"].toObject();
+    res.id          = mon.value("Id").toString();
+    res.name        = mon.value("Name").toString();
+    res.function    = mon.value("Function").toString();
+    res.host        = mon.value("Host").toString();
+    res.path        = mon.value("Path").toString();
+    res.size        = QSize(mon.value("Width").toString().toInt(), mon.value("Height").toString().toInt());
+    QJsonObject monStatus = doc["Monitor_Status"].toObject();
+    res.status      = monStatus.value("Status").toString();
+    res.captureFPS  = monStatus.value("CaptureFPS").toString();
     return res;
 }
 
@@ -44,6 +48,8 @@ ZMMonitor::ZMMonitor(const ZMMonitor& zmmon) {
     path = zmmon.path;
     name = zmmon.name;
     size = zmmon.size;
+    status=zmmon.status;
+    captureFPS = zmmon.captureFPS;
 }
 
 ZMMonitor::~ZMMonitor(){}
