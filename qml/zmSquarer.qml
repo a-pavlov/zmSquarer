@@ -209,7 +209,7 @@ ApplicationWindow {
                                 if (monId !== "") {
                                     console.log("order " + counter + " mon " + monId)
                                     switch(counter++) {
-                                        case 0: item.url_1 = zmc.getMonitorUrl(monId); break;
+                                        //case 0: item.url_1 = zmc.getMonitorUrl(monId); break;
                                         case 1: item.url_2 = zmc.getMonitorUrl(monId); break;
                                         case 2: item.url_3 = zmc.getMonitorUrl(monId); break;
                                         case 3: item.url_4 = zmc.getMonitorUrl(monId); break;

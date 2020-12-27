@@ -28,6 +28,7 @@ public:
 
     QString url() const;
     QString setUrl(const QString&);
+    void drawNoSignal();
 protected:
     void timerEvent( QTimerEvent* );
 

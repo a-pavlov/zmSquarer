@@ -67,6 +67,19 @@ void CamVideoProducer::closeSurface()
         _surface->stop();
 }
 
+void CamVideoProducer::drawNoSignal() {
+    QImage screenImage(":/no_signal.jpg");
+    QVideoFrame::PixelFormat pixelFormat = QVideoFrame::pixelFormatFromImageFormat( screenImage.format() );
+    if( screenImage.size() != _format.frameSize() ||
+        pixelFormat != _format.pixelFormat() ) {
+        closeSurface();
+        _format = QVideoSurfaceFormat( screenImage.size(), pixelFormat );
+        _surface->start( _format );
+    }
+
+    _surface->present( QVideoFrame( screenImage ) );
+}
+
 void CamVideoProducer::timerEvent( QTimerEvent* )
 {
     if( !_surface )
@@ -79,7 +92,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         return;
 
     if (netCam == nullptr) {
-        qDebug() << "netcam is null";
+        drawNoSignal();
         return;
     }
 
@@ -87,6 +100,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
 
     // check we have the new buffer
     if (ptr.isNull()) {
+        drawNoSignal();
         return;
     }
 
