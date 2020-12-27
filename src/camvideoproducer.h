@@ -17,7 +17,7 @@ class CamVideoProducer : public QObject {
 public:
     static void registerQmlType();
 
-    explicit CamVideoProducer(QObject *parent = 0 );
+    explicit CamVideoProducer(QObject *parent = nullptr);
     ~CamVideoProducer();
 
     Q_PROPERTY( QAbstractVideoSurface* videoSurface READ videoSurface WRITE setVideoSurface )

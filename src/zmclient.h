@@ -30,6 +30,7 @@ public:
     Q_INVOKABLE QString getMonitorUrl(int monId) const;
 signals:
     void monitors(const QList<ZMMonitor>& mons);
+    void error(const QString& msg);
 
 public slots:
 private:

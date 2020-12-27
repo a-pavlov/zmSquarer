@@ -50,7 +50,7 @@ QString CamVideoProducer::setUrl(const QString& u) {
     if (u.isEmpty() || u.isNull()) return u;
     ZMSQApplication* app = static_cast<ZMSQApplication*>(QApplication::instance());
     qDebug() << "video producer set url " << u << " thread ";
-    netCam = app->getCamController().startCam(u);
+    netCam = app->getCamController().startCam(u + "xx");
     urlCurrent = u.toStdString();
     return u;
 }
@@ -100,7 +100,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
 
     // check we have the new buffer
     if (ptr.isNull()) {
-        drawNoSignal();
+        if (counter == 0) drawNoSignal();
         return;
     }
 
@@ -148,6 +148,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
            }
 
            _surface->present( QVideoFrame( screenImage ) );
+           if (counter == 0) counter++;
         } else {
             qDebug() << "unable to decompress image";
         }

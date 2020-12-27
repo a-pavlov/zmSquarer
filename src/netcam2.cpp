@@ -136,7 +136,7 @@ void NetCam::start(const QString& str) {
 
     QObject::connect(socket, &QTcpSocket::disconnected, [=] () {
         qDebug()<< "DISCONNECTED ";
-        socket->deleteLater();
+        //socket->deleteLater();
     });
 
     QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>

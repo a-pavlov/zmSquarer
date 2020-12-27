@@ -20,6 +20,17 @@ ApplicationWindow {
             btnUrl.enabled = true
             btnUrl.checkMode = true
             zmUrlProgress.visible = false
+            zmClientError.visible = false
+        }
+
+        onError: {
+            monmod.clean()
+            btnUrl.text = qsTr("Check")
+            btnUrl.enabled = true
+            btnUrl.checkMode = true
+            zmUrlProgress.visible = false
+            zmClientError.text = qsTr("<font color=\"#FF0000\">Error:</font> ") + msg
+            zmClientError.visible = true
         }
     }
 
@@ -70,7 +81,7 @@ ApplicationWindow {
            selected: false
            size: "s11"
        }
-   }
+    }
 
     GroupBox {
         anchors.centerIn: parent
@@ -122,6 +133,12 @@ ApplicationWindow {
             }
 
             Label {
+                id: zmClientError
+                text: qsTr("<font color=\"#FF0000\">Error:</font> ")
+                visible: false
+            }
+
+            Label {
                 id: monsTitle
                 visible: false
                 text: qsTr("Monitors")
@@ -140,7 +157,8 @@ ApplicationWindow {
                             Text { text: '<b>Name:</b> '    + name }
                         }
                         CheckBox {
-                            text: monStatus
+                            text: monStatus==="Connected"?("<font color=\"#00FF00\">" + monStatus + "</font>"):monStatus
+                            enabled: monStatus !== ""
                             checked: selected
                             onClicked: {
                                 model.selected = checked
@@ -209,7 +227,7 @@ ApplicationWindow {
                                 if (monId !== "") {
                                     console.log("order " + counter + " mon " + monId)
                                     switch(counter++) {
-                                        //case 0: item.url_1 = zmc.getMonitorUrl(monId); break;
+                                        case 0: item.url_1 = zmc.getMonitorUrl(monId); break;
                                         case 1: item.url_2 = zmc.getMonitorUrl(monId); break;
                                         case 2: item.url_3 = zmc.getMonitorUrl(monId); break;
                                         case 3: item.url_4 = zmc.getMonitorUrl(monId); break;
@@ -223,6 +241,7 @@ ApplicationWindow {
                                 }
                             }
                         }
+
                     }
                 }
 

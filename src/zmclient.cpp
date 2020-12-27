@@ -37,8 +37,23 @@ QString ZMClient::getMonitors() {
         // do nothing here
     });*/
 
-    QObject::connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), [](QNetworkReply::NetworkError code) {
+    QObject::connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), [this](QNetworkReply::NetworkError code) {
         qDebug() << "network error occurred " << code;
+        switch (code) {
+            case QNetworkReply::NetworkError::ConnectionRefusedError:       emit error(QString("Connection refused")); break;
+            case QNetworkReply::NetworkError::RemoteHostClosedError:        emit error(QString("Remote host closed")); break;
+            case QNetworkReply::NetworkError::HostNotFoundError:            emit error(QString("Host not found")); break;
+            case QNetworkReply::NetworkError::TimeoutError:                 emit error(QString("Timeout")); break;
+            case QNetworkReply::NetworkError::OperationCanceledError:       emit error(QString("Operation canceled")); break;
+            case QNetworkReply::NetworkError::SslHandshakeFailedError:      emit error(QString("Ssl handshake failed")); break;
+            case QNetworkReply::NetworkError::TemporaryNetworkFailureError: emit error(QString("Temporary network failure")); break;
+            case QNetworkReply::NetworkError::NetworkSessionFailedError:    emit error(QString("Network session failed")); break;
+            case QNetworkReply::NetworkError::BackgroundRequestNotAllowedError: emit error(QString("Background request not allowed")); break;
+            case QNetworkReply::NetworkError::TooManyRedirectsError:        emit error(QString("Too many redirects")); break;
+            case QNetworkReply::NetworkError::InsecureRedirectError:        emit error(QString("Insecure redirect")); break;
+            default:
+                emit error(QString::number(code));
+        }
     });
 
     QObject::connect(reply, &QNetworkReply::sslErrors, [reply](const QList<QSslError> &errors) {
@@ -48,10 +63,13 @@ QString ZMClient::getMonitors() {
     QObject::connect(reply, &QNetworkReply::finished, [reply, this]() {
         //ZMAPIRequest* originator = dynamic_cast<ZMAPIRequest*>(reply->request().originatingObject());
         //Q_ASSERT(originator != nullptr);
-        QByteArray buffer = reply->readAll();
-        QList<ZMMonitor> mons = ZMMonitor::fromJson(QJsonDocument::fromJson(buffer));
-        qDebug() << "monitors " << mons.size() << " data size bytes " << buffer.size();
-        emit monitors(mons);
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray buffer = reply->readAll();
+            QList<ZMMonitor> mons = ZMMonitor::fromJson(QJsonDocument::fromJson(buffer));
+            qDebug() << "monitors " << mons.size() << " data size bytes " << buffer.size();
+            emit monitors(mons);
+        }
+
         reply->deleteLater();
     });
 
