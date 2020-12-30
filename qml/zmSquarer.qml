@@ -204,12 +204,12 @@ ApplicationWindow {
                 text: qsTr("Start")
                 property string componentName: ""
                 onClicked: {
-
                     switch(monmod.getCheckedCount()) {
                     case 1: componentName = "square_1.qml"; break;
                     case 2: componentName = "square_2.qml"; break;
                     case 3: componentName = "square_3.qml"; break;
                     case 4: componentName = "square_4.qml"; break;
+                    case 5: componentName = "square_5.qml"; break;
                     case 9: componentName = "square_9.qml"; break;
                     default:
                         console.log("Does not supported yet");
