@@ -13,3 +13,4 @@ MVP application for ZM on http and no authorization.
 
 
 ![zmSquarer](images/zmSquarer.png)
+![zmSquarer2](images/zmSquarer2.png)
