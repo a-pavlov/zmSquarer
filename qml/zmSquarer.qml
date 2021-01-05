@@ -212,6 +212,7 @@ ApplicationWindow {
                     case 3: componentName = "square_3.qml"; break;
                     case 4: componentName = "square_4.qml"; break;
                     case 5: componentName = "square_5.qml"; break;
+                    case 6: componentName = "square_6.qml"; break;
                     case 9: componentName = "square_9.qml"; break;
                     default:
                         console.log("Does not supported yet");
@@ -229,16 +230,16 @@ ApplicationWindow {
                                 var monId = monmod.getCheckedMonId(i);
                                 if (monId !== "") {
                                     console.log("order " + counter + " mon " + monId)
-                                    switch(counter++) {
-                                        case 0: item.url_1 = zmc.getMonitorUrl(monId); break;
-                                        case 1: item.url_2 = zmc.getMonitorUrl(monId); break;
-                                        case 2: item.url_3 = zmc.getMonitorUrl(monId); break;
-                                        case 3: item.url_4 = zmc.getMonitorUrl(monId); break;
-                                        case 4: item.url_5 = zmc.getMonitorUrl(monId); break;
-                                        case 5: item.url_6 = zmc.getMonitorUrl(monId); break;
-                                        case 6: item.url_7 = zmc.getMonitorUrl(monId); break;
-                                        case 7: item.url_8 = zmc.getMonitorUrl(monId); break;
-                                        case 8: item.url_9 = zmc.getMonitorUrl(monId); break;
+                                    switch(++counter) {
+                                        case 1: item.url_1 = zmc.getMonitorUrl(monId); break;
+                                        case 2: item.url_2 = zmc.getMonitorUrl(monId); break;
+                                        case 3: item.url_3 = zmc.getMonitorUrl(monId); break;
+                                        case 4: item.url_4 = zmc.getMonitorUrl(monId); break;
+                                        case 5: item.url_5 = zmc.getMonitorUrl(monId); break;
+                                        case 6: item.url_6 = zmc.getMonitorUrl(monId); break;
+                                        case 7: item.url_7 = zmc.getMonitorUrl(monId); break;
+                                        case 8: item.url_8 = zmc.getMonitorUrl(monId); break;
+                                        case 9: item.url_9 = zmc.getMonitorUrl(monId); break;
                                         default: break;
                                     }
                                 }
