@@ -8,6 +8,7 @@
 #include "zmclient.h"
 #include "monitor_model.h"
 #include "zmdata.h"
+#include "preferences.h"
 
 
 int main(int argc, char *argv[]) {
@@ -16,6 +17,8 @@ int main(int argc, char *argv[]) {
     ZMClient::registerMetaType();
     ZMClient::registerQmlType();
     MonitorModel::registerQmlType();
+    Preferences::registerQmlType();
+
     ZMSQApplication app(argc, argv);
     //MonitorModel monmod;
     qDebug() << "app thread id " << app.thread()->currentThreadId();

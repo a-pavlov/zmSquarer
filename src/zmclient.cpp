@@ -24,8 +24,8 @@ ZMClient::ZMClient(QObject *parent) :
 }
 
 QString ZMClient::getMonitors() {
-    Q_ASSERT(!url.isEmpty());
-    QNetworkRequest request(url + "/zm/api/monitors.json");
+    Q_ASSERT(!baseUrl.isEmpty());
+    QNetworkRequest request(baseUrl + "/zm/api/monitors.json");
     //request.setOriginatingObject(new ZMAPIRequest());
     QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
 
@@ -77,13 +77,17 @@ QString ZMClient::getMonitors() {
 }
 
 void ZMClient::setUrl(const QString &u) {
-    url = u;
+    baseUrl = u;
+}
+
+QString ZMClient::url() const {
+    return baseUrl;
 }
 
 QString ZMClient::getMonitorUrl(int monId) const {
     Q_ASSERT(monId > 0);
-    Q_ASSERT(!url.isEmpty());
-    return url + "/zm/cgi-bin/nph-zms?mode=jpeg&monitor=" + QString::number(monId) + "&scale=100&maxfps=30&buffer=1000&user=admin&pass=root";
+    Q_ASSERT(!baseUrl.isEmpty());
+    return baseUrl + "/zm/cgi-bin/nph-zms?mode=jpeg&monitor=" + QString::number(monId) + "&scale=100&maxfps=30&buffer=1000&user=admin&pass=root";
 }
 
 

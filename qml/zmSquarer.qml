@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.12
 import QtQuick.Window 2.1
 import ZMClient 0.1
 import MonitorModel 0.1
+import ZMSQPreferences 0.1
 
 ApplicationWindow {
     id: wnd
@@ -12,8 +13,13 @@ ApplicationWindow {
     height: 480
     property var comp: ""
 
+    ZMSQPreferences {
+        id: prefs
+    }
+
     ZMClient {
         id: zmc
+        url: prefs.url
         onMonitors: {
             monmod.clean()
             monmod.addAll(mons)
@@ -22,6 +28,9 @@ ApplicationWindow {
             btnUrl.checkMode = true
             zmUrlProgress.visible = false
             zmClientError.visible = false
+            // flush settings in case of successfull connection
+            prefs.url = url
+            prefs.flush();
         }
 
         onError: {
@@ -99,9 +108,9 @@ ApplicationWindow {
                 TextField {
                     id: zmUrl
                     placeholderText: qsTr("http://")
-                    text: "http://192.168.100.13"
+                    text: prefs.url
                     onTextChanged: {
-                        zmc.setUrl(text)
+                        zmc.url = text
                     }
                 }
 
@@ -160,10 +169,16 @@ ApplicationWindow {
                         CheckBox {
                             text: monStatus==="Connected"?("<font color=\"#00FF00\">" + monStatus + "</font>"):monStatus
                             enabled: monStatus !== ""
-                            checked: selected
+                            // fix it
+                            checked: prefs.isCheckedMon(mid)
                             onClicked: {
                                 model.selected = checked
                                 monSelCount.selectedCount = monSelCount.selectedCount + (checked?1:-1)
+                                if (checked) {
+                                    prefs.setCheckedMon(mid)
+                                } else {
+                                    prefs.unsetCheckedMon(mid)
+                                }
                             }
                         }
                         Row {
@@ -197,7 +212,8 @@ ApplicationWindow {
 
             Label {
                 id: monSelCount
-                property var selectedCount: 0
+                // temporary set to checked mons in prefs, must be fixed
+                property var selectedCount: prefs.checkedMons
                 text: '<b>Selected: </b>' + selectedCount
             }
 
@@ -206,6 +222,7 @@ ApplicationWindow {
                 text: qsTr("Start")
                 property string componentName: ""
                 onClicked: {
+                    prefs.flush()
                     switch(monmod.getCheckedCount()) {
                     case 1: componentName = "square_1.qml"; break;
                     case 2: componentName = "square_2.qml"; break;
