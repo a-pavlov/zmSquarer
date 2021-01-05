@@ -10,6 +10,7 @@ ApplicationWindow {
     visible: true
     width: 640
     height: 480
+    property var comp: ""
 
     ZMClient {
         id: zmc
@@ -185,6 +186,7 @@ ApplicationWindow {
                 boundsBehavior: Flickable.StopAtBounds
                 delegate: monDelegate
                 clip: true
+                spacing: 2
 
                 highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
 
@@ -219,6 +221,7 @@ ApplicationWindow {
                     console.log("component name is " + componentName)
                     if (componentName !== "") {
                         var component = Qt.createComponent(componentName);
+                        comp = component;
                         if (component.status === Component.Ready) {
                             var item = component.createObject(wnd);
                             var counter = 0;
@@ -249,4 +252,5 @@ ApplicationWindow {
             }
         }
      }
+
 }
