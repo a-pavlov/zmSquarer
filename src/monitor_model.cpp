@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <QtQml/qqml.h>
 
+#include "preferences.h"
+
 void MonitorModel::registerQmlType() {
     qmlRegisterType<MonitorModel>(
         "MonitorModel", 0, 1, "MonitorModel" );
@@ -53,6 +55,7 @@ bool MonitorModel::setData(const QModelIndex& index, const QVariant &value, int 
     if (index.isValid() && (index.row() >= 0 && index.row() < rowCount() && index.column() >= 0)) {
         if (role == CheckedRole) {
             checked[index.row()] = value.toBool();
+            emit checkedCountChanged();
             return true;
         }
     }
@@ -69,18 +72,13 @@ QModelIndex MonitorModel::getIndex(const QString& id) const {
 }
 
 void MonitorModel::add(const ZMMonitor& mon) {
-    /*foreach(const QED2KServer& srv, servers) {
-        if (srv == s) {
-            return;
-        }
-    }*/
-
+    Preferences pref;
     beginInsertRows(QModelIndex(), monitors.size(), monitors.size());
-    qDebug() << "add " << mon.name;
     monitors << mon;
-    while(checked.size() < monitors.size()) checked.append(false);
+    while(checked.size() < monitors.size()) checked.append(pref.isCheckedMon(monitors[checked.size()].id));
     endInsertRows();
     emit dataIncoming(monitors.size());
+    emit checkedCountChanged();
 }
 
 void MonitorModel::addAll(const QList<ZMMonitor>& monitors) {

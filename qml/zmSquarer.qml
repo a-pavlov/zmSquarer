@@ -169,11 +169,10 @@ ApplicationWindow {
                         CheckBox {
                             text: monStatus==="Connected"?("<font color=\"#00FF00\">" + monStatus + "</font>"):monStatus
                             enabled: monStatus !== ""
-                            // fix it
-                            checked: prefs.isCheckedMon(mid)
+                            checked: selected
                             onClicked: {
                                 model.selected = checked
-                                monSelCount.selectedCount = monSelCount.selectedCount + (checked?1:-1)
+                                //monSelCount.selectedCount = monSelCount.selectedCount + (checked?1:-1)
                                 if (checked) {
                                     prefs.setCheckedMon(mid)
                                 } else {
@@ -213,7 +212,7 @@ ApplicationWindow {
             Label {
                 id: monSelCount
                 // temporary set to checked mons in prefs, must be fixed
-                property var selectedCount: prefs.checkedMons
+                property var selectedCount: monmod.checkedCount
                 text: '<b>Selected: </b>' + selectedCount
             }
 
