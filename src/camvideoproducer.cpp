@@ -23,7 +23,9 @@ void CamVideoProducer::registerQmlType() {
 }
 
 CamVideoProducer::CamVideoProducer(QObject *parent )
-    : QObject( parent ), _surface( 0 ), netCam(nullptr) {
+    : QObject( parent )
+    , _surface( nullptr )
+    , netCam(nullptr) {
     startTimer( 1000 / 10 ); //15 fps
     counter = 0;
 #ifdef WITH_TURBOJPEG
