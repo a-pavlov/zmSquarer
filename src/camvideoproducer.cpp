@@ -25,7 +25,8 @@ void CamVideoProducer::registerQmlType() {
 CamVideoProducer::CamVideoProducer(QObject *parent )
     : QObject( parent )
     , _surface( nullptr )
-    , netCam(nullptr) {
+    , netCam(nullptr)
+    , errorOnCam(false) {
     startTimer( 1000 / 10 ); //15 fps
     counter = 0;
 #ifdef WITH_TURBOJPEG
@@ -53,6 +54,16 @@ QString CamVideoProducer::setUrl(const QString& u) {
     ZMSQApplication* app = static_cast<ZMSQApplication*>(QApplication::instance());
     qDebug() << "video producer set url " << u << " thread ";
     netCam = app->getCamController().startCam(u + "xx");
+
+    QObject::connect(netCam, &NetCam::error, [&] () {
+        errorOnCam = true;
+    });
+
+
+    QObject::connect(netCam, &NetCam::success, [&] () {
+        errorOnCam = false;
+    });
+
     urlCurrent = u.toStdString();
     return u;
 }
@@ -102,7 +113,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
 
     // check we have the new buffer
     if (ptr.isNull()) {
-        if (counter == 0) drawNoSignal();
+        if (errorOnCam || (counter == 0)) drawNoSignal();
         return;
     }
 

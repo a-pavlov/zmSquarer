@@ -44,6 +44,7 @@ private:
     NetCam* netCam;
     std::vector<unsigned char> buffer;
     int counter;
+    bool errorOnCam;
 #ifdef WITH_TURBOJPEG
     tjhandle _jpegDecompressor;
 #endif

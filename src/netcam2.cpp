@@ -76,14 +76,12 @@ void NetCam::connect() {
 
     if (watchdog == nullptr) {
         watchdog = new QTimer(this);
-        qDebug() << "start netcam";
         QObject::connect(watchdog, &QTimer::timeout, [&] () {
             const QTime& frameTime = rsp.getFrameTime();
-            qDebug() << "watch ";
             if (frameTime.isValid()) {
-                qDebug() << "watch valid " << frameTime.msecsTo(QTime::currentTime());
                 // 10 seconds timeout
                 if ((frameTime.msecsTo(QTime::currentTime())) > 3*1000) {
+                    emit error();
                     watchdog->stop();
                     if (++failCount <= RETRY_COUNT) {
                         QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
@@ -107,6 +105,7 @@ void NetCam::connect() {
 
        qDebug() << "request " << array.constData();
        socket->write(array.constData(), array.size());
+       emit success();
     });
 
     QObject::connect(socket, &QTcpSocket::readyRead, [&]() {
@@ -176,6 +175,7 @@ void NetCam::connect() {
     QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
     (&QAbstractSocket::error), [&](QAbstractSocket::SocketError) {
         qDebug()<< "ERROR " << socket->errorString() << " error: " << socket->error();
+        emit error();
         Q_ASSERT(watchdog != nullptr);
         rsp.reset();
         watchdog->stop();

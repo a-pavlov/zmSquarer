@@ -40,7 +40,8 @@ private:
 
       void connect();
 signals:
-
+        void error();
+        void success();
 public slots:
       void start(const QString&);
       void restartConnection();
