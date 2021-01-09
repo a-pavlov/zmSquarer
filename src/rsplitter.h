@@ -41,6 +41,10 @@ public:
     QSharedPointer<RBuffer> getOutputBuffer();
 
     void processCB(QSharedPointer<RBuffer>);
+    /**
+     * @brief reset splitter to initial state
+     */
+    void reset();
 private:
     std::vector<char> pattern;
     int currentRBuf;

@@ -94,6 +94,7 @@ ApplicationWindow {
     }
 
     GroupBox {
+        id: setup
         anchors.centerIn: parent
         title: qsTr("Setup connection")
 
@@ -263,11 +264,12 @@ ApplicationWindow {
                         }
 
                     }
+
+                    setup.visible = false
                 }
 
                 visible: false
             }
         }
      }
-
 }

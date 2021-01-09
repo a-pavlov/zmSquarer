@@ -2,6 +2,7 @@
 #include "http_parser.h"
 #include <QTcpSocket>
 #include <QtGlobal>
+#include <QTimer>
 
 int NetCam::url_callback(http_parser* p, const char* c, unsigned long len) {
     NetCam* pnc = static_cast<NetCam*>(p->data);
@@ -38,6 +39,7 @@ int NetCam::header_value_callback(http_parser* p, const char* c, unsigned long l
 }
 
 int NetCam::headers_complete(http_parser* p) {
+    Q_UNUSED(p)
     qDebug() << "headers completed";
     return 0;
 }
@@ -47,7 +49,8 @@ NetCam::NetCam(QObject *parent) : QObject(parent)
     , headerBytesRead(0)
     , headersBuffer(1024)
     , lastHeaderValueOffset(0)
-    , getCLValue(false) {
+    , getCLValue(false)
+    , failCount(0) {
 }
 
 NetCam::~NetCam() {
@@ -59,7 +62,12 @@ NetCam::~NetCam() {
 }
 
 void NetCam::start(const QString& str) {
-    QUrl url(str);
+    url = str;
+    connect();
+}
+
+void NetCam::connect() {
+    Q_ASSERT(!url.isEmpty());
     qDebug() << "netcam th id " << thread()->currentThreadId();
     socket = new QTcpSocket;
 
@@ -136,14 +144,22 @@ void NetCam::start(const QString& str) {
 
     QObject::connect(socket, &QTcpSocket::disconnected, [=] () {
         qDebug()<< "DISCONNECTED ";
-        //socket->deleteLater();
+        socket->deleteLater();
     });
 
     QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
     (&QAbstractSocket::error), [=](QAbstractSocket::SocketError) {
-        qDebug()<< "ERROR " << socket->errorString();
-        //socket->deleteLater();
+        qDebug()<< "ERROR " << socket->errorString() << " error: " << socket->error();
+        if (++failCount <= 3) {
+            qDebug() << "initiate restart " << failCount;
+            QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
+        }
     });
 
     socket->connectToHost(url.host(), 80);
+}
+
+void NetCam::restartConnection() {
+    qDebug() << "restart connection to " << url;
+    connect();
 }

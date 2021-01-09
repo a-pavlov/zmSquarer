@@ -38,16 +38,6 @@ Item {
                 onClicked: { parent.color = 'red' }
             }
         }
-
-        Keys.onPressed: {
-            if (event.key === Qt.Key_Escape) {
-                console.log("escape left");
-                event.accepted = true;
-                square_1.destroy();
-
-            }
-        }
-
         //onDestroyed: videoProducer_1.destroy();
     }
 

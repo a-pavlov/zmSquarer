@@ -106,6 +106,18 @@ void RSplitter::processCB(QSharedPointer<RBuffer> prbuf) {
     }
 }
 
+void RSplitter::reset() {
+    QMutexLocker ml(&switchBufferMutex);
+    currentRBuf = 0;
+    outputRBuf  = 2;
+    latestRBuf  = -1;
+    frameCounter= 0;
+    lastBufferSize = -1;
+    foreach (QSharedPointer<RBuffer> buffer, rbuffers) {
+        buffer.reset();
+    }
+}
+
 void RSplitter::setPattern(const QString& p) {
     std::string str = p.toStdString();
     std::vector<char> newPattern(str.begin(), str.end());

@@ -34,10 +34,14 @@ private:
       QString contentType;
       QString boundary;
       RSplitter rsp;
+      int failCount;
+
+      void connect();
 signals:
 
 public slots:
       void start(const QString&);
+      void restartConnection();
 };
 
 #endif // NETCAM_H

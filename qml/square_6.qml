@@ -3,14 +3,14 @@ import QtMultimedia 5.0
 import CamVideoProducer 0.1
 
 Item {
+    anchors.fill: parent
     property string url_1: ""
     property string url_2: ""
     property string url_3: ""
     property string url_4: ""
     property string url_5: ""
     property string url_6: ""
-
-    anchors.fill: parent
+    focus: true
 
     CamVideoProducer {
         id: videoProducer_1
