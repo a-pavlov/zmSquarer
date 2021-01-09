@@ -19,26 +19,6 @@ Item {
         id: output1
         anchors.fill: parent
         source: videoProducer_1
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                console.log("mouse click")
-                square_1.destroy();
-            }
-        }
-
-        Rectangle {
-            anchors.top: parent.top
-            anchors.centerIn: parent
-            width: 100; height: 100
-            color: "green"
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: { parent.color = 'red' }
-            }
-        }
-        //onDestroyed: videoProducer_1.destroy();
     }
 
     //Component.onCompleted: {

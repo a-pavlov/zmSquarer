@@ -7,6 +7,7 @@
 #include "rsplitter.h"
 
 class QTcpSocket;
+class QTimer;
 struct http_parser;
 
 class NetCam : public QObject {
@@ -35,6 +36,7 @@ private:
       QString boundary;
       RSplitter rsp;
       int failCount;
+      QTimer* watchdog;
 
       void connect();
 signals:

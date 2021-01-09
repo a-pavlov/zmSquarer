@@ -20,6 +20,7 @@ public:
     char* checkBufferSize(rbuffer_size numBytes);
     rbuffer_size append(const char* src, rbuffer_size srcSize);
     void clear();
+    void reset();
 
     rbuffer_size getUsed() const {
         return used;

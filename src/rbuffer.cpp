@@ -58,6 +58,11 @@ void RBuffer::clear() {
     soi_position = 0;
 }
 
+void RBuffer::reset() {
+    clear();
+    frameIndex = 0;
+}
+
 int RBuffer::findCharacter(char c) const {
     for(size_t i = content_length; i < used; ++i) {
         if (buffer[i] == c) return static_cast<int>(i);

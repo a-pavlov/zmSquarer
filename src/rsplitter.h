@@ -40,11 +40,15 @@ public:
 
     QSharedPointer<RBuffer> getOutputBuffer();
 
+    const QTime& getFrameTime() const {
+        return frameTime;
+    }
+
     void processCB(QSharedPointer<RBuffer>);
     /**
      * @brief reset splitter to initial state
      */
-    void reset();
+    void reset();       
 private:
     std::vector<char> pattern;
     int currentRBuf;

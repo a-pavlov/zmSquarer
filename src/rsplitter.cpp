@@ -113,8 +113,10 @@ void RSplitter::reset() {
     latestRBuf  = -1;
     frameCounter= 0;
     lastBufferSize = -1;
+    frameTime = QTime();
+    outputTime = QTime();
     foreach (QSharedPointer<RBuffer> buffer, rbuffers) {
-        buffer.reset();
+        buffer->reset();
     }
 }
 

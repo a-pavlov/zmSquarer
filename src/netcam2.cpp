@@ -4,6 +4,8 @@
 #include <QtGlobal>
 #include <QTimer>
 
+#define RETRY_COUNT 5
+
 int NetCam::url_callback(http_parser* p, const char* c, unsigned long len) {
     NetCam* pnc = static_cast<NetCam*>(p->data);
     Q_ASSERT(pnc != nullptr);
@@ -50,7 +52,8 @@ NetCam::NetCam(QObject *parent) : QObject(parent)
     , headersBuffer(1024)
     , lastHeaderValueOffset(0)
     , getCLValue(false)
-    , failCount(0) {
+    , failCount(0)
+    , watchdog(nullptr) {
 }
 
 NetCam::~NetCam() {
@@ -71,6 +74,28 @@ void NetCam::connect() {
     qDebug() << "netcam th id " << thread()->currentThreadId();
     socket = new QTcpSocket;
 
+    if (watchdog == nullptr) {
+        watchdog = new QTimer(this);
+        qDebug() << "start netcam";
+        QObject::connect(watchdog, &QTimer::timeout, [&] () {
+            const QTime& frameTime = rsp.getFrameTime();
+            qDebug() << "watch ";
+            if (frameTime.isValid()) {
+                qDebug() << "watch valid " << frameTime.msecsTo(QTime::currentTime());
+                // 10 seconds timeout
+                if ((frameTime.msecsTo(QTime::currentTime())) > 3*1000) {
+                    watchdog->stop();
+                    if (++failCount <= RETRY_COUNT) {
+                        QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
+                        rsp.reset();
+                    }
+                }
+            }
+        });
+    }
+
+    watchdog->start(10000);
+
     QObject::connect(socket, &QTcpSocket::connected,[=](){
        qDebug() << "connected";
        QByteArray array;
@@ -86,6 +111,7 @@ void NetCam::connect() {
 
     QObject::connect(socket, &QTcpSocket::readyRead, [&]() {
         qint64 bytesAvailable = socket->bytesAvailable();
+        failCount = 0;
         //qDebug() << "bytes available " << bytesAvailable;
 
         while(bytesAvailable > 0) {
@@ -148,10 +174,13 @@ void NetCam::connect() {
     });
 
     QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
-    (&QAbstractSocket::error), [=](QAbstractSocket::SocketError) {
+    (&QAbstractSocket::error), [&](QAbstractSocket::SocketError) {
         qDebug()<< "ERROR " << socket->errorString() << " error: " << socket->error();
-        if (++failCount <= 3) {
-            qDebug() << "initiate restart " << failCount;
+        Q_ASSERT(watchdog != nullptr);
+        rsp.reset();
+        watchdog->stop();
+        if (++failCount <= RETRY_COUNT) {
+            qDebug() << "initiate restart in " << failCount*2 << " seconds";
             QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
         }
     });
