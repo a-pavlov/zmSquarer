@@ -13,11 +13,13 @@ struct http_parser;
 class NetCam : public QObject {
     Q_OBJECT
 public:
-    explicit NetCam(QObject *parent = nullptr);
+    explicit NetCam(const QString&, QObject *parent = nullptr);
     ~NetCam();
     RSplitter& splitter() {
         return rsp;
     }
+
+    QSharedPointer<RBuffer> getImageBuffer();
 private:
       static int url_callback(http_parser* p, const char* c, unsigned long len);
       static int header_field_callback(http_parser* p, const char* c, unsigned long len);
@@ -37,13 +39,13 @@ private:
       RSplitter rsp;
       int failCount;
       QTimer* watchdog;
-
+      QTime tmImgReq;
       void connect();
 signals:
         void error();
         void success();
 public slots:
-      void start(const QString&);
+      void start();
       void restartConnection();
 };
 

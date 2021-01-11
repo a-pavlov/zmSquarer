@@ -5,6 +5,7 @@
 #include <QTimer>
 
 #define RETRY_COUNT 5
+#define IMG_REQ_TIMEOUT 5
 
 int NetCam::url_callback(http_parser* p, const char* c, unsigned long len) {
     NetCam* pnc = static_cast<NetCam*>(p->data);
@@ -46,7 +47,8 @@ int NetCam::headers_complete(http_parser* p) {
     return 0;
 }
 
-NetCam::NetCam(QObject *parent) : QObject(parent)
+NetCam::NetCam(const QString& u, QObject *parent) : QObject(parent)
+    , url(u)
     , headersEndOffset(0)
     , headerBytesRead(0)
     , headersBuffer(1024)
@@ -64,8 +66,7 @@ NetCam::~NetCam() {
     }
 }
 
-void NetCam::start(const QString& str) {
-    url = str;
+void NetCam::start() {
     connect();
 }
 
@@ -87,6 +88,13 @@ void NetCam::connect() {
                         QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
                         rsp.reset();
                     }
+                }
+            } else if (tmImgReq.isValid()) {
+                if (tmImgReq.secsTo(QTime::currentTime()) > IMG_REQ_TIMEOUT) {
+                    // todo add payload
+                    //watchdog->stop();
+                    //socket->close();
+                    //rsp.reset();
                 }
             }
         });
@@ -191,4 +199,9 @@ void NetCam::connect() {
 void NetCam::restartConnection() {
     qDebug() << "restart connection to " << url;
     connect();
+}
+
+QSharedPointer<RBuffer> NetCam::getImageBuffer() {
+    tmImgReq = QTime::currentTime();
+    return splitter().getOutputBuffer();
 }
