@@ -44,6 +44,7 @@ private:
 signals:
         void error();
         void success();
+        void disconnected();
 public slots:
       void start();
       void restartConnection();

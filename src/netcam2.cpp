@@ -6,6 +6,7 @@
 
 #define RETRY_COUNT 5
 #define IMG_REQ_TIMEOUT 5
+#define WATCH_DOG_INTERVAL_SEC 5
 
 int NetCam::url_callback(http_parser* p, const char* c, unsigned long len) {
     NetCam* pnc = static_cast<NetCam*>(p->data);
@@ -55,6 +56,7 @@ NetCam::NetCam(const QString& u, QObject *parent) : QObject(parent)
     , lastHeaderValueOffset(0)
     , getCLValue(false)
     , failCount(0)
+    , socket(nullptr)
     , watchdog(nullptr) {
 }
 
@@ -73,126 +75,130 @@ void NetCam::start() {
 void NetCam::connect() {
     Q_ASSERT(!url.isEmpty());
     qDebug() << "netcam th id " << thread()->currentThreadId();
-    socket = new QTcpSocket;
 
     if (watchdog == nullptr) {
         watchdog = new QTimer(this);
         QObject::connect(watchdog, &QTimer::timeout, [&] () {
             const QTime& frameTime = rsp.getFrameTime();
             if (frameTime.isValid()) {
-                // 10 seconds timeout
                 if ((frameTime.msecsTo(QTime::currentTime())) > 3*1000) {
                     emit error();
                     watchdog->stop();
                     if (++failCount <= RETRY_COUNT) {
                         QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
                         rsp.reset();
+                        return;
                     }
                 }
-            } else if (tmImgReq.isValid()) {
+            }
+
+            if (tmImgReq.isValid()) {
                 if (tmImgReq.secsTo(QTime::currentTime()) > IMG_REQ_TIMEOUT) {
+                    qDebug() << "idle timeout reached, stop connection";
                     // todo add payload
-                    //watchdog->stop();
-                    //socket->close();
-                    //rsp.reset();
+                    watchdog->stop();
+                    socket->close();
+                    rsp.reset();
                 }
             }
         });
     }
 
-    watchdog->start(10000);
+    if (socket == nullptr) {
+        socket = new QTcpSocket;
+        QObject::connect(socket, &QTcpSocket::connected,[=](){
+           qDebug() << "connected";
+           QByteArray array;
+           array.append("GET ")
+                   .append(url.path().toStdString().c_str())
+                   .append("?")
+                   .append(url.query().toStdString().c_str())
+                   .append(" HTTP/1.0\r\nHost: " + url.host() + "\r\nUser-Agent: zmSquarer-netcam/0.1\r\nConnection: close\r\n\r\n");
 
-    QObject::connect(socket, &QTcpSocket::connected,[=](){
-       qDebug() << "connected";
-       QByteArray array;
-       array.append("GET ")
-               .append(url.path().toStdString().c_str())
-               .append("?")
-               .append(url.query().toStdString().c_str())
-               .append(" HTTP/1.0\r\nHost: " + url.host() + "\r\nUser-Agent: zmSquarer-netcam/0.1\r\nConnection: close\r\n\r\n");
+           qDebug() << "request " << array.constData();
+           socket->write(array.constData(), array.size());
+           emit success();
+        });
 
-       qDebug() << "request " << array.constData();
-       socket->write(array.constData(), array.size());
-       emit success();
-    });
+        QObject::connect(socket, &QTcpSocket::readyRead, [&]() {
+            qint64 bytesAvailable = socket->bytesAvailable();
+            failCount = 0;
+            //qDebug() << "bytes available " << bytesAvailable;
 
-    QObject::connect(socket, &QTcpSocket::readyRead, [&]() {
-        qint64 bytesAvailable = socket->bytesAvailable();
-        failCount = 0;
-        //qDebug() << "bytes available " << bytesAvailable;
+            while(bytesAvailable > 0) {
+                if (headerBytesRead < headersBuffer.size()) {
+                    size_t bytesToRead = qMin(static_cast<size_t>(bytesAvailable), headersBuffer.size() - headerBytesRead);
+                    qint64 readBytes = socket->read(&headersBuffer[0] + headerBytesRead, static_cast<qint64>(bytesToRead));
 
-        while(bytesAvailable > 0) {
-            if (headerBytesRead < headersBuffer.size()) {
-                size_t bytesToRead = qMin(static_cast<size_t>(bytesAvailable), headersBuffer.size() - headerBytesRead);
-                qint64 readBytes = socket->read(&headersBuffer[0] + headerBytesRead, static_cast<qint64>(bytesToRead));
-
-                if (readBytes == -1) {
-                    // error
-                }
-
-                headerBytesRead += static_cast<size_t>(readBytes);
-                bytesAvailable -= readBytes;
-
-                if (headerBytesRead == headersBuffer.size()) {
-                    // start headers processing
-                    http_parser parser;
-                    parser.data = this;
-                    http_parser_init(&parser, HTTP_RESPONSE); /* initialise parser */
-                    http_parser_settings settings;
-                    http_parser_settings_init(&settings);
-                    settings.on_url = (http_data_cb)&NetCam::url_callback;
-                    settings.on_header_field = (http_data_cb)&NetCam::header_field_callback;
-                    settings.on_header_value = (http_data_cb)&NetCam::header_value_callback;
-                    settings.on_headers_complete = &NetCam::headers_complete;
-                    size_t nparsed = http_parser_execute(&parser, &settings, &headersBuffer[0], headersBuffer.size());
-                    qDebug() << "parsed " << nparsed << " input " << headersBuffer.size() << " last header value pos " << lastHeaderValueOffset;
-                    qDebug() << "remain " << headersBuffer.size() - lastHeaderValueOffset;
-                    qDebug() << QString::fromLocal8Bit(&headersBuffer[lastHeaderValueOffset], qMin<size_t>(20ul, headersBuffer.size() - lastHeaderValueOffset));
-                    Q_ASSERT(headersEndOffset < headersBuffer.size());
-                    // calculate the rest of data in the buffer and write it to target
-                    Q_ASSERT(hdrKeys.size() == hdrValues.size());
-
-                    for(int i = 0; i < hdrKeys.size(); ++i) {
-                        qDebug() << hdrKeys[i] << "=" << hdrValues[i];
+                    if (readBytes == -1) {
+                        // error
                     }
 
-                    qDebug() << "boundary " << boundary;
-                    qDebug() << "content-type " << contentType;
-                    this->rsp.setPattern(boundary);
-                    // read the remain data in the headers buffer
-                    rsp.read(&headersBuffer[lastHeaderValueOffset], headersBuffer.size() - lastHeaderValueOffset);
-                    break;
+                    headerBytesRead += static_cast<size_t>(readBytes);
+                    bytesAvailable -= readBytes;
+
+                    if (headerBytesRead == headersBuffer.size()) {
+                        // start headers processing
+                        http_parser parser;
+                        parser.data = this;
+                        http_parser_init(&parser, HTTP_RESPONSE); /* initialise parser */
+                        http_parser_settings settings;
+                        http_parser_settings_init(&settings);
+                        settings.on_url = (http_data_cb)&NetCam::url_callback;
+                        settings.on_header_field = (http_data_cb)&NetCam::header_field_callback;
+                        settings.on_header_value = (http_data_cb)&NetCam::header_value_callback;
+                        settings.on_headers_complete = &NetCam::headers_complete;
+                        size_t nparsed = http_parser_execute(&parser, &settings, &headersBuffer[0], headersBuffer.size());
+                        qDebug() << "parsed " << nparsed << " input " << headersBuffer.size() << " last header value pos " << lastHeaderValueOffset;
+                        qDebug() << "remain " << headersBuffer.size() - lastHeaderValueOffset;
+                        qDebug() << QString::fromLocal8Bit(&headersBuffer[lastHeaderValueOffset], qMin<size_t>(20ul, headersBuffer.size() - lastHeaderValueOffset));
+                        Q_ASSERT(headersEndOffset < headersBuffer.size());
+                        // calculate the rest of data in the buffer and write it to target
+                        Q_ASSERT(hdrKeys.size() == hdrValues.size());
+
+                        for(int i = 0; i < hdrKeys.size(); ++i) {
+                            qDebug() << hdrKeys[i] << "=" << hdrValues[i];
+                        }
+
+                        qDebug() << "boundary " << boundary;
+                        qDebug() << "content-type " << contentType;
+                        this->rsp.setPattern(boundary);
+                        // read the remain data in the headers buffer
+                        rsp.read(&headersBuffer[lastHeaderValueOffset], headersBuffer.size() - lastHeaderValueOffset);
+                        break;
+                    }
+                } else {
+                    QSharedPointer<RBuffer> buf = this->rsp.getCurrentRBuffer();
+                    Q_ASSERT(!buf.isNull());
+                    char* ptr = buf->checkBufferSize(static_cast<size_t>(bytesAvailable));
+                    socket->read(ptr, bytesAvailable);
+                    buf->expandUsed(static_cast<size_t>(bytesAvailable));
+                    rsp.processCB(buf);
+                    bytesAvailable = 0;
                 }
-            } else {
-                QSharedPointer<RBuffer> buf = this->rsp.getCurrentRBuffer();
-                Q_ASSERT(!buf.isNull());
-                char* ptr = buf->checkBufferSize(static_cast<size_t>(bytesAvailable));
-                socket->read(ptr, bytesAvailable);
-                buf->expandUsed(static_cast<size_t>(bytesAvailable));
-                rsp.processCB(buf);
-                bytesAvailable = 0;
             }
-        }
-    });
+        });
 
-    QObject::connect(socket, &QTcpSocket::disconnected, [=] () {
-        qDebug()<< "DISCONNECTED ";
-        socket->deleteLater();
-    });
+        QObject::connect(socket, &QTcpSocket::disconnected, [=] () {
+            qDebug()<< "DISCONNECTED ";
+            emit disconnected();
+        });
 
-    QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
-    (&QAbstractSocket::error), [&](QAbstractSocket::SocketError) {
-        qDebug()<< "ERROR " << socket->errorString() << " error: " << socket->error();
-        emit error();
-        Q_ASSERT(watchdog != nullptr);
-        rsp.reset();
-        watchdog->stop();
-        if (++failCount <= RETRY_COUNT) {
-            qDebug() << "initiate restart in " << failCount*2 << " seconds";
-            QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
-        }
-    });
+        QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
+        (&QAbstractSocket::error), [&](QAbstractSocket::SocketError) {
+            qDebug()<< "ERROR " << socket->errorString() << " error: " << socket->error();
+            emit error();
+            Q_ASSERT(watchdog != nullptr);
+            rsp.reset();
+            watchdog->stop();
+            if (++failCount <= RETRY_COUNT) {
+                qDebug() << "initiate restart in " << failCount*2 << " seconds";
+                QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
+            }
+        });
+    }
 
+    watchdog->start(WATCH_DOG_INTERVAL_SEC*1000);
     socket->connectToHost(url.host(), 80);
 }
 

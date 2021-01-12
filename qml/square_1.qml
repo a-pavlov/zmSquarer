@@ -21,6 +21,13 @@ Item {
         source: videoProducer_1
     }
 
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            square_1.destroy()
+        }
+    }
+
     //Component.onCompleted: {
     //    console.log("completed " + url_1)
     //}

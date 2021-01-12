@@ -13,12 +13,17 @@ CamController::~CamController() {
     networkThread.wait();
 }
 
-NetCam* CamController::startCam(const QString& url) {
+NetCam* CamController::createCam(const QString& url) {
     NetCam* cam = new NetCam(url);
     cam->moveToThread(&networkThread);
     connect(&networkThread, &QThread::finished, cam, &QObject::deleteLater);
     //connect(this, &CamController::startCam, cam, &NetCam::start);
-    QMetaObject::invokeMethod(cam, "start", Qt::QueuedConnection);
+    //QMetaObject::invokeMethod(cam, "start", Qt::QueuedConnection);
     //Q_ARG(QString, url));
     return cam;
+}
+
+void CamController::startCam(NetCam* nc) {
+    Q_ASSERT(nc != nullptr);
+    QMetaObject::invokeMethod(nc, "start", Qt::QueuedConnection);
 }

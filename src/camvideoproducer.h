@@ -45,6 +45,7 @@ private:
     std::vector<unsigned char> buffer;
     int counter;
     bool errorOnCam;
+    bool camDisconnected;
 #ifdef WITH_TURBOJPEG
     tjhandle _jpegDecompressor;
 #endif

@@ -11,7 +11,8 @@ class CamController : public QObject {
 public:
     explicit CamController(QObject *parent = nullptr);
     ~CamController();
-    NetCam* startCam(const QString&);
+    NetCam* createCam(const QString&);
+    void startCam(NetCam*);
 private:
     QThread networkThread;
 public slots:

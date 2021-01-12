@@ -26,7 +26,8 @@ CamVideoProducer::CamVideoProducer(QObject *parent )
     : QObject( parent )
     , _surface( nullptr )
     , netCam(nullptr)
-    , errorOnCam(false) {
+    , errorOnCam(false)
+    , camDisconnected(true) {
     startTimer( 1000 / 10 ); //15 fps
     counter = 0;
 #ifdef WITH_TURBOJPEG
@@ -53,7 +54,7 @@ QString CamVideoProducer::setUrl(const QString& u) {
     if (u.isEmpty() || u.isNull()) return u;
     ZMSQApplication* app = static_cast<ZMSQApplication*>(QApplication::instance());
     qDebug() << "video producer set url " << u << " thread ";
-    netCam = app->getCamController().startCam(u + "xx");
+    netCam = app->getCamController().createCam(u);
 
     QObject::connect(netCam, &NetCam::error, [&] () {
         errorOnCam = true;
@@ -62,6 +63,10 @@ QString CamVideoProducer::setUrl(const QString& u) {
 
     QObject::connect(netCam, &NetCam::success, [&] () {
         errorOnCam = false;
+    });
+
+    QObject::connect(netCam, &NetCam::disconnected, [&] () {
+        camDisconnected = true;
     });
 
     urlCurrent = u.toStdString();
@@ -93,8 +98,9 @@ void CamVideoProducer::drawNoSignal() {
     _surface->present( QVideoFrame( screenImage ) );
 }
 
-void CamVideoProducer::timerEvent( QTimerEvent* )
-{
+void CamVideoProducer::timerEvent( QTimerEvent* ) {
+
+    qDebug() << "videopoducer obtain frame";
     if( !_surface )
         return;
 
@@ -109,11 +115,19 @@ void CamVideoProducer::timerEvent( QTimerEvent* )
         return;
     }
 
-    QSharedPointer<RBuffer> ptr = netCam->splitter().getOutputBuffer();
+    QSharedPointer<RBuffer> ptr = netCam->getImageBuffer();
 
     // check we have the new buffer
     if (ptr.isNull()) {
         if (errorOnCam || (counter == 0)) drawNoSignal();
+
+        // start netcam if it is still not started
+        if (camDisconnected) {
+            ZMSQApplication* app = static_cast<ZMSQApplication*>(QApplication::instance());
+            app->getCamController().startCam(netCam);
+            camDisconnected = false;
+        }
+
         return;
     }
 
