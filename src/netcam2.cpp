@@ -57,7 +57,8 @@ NetCam::NetCam(const QString& u, QObject *parent) : QObject(parent)
     , getCLValue(false)
     , failCount(0)
     , socket(nullptr)
-    , watchdog(nullptr) {
+    , watchdog(nullptr)
+    , restartRequested(false) {
 }
 
 NetCam::~NetCam() {
@@ -80,19 +81,20 @@ void NetCam::connect() {
         watchdog = new QTimer(this);
         QObject::connect(watchdog, &QTimer::timeout, [&] () {
             const QTime& frameTime = rsp.getFrameTime();
-            if (frameTime.isValid()) {
-                if ((frameTime.msecsTo(QTime::currentTime())) > 3*1000) {
+            if (!frameTime.isNull()) {
+                if ((frameTime.msecsTo(QTime::currentTime())) > 3*1000 && !restartRequested) {
                     emit error();
                     watchdog->stop();
                     if (++failCount <= RETRY_COUNT) {
                         QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
                         rsp.reset();
+                        restartRequested = true;
                         return;
                     }
                 }
             }
 
-            if (tmImgReq.isValid()) {
+            if (!tmImgReq.isNull()) {
                 if (tmImgReq.secsTo(QTime::currentTime()) > IMG_REQ_TIMEOUT) {
                     qDebug() << "idle timeout reached, stop connection";
                     // todo add payload
@@ -188,14 +190,19 @@ void NetCam::connect() {
         (&QAbstractSocket::error), [&](QAbstractSocket::SocketError) {
             qDebug()<< "ERROR " << socket->errorString() << " error: " << socket->error();
             emit error();
-            Q_ASSERT(watchdog != nullptr);
-            rsp.reset();
-            watchdog->stop();
-            if (++failCount <= RETRY_COUNT) {
-                qDebug() << "initiate restart in " << failCount*2 << " seconds";
-                QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
+            if (!restartRequested) {
+                Q_ASSERT(watchdog != nullptr);
+                rsp.reset();
+                watchdog->stop();
+                if (++failCount <= RETRY_COUNT) {
+                    qDebug() << "initiate restart in " << failCount*2 << " seconds";
+                    QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
+                }
             }
         });
+    } else {
+        qDebug() << "force close";
+        socket->close();
     }
 
     watchdog->start(WATCH_DOG_INTERVAL_SEC*1000);
@@ -203,8 +210,9 @@ void NetCam::connect() {
 }
 
 void NetCam::restartConnection() {
-    qDebug() << "restart connection to " << url;
+    qDebug() << "restart connection to " << url;   
     connect();
+    restartRequested = false;
 }
 
 QSharedPointer<RBuffer> NetCam::getImageBuffer() {

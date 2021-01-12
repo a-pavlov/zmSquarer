@@ -40,6 +40,7 @@ private:
       int failCount;
       QTimer* watchdog;
       QTime tmImgReq;
+      bool restartRequested;
       void connect();
 signals:
         void error();

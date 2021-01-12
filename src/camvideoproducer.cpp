@@ -98,9 +98,7 @@ void CamVideoProducer::drawNoSignal() {
     _surface->present( QVideoFrame( screenImage ) );
 }
 
-void CamVideoProducer::timerEvent( QTimerEvent* ) {
-
-    qDebug() << "videopoducer obtain frame";
+void CamVideoProducer::timerEvent( QTimerEvent* ) {   
     if( !_surface )
         return;
 
