@@ -28,7 +28,9 @@ public:
 
     QString url() const;
     QString setUrl(const QString&);
+
     void drawNoSignal();
+    Q_INVOKABLE void updateTimer(bool start);
 protected:
     void timerEvent( QTimerEvent* );
 
@@ -40,12 +42,13 @@ private:
     QAbstractVideoSurface* _surface;
     QVideoSurfaceFormat _format;
     QStringList frames;
-    std::string urlCurrent;
+    QString urlCurrent;
     NetCam* netCam;
     std::vector<unsigned char> buffer;
     int counter;
     bool errorOnCam;
     bool camDisconnected;
+    int timerId;
 #ifdef WITH_TURBOJPEG
     tjhandle _jpegDecompressor;
 #endif

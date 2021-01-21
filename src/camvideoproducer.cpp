@@ -28,7 +28,7 @@ CamVideoProducer::CamVideoProducer(QObject *parent )
     , netCam(nullptr)
     , errorOnCam(false)
     , camDisconnected(true) {
-    startTimer( 1000 / 10 ); //15 fps
+    timerId = startTimer( 1000 / 10 ); //15 fps
     counter = 0;
 #ifdef WITH_TURBOJPEG
     _jpegDecompressor = tjInitDecompress();
@@ -36,7 +36,11 @@ CamVideoProducer::CamVideoProducer(QObject *parent )
 }
 
 CamVideoProducer::~CamVideoProducer() {
+    qDebug() << "cam video producer close";
     closeSurface();
+    if (netCam) {
+        netCam->deleteLater();
+    }
 #ifdef WITH_TURBOJPEG
     tjDestroy(_jpegDecompressor);
 #endif
@@ -47,7 +51,7 @@ QAbstractVideoSurface* CamVideoProducer::videoSurface() const {
 }
 
 QString CamVideoProducer::url() const {
-    return QString(urlCurrent.c_str());
+    return urlCurrent;
 }
 
 QString CamVideoProducer::setUrl(const QString& u) {
@@ -69,7 +73,7 @@ QString CamVideoProducer::setUrl(const QString& u) {
         camDisconnected = true;
     });
 
-    urlCurrent = u.toStdString();
+    urlCurrent = u;
     return u;
 }
 
@@ -98,7 +102,22 @@ void CamVideoProducer::drawNoSignal() {
     _surface->present( QVideoFrame( screenImage ) );
 }
 
-void CamVideoProducer::timerEvent( QTimerEvent* ) {   
+void CamVideoProducer::updateTimer(bool start) {
+    if (start) {
+        if (timerId == -1) {
+            timerId = startTimer( 1000 / 10 );
+            qDebug() << "start timer " << timerId;
+        }
+    } else {
+        if (timerId != -1) {
+            qDebug() << "stop timer " << timerId;
+            killTimer(timerId);
+            timerId = -1;
+        }
+    }
+}
+
+void CamVideoProducer::timerEvent( QTimerEvent* ) {
     if( !_surface )
         return;
 

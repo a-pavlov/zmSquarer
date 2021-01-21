@@ -27,8 +27,4 @@ Item {
             square_1.destroy()
         }
     }
-
-    //Component.onCompleted: {
-    //    console.log("completed " + url_1)
-    //}
 }
