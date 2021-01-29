@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file alias="main.qml">qml/main.qml</file>
         <file alias="zmSquarer.qml">qml/zmSquarer.qml</file>
+        <file alias="zmSquarer2.qml">qml/zmSquarer2.qml</file>
         <file alias="square_1.qml">qml/square_1.qml</file>
         <file alias="square_2.qml">qml/square_2.qml</file>
         <file alias="square_3.qml">qml/square_3.qml</file>
@@ -12,5 +13,6 @@
         <file alias="square_8.qml">qml/square_8.qml</file>
         <file alias="square_9.qml">qml/square_9.qml</file>
         <file alias="square_hi_res.qml">qml/square_hi_res.qml</file>
-    </qresource>
+	<file alias="ImageButton.qml">qml/CustomWidgets/ImageButton.qml</file>
+     </qresource>
 </RCC>

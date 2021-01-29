@@ -6,7 +6,9 @@ SOURCES = main.cpp \
     ../src/rsplitter.cpp \
     ../src/zmdata.cpp \
     httpparsertest.cpp \
-    zmclienttest.cpp
+    zmclienttest.cpp \
+    colorarraytest.cpp \
+    ../src/colormatrix.cpp
 
 INCLUDEPATH += ../src
 
@@ -19,7 +21,9 @@ HEADERS += \
     ../src/rsplitter.h \
     ../src/zmdata.h \
     httpparsertest.h \
-    zmclienttest.h
+    zmclienttest.h \
+    colorarraytest.h \
+    ../src/colormatrix.h
 
 RESOURCES += \
     res.qrc

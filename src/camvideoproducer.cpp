@@ -90,7 +90,7 @@ void CamVideoProducer::closeSurface()
 }
 
 void CamVideoProducer::drawNoSignal() {
-    QImage screenImage(":/no_signal.jpg");
+    QImage screenImage(":/images/no_signal.jpg");
     QVideoFrame::PixelFormat pixelFormat = QVideoFrame::pixelFormatFromImageFormat( screenImage.format() );
     if( screenImage.size() != _format.frameSize() ||
         pixelFormat != _format.pixelFormat() ) {

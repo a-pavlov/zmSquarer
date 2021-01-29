@@ -1,4 +1,5 @@
-import QtQuick 2.0
+import QtQuick 2.7
+import QtQuick.Controls 2.12
 import QtMultimedia 5.0
 import CamVideoProducer 0.1
 
@@ -66,6 +67,51 @@ Item {
         width: parent.width/3
         height: parent.height/2
         source: videoProducer_1
+
+        Button {
+            id: button
+            visible: true
+
+            background: Image {
+                mipmap: true
+                source: "qrc:/images/zoom.png"
+                sourceSize.width: parent.width
+                sourceSize.height: parent.height
+            }
+
+            focusPolicy: Qt.NoFocus
+
+            Component.onCompleted: {
+                if (button.topInset !== undefined)
+                {
+                    button.topInset = 0;
+                    button.bottomInset = 0;
+                }
+            }
+
+            width: 16
+            height: 16
+            anchors.right: parent.right
+            anchors.bottom: parent.verticalCenter
+            anchors.rightMargin: 8
+            anchors.topMargin: 16
+            onClicked: {
+                console.log("producer 1 clicked, start " + hires_url_1)
+                var component = Qt.createComponent("square_hi_res.qml");
+                if (component.status === Component.Ready) {
+                    var item = component.createObject(main);
+                    item.url_hi_res = hires_url_1;
+
+                    output1.visible = false
+                    output2.visible = false
+                    output3.visible = false
+                    output4.visible = false
+                    output5.visible = false
+                    output6.visible = false
+                }
+            }
+        }
+/*
         MouseArea {
             anchors.fill: parent
             onClicked: {
@@ -84,7 +130,7 @@ Item {
                 }
             }
         }
-
+*/
         onVisibleChanged: {
             if (visible) {
                 console.log("visible")

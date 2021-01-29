@@ -10,7 +10,8 @@ HEADERS +=  $$PWD/rbuffer.h\
             $$PWD/zmclient.h\
             $$PWD/monitor_model.h\
             $$PWD/qinisettings.h\
-            $$PWD/preferences.h
+            $$PWD/preferences.h \
+            $$PWD/colormatrix.h
 
 SOURCES +=  $$PWD/rbuffer.cpp\
             $$PWD/rsplitter.cpp\
@@ -21,4 +22,5 @@ SOURCES +=  $$PWD/rbuffer.cpp\
             $$PWD/zmsqapplication.cpp\
             $$PWD/zmclient.cpp\
             $$PWD/monitor_model.cpp\
-            $$PWD/preferences.cpp
+            $$PWD/preferences.cpp\
+            $$PWD/colormatrix.cpp

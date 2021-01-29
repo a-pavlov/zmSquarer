@@ -25,6 +25,6 @@ int main(int argc, char *argv[]) {
     QQmlApplicationEngine engine;
     //engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
     //engine.rootContext()->setContextProperty("monmod", &monmod);
-    engine.load(QUrl(QStringLiteral("qrc:///zmSquarer.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:///zmSquarer2.qml")));
     return app.exec();
 }

@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.7
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.11
@@ -17,6 +17,53 @@ ApplicationWindow {
         id: prefs
     }
 
+    Button {
+        id: button
+        visible: false
+        property string image: ""
+
+        background: Image {
+            mipmap: true
+            source: "qrc:/images/delete.png"
+            sourceSize.width: parent.width
+            sourceSize.height: parent.height
+        }
+
+        focusPolicy: Qt.NoFocus
+
+        Component.onCompleted: {
+            if (button.topInset !== undefined)
+            {
+                button.topInset = 0;
+                button.bottomInset = 0;
+            }
+        }
+
+        width: 24
+        height: 24
+        anchors.right: parent.right
+        anchors.rightMargin: 36
+        anchors.bottom: parent.verticalCenter
+        anchors.topMargin: 16
+        onClicked: {
+            console.log("clicked")
+        }
+    }
+
+    /*ImageButton {
+        id: closeBtn
+        image: "qrc:/delete.png"
+        width: 24
+        height: 24
+        anchors.right: parent.horizontalCenter
+        anchors.rightMargin: 8
+        anchors.top: parent.top
+        anchors.topMargin: 16
+        onClicked: {
+            console.log("clicked")
+        }
+    }
+*/
     ZMClient {
         id: zmc
         url: prefs.url

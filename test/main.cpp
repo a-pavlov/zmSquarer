@@ -4,11 +4,14 @@
 #include "test.h"
 #include "httpparsertest.h"
 #include "zmclienttest.h"
+#include "colorarraytest.h"
 
 int main(int argc, char *argv[]) {
     QCoreApplication app(argc, argv);
     Test test;
     HttpParserTest htest;
     ZMClientTest zmctest;
-    return QTest::qExec(&test, argc, argv) | QTest::qExec(&htest, argc, argv) | QTest::qExec(&zmctest, argc, argv);
+    ColorArrayTest caTest;
+    return QTest::qExec(&caTest, argc, argv);
+    //return QTest::qExec(&test, argc, argv) | QTest::qExec(&htest, argc, argv) | QTest::qExec(&zmctest, argc, argv);
 }

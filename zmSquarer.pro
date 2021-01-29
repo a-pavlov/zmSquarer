@@ -5,14 +5,15 @@ QT += qml quick multimedia widgets network
 SOURCES += main.cpp
 
 RESOURCES += qml.qrc \
-    image.qrc
+    images.qrc
 
 QMAKE_CFLAGS += -Dsysconfdir=\"xxx\"
 QMAKE_CXXFLAGS += -Dsysconfdir=\"xxx\" -DWITH_TURBOJPEG
 #LIBS += -lpthread -ljpeg
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH =
+
+QML_IMPORT_PATH += $$PWD/qml C:/dev/zmSquarer/qml
 
 win32 {
     include(winconf.pri)
