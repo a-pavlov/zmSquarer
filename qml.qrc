@@ -13,6 +13,5 @@
         <file alias="square_8.qml">qml/square_8.qml</file>
         <file alias="square_9.qml">qml/square_9.qml</file>
         <file alias="square_hi_res.qml">qml/square_hi_res.qml</file>
-	<file alias="ImageButton.qml">qml/CustomWidgets/ImageButton.qml</file>
      </qresource>
 </RCC>
