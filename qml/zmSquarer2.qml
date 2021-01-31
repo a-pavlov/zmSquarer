@@ -23,6 +23,27 @@ ApplicationWindow {
         id: prefs
     }
 
+    MonitorModel {
+        id: monmod
+        onDataIncoming: {
+            //monsList.visible = mc>0
+            //monsTitle.visible = mc>0
+            //monsStart.visible = mc>0
+        }
+    }
+
+    Component.onCompleted: {
+        console.log("component is ready");
+        monmod.testAdd();
+        monmod.testAdd();
+        monmod.testAdd();
+        monmod.testAdd();
+        monmod.testAdd();
+        monmod.testAdd();
+        monmod.addNewLine();
+        monmod.addStopper();
+    }
+
     Rectangle {
         id: itm
         width: 320
@@ -128,6 +149,9 @@ ApplicationWindow {
                                       "type": "newline",
                                       "monStatus": "xxx"
                                   })
+                monmod.testAdd()
+                monmod.testAdd()
+                monmod.addNewLine()
             }
         }
 
@@ -174,7 +198,7 @@ ApplicationWindow {
             model: DelegateModel {
                 //! [0]
                 id: visualModel
-                model: colorModel
+                model: monmod
 
                 delegate: chooser
                 DelegateChooser {
@@ -257,7 +281,7 @@ ApplicationWindow {
                                     onDoubleClicked: {
                                         console.log("double click on visual index "
                                                     + parent.visualIndex + " indx " + index)
-                                        colorModel.remove(index)
+                                        monmod.remove(index)
                                     }
                                 }
 
@@ -331,7 +355,7 @@ ApplicationWindow {
 
                                 Image {
                                     id: pictDel
-                                    source: "qrc:/images/Delete.png"
+                                    source: "qrc:/images/delete.png"
                                     width: 12
                                     height: 12
                                     anchors {

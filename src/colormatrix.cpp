@@ -9,14 +9,16 @@ const std::array<const char*, CC_MAX> ColorMatrix::colors= {
    "ghostwhite", "gold", "greenyellow", "honeydew", "ivory",
    "lavender", "lavenderblush", "lemonchiffon", "lightgoldenrodyellow", "lightpink" };
 
-ColorMatrix::ColorMatrix(size_t cc)
-    : camsCount(cc), noCamsMarker(-1*cc) {
+ColorMatrix::ColorMatrix()
+    : camsCount(0)
+    , lastColor(0) {
     for(size_t i = 0; i < CC_MAX; ++i)
         for(size_t j = 0; j < CC_MAX; ++j)
             matrix[i][j] = 0;
 }
 
 size_t ColorMatrix::findCamColorIndex(size_t camIndex) const {
+    Q_ASSERT(camIndex < camsCount);
     for(auto itrColor = matrix.begin(); itrColor != matrix.end(); ++itrColor) {
         if ((*itrColor)[camIndex] == 1) {
             return (itrColor - matrix.begin());
@@ -26,7 +28,13 @@ size_t ColorMatrix::findCamColorIndex(size_t camIndex) const {
     return CC_MAX;
 }
 
+const char* ColorMatrix::getColor(size_t colorIndex) const {
+    Q_ASSERT(colorIndex < CC_MAX);
+    return colors[colorIndex];
+}
+
 size_t ColorMatrix::nextColorIndex(size_t camIndex, bool unique) {
+    Q_ASSERT(camIndex < camsCount);
     size_t ci = findCamColorIndex(camIndex);
     size_t result = ci;
     if (ci == CC_MAX) ci = 0; else ++ci;
@@ -54,3 +62,11 @@ const char* ColorMatrix::nextColor(size_t camIndex) {
     Q_ASSERT(camIndex < colors.size());
     return colors[camIndex];
 }
+
+size_t ColorMatrix::addCam(size_t camIndex) {
+    Q_ASSERT(camsCount < CC_MAX);
+    Q_ASSERT(camIndex < CC_MAX);
+    matrix[lastColor++][camIndex] = 1;
+    return ++camsCount;
+}
+

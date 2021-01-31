@@ -1,9 +1,12 @@
 #ifndef ZMDATA_H
 #define ZMDATA_H
 
+#include <cstdint>
 #include <QObject>
 #include <QJsonDocument>
 #include <QSize>
+
+enum class CamType: std::int8_t { CAM = 1, NEW_LINE = 2, END_SCREEN = 3 };
 
 struct ZMMonitor {
       QString id;
@@ -14,6 +17,7 @@ struct ZMMonitor {
       QSize size;
       QString status;
       QString captureFPS;
+      CamType type;
       ZMMonitor();
       ZMMonitor(const ZMMonitor&);
       ~ZMMonitor();

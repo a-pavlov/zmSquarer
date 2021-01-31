@@ -10,7 +10,8 @@ void MonitorModel::registerQmlType() {
 }
 
 MonitorModel::MonitorModel(QObject* parent)
-    : QAbstractListModel(parent) {}
+    : QAbstractListModel(parent) {
+}
 
 QHash<int, QByteArray> MonitorModel::roleNames() const {
     QHash<int, QByteArray> roles;
@@ -22,11 +23,22 @@ QHash<int, QByteArray> MonitorModel::roleNames() const {
     roles[StatusRole]       = "monStatus";
     roles[CaptureFPSRole]   = "captureFPS";
     roles[CheckedRole]      = "selected";
+    roles[TypeRole]         = "type";
+    roles[ColorModel]       = "color";
     return roles;
 }
 
 int MonitorModel::rowCount(const QModelIndex&) const {
     return monitors.size();
+}
+
+QString camType2String(CamType ct) {
+    switch (ct) {
+    case CamType::CAM: return "cam";
+    case CamType::NEW_LINE: return "newline";
+    case CamType::END_SCREEN: return "stopper";
+    default: return "_|_";
+    }
 }
 
 QVariant MonitorModel::data(const QModelIndex& index, int role) const {
@@ -44,6 +56,13 @@ QVariant MonitorModel::data(const QModelIndex& index, int role) const {
         case StatusRole:        return mon.status;
         case CaptureFPSRole:    return mon.captureFPS;
         case CheckedRole:       return checked.at(index.row());
+        case TypeRole:
+            qDebug() << "cam type " << camType2String(mon.type);
+            return camType2String(mon.type);
+        case ColorModel:
+            //qDebug() << "color for " << index.row() << " color " << colorMatrix.getColor(colorMatrix.findCamColorIndex(index.row()));
+            qDebug() << "get color for index " << index.row() << " type " << camType2String(mon.type);
+            return mon.type==CamType::CAM?colorMatrix.getColor(colorMatrix.findCamColorIndex(index.row())):"lightgrey";
     default:
         break;
     }
@@ -75,16 +94,54 @@ void MonitorModel::add(const ZMMonitor& mon) {
     Preferences pref;
     beginInsertRows(QModelIndex(), monitors.size(), monitors.size());
     monitors << mon;
+    if (mon.type == CamType::CAM) {
+        qDebug() << "add mon " << (monitors.size() - 1);
+        colorMatrix.addCam(colorMatrix.size());
+    }
+    Q_ASSERT(static_cast<size_t>(monitors.size()) >= colorMatrix.size());
     while(checked.size() < monitors.size()) checked.append(pref.isCheckedMon(monitors[checked.size()].id));
     endInsertRows();
     emit dataIncoming(monitors.size());
     emit checkedCountChanged();
+    qDebug() << "item was added";
 }
 
 void MonitorModel::addAll(const QList<ZMMonitor>& monitors) {
     foreach (const ZMMonitor& mon, monitors) {
         add(mon);
     }
+}
+
+void MonitorModel::testAdd() {
+    ZMMonitor mon;
+    mon.id = QString::number(monitors.size());
+    mon.host = "192.168.100.11";
+    mon.name = "Test " + QString::number(monitors.size());
+    mon.type = CamType::CAM;
+    mon.size = QSize(1920, 1080);
+    mon.status = "on";
+    add(mon);
+}
+
+void MonitorModel::addNewLine() {
+    ZMMonitor mon;
+    mon.type = CamType::NEW_LINE;
+    mon.name = "NL";
+    add(mon);
+}
+
+void MonitorModel::addStopper() {
+    ZMMonitor mon;
+    mon.type = CamType::END_SCREEN;
+    mon.name = "END";
+    add(mon);
+}
+
+void MonitorModel::remove(int index) {
+    beginRemoveRows(QModelIndex(), index, index);
+    qDebug() << "remove " << index;
+    monitors.removeAt(index);
+    endRemoveRows();
 }
 
 void MonitorModel::onMonitors(const QList<ZMMonitor>& monitors) {

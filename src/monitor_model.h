@@ -7,12 +7,14 @@
 #include <QByteArray>
 
 #include "zmdata.h"
+#include "colormatrix.h"
 
 class MonitorModel : public QAbstractListModel {
     Q_OBJECT
 private:
     QList<ZMMonitor>  monitors;
     QList<bool> checked;
+    ColorMatrix colorMatrix;
 public:
     enum ServerRoles {
         IdRole   = Qt::UserRole + 1,
@@ -22,7 +24,9 @@ public:
         SizeRole,
         StatusRole,
         CaptureFPSRole,
-        CheckedRole
+        CheckedRole,
+        TypeRole,
+        ColorModel
     };
 
     static void registerQmlType();
@@ -43,6 +47,10 @@ public:
     Q_INVOKABLE void clean();
     Q_INVOKABLE void add(const ZMMonitor& mon);
     Q_INVOKABLE void addAll(const QList<ZMMonitor>&);
+    Q_INVOKABLE void testAdd();
+    Q_INVOKABLE void addNewLine();
+    Q_INVOKABLE void addStopper();
+    Q_INVOKABLE void remove(int);
 signals:
     void dataIncoming(int mc);
     void checkedCountChanged();

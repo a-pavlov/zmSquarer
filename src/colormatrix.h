@@ -11,12 +11,22 @@ private:
     static const std::array<const char*, CC_MAX> colors;
     std::array<std::array<int, CC_MAX>, CC_MAX> matrix;
     size_t camsCount;
-    int noCamsMarker;
+    size_t lastColor;
 public:
-    ColorMatrix(size_t);
+    ColorMatrix();
+    size_t addCam(size_t camIndex);
     size_t findCamColorIndex(size_t camIndex) const;
+    const char* getColor(size_t colorIndex) const;
+
     size_t nextColorIndex(size_t camIndex, bool unique);
     const char* nextColor(size_t camIndex);
+    size_t size() const {
+        return camsCount;
+    }
+
+    static size_t camsLimit() {
+        return CC_MAX;
+    }
 };
 
 #endif

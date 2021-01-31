@@ -12,6 +12,8 @@ int main(int argc, char *argv[]) {
     HttpParserTest htest;
     ZMClientTest zmctest;
     ColorArrayTest caTest;
-    return QTest::qExec(&caTest, argc, argv);
-    //return QTest::qExec(&test, argc, argv) | QTest::qExec(&htest, argc, argv) | QTest::qExec(&zmctest, argc, argv);
+    return QTest::qExec(&test, argc, argv)
+            | QTest::qExec(&htest, argc, argv)
+            | QTest::qExec(&zmctest, argc, argv)
+            | QTest::qExec(&caTest, argc, argv);
 }
