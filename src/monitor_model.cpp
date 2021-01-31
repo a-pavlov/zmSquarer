@@ -24,7 +24,7 @@ QHash<int, QByteArray> MonitorModel::roleNames() const {
     roles[CaptureFPSRole]   = "captureFPS";
     roles[CheckedRole]      = "selected";
     roles[TypeRole]         = "type";
-    roles[ColorModel]       = "color";
+    roles[ColorRole]        = "color";
     return roles;
 }
 
@@ -59,7 +59,7 @@ QVariant MonitorModel::data(const QModelIndex& index, int role) const {
         case TypeRole:
             qDebug() << "cam type " << camType2String(mon.type);
             return camType2String(mon.type);
-        case ColorModel:
+        case ColorRole:
             //qDebug() << "color for " << index.row() << " color " << colorMatrix.getColor(colorMatrix.findCamColorIndex(index.row()));
             qDebug() << "get color for index " << index.row() << " type " << camType2String(mon.type);
             return mon.type==CamType::CAM?colorMatrix.getColor(colorMatrix.findCamColorIndex(index.row())):"lightgrey";
@@ -71,10 +71,19 @@ QVariant MonitorModel::data(const QModelIndex& index, int role) const {
 }
 
 bool MonitorModel::setData(const QModelIndex& index, const QVariant &value, int role/* = Qt::EditRole*/) {
+    qDebug() << "set data override " << index.row() << " value " << value;
     if (index.isValid() && (index.row() >= 0 && index.row() < rowCount() && index.column() >= 0)) {
         if (role == CheckedRole) {
             checked[index.row()] = value.toBool();
             emit checkedCountChanged();
+            return true;
+        }
+
+        if (role == ColorRole) {
+            qDebug() << "color role called " << index.row() << " current color index " << colorMatrix.findCamColorIndex(index.row());
+            colorMatrix.nextColorIndex(index.row(), false);
+            qDebug() << "next color index " << colorMatrix.findCamColorIndex(index.row());
+            emit dataChanged(index, index);
             return true;
         }
     }
@@ -142,6 +151,10 @@ void MonitorModel::remove(int index) {
     qDebug() << "remove " << index;
     monitors.removeAt(index);
     endRemoveRows();
+}
+
+void MonitorModel::changeColor(int index) {
+    //emit dataChanged(QModelIndex())
 }
 
 void MonitorModel::onMonitors(const QList<ZMMonitor>& monitors) {

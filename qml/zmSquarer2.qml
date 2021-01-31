@@ -34,14 +34,14 @@ ApplicationWindow {
 
     Component.onCompleted: {
         console.log("component is ready");
-        monmod.testAdd();
-        monmod.testAdd();
-        monmod.testAdd();
-        monmod.testAdd();
-        monmod.testAdd();
-        monmod.testAdd();
-        monmod.addNewLine();
-        monmod.addStopper();
+        monmod.testAdd()
+        monmod.testAdd()
+        monmod.testAdd()
+        monmod.testAdd()
+        monmod.testAdd()
+        monmod.testAdd()
+        monmod.addNewLine()
+        monmod.addStopper()
     }
 
     Rectangle {
@@ -276,12 +276,18 @@ ApplicationWindow {
 
                                 MouseArea {
                                     anchors.fill: parent
-                                    propagateComposedEvents: true
+                                    //propagateComposedEvents: true
 
                                     onDoubleClicked: {
                                         console.log("double click on visual index "
                                                     + parent.visualIndex + " indx " + index)
-                                        monmod.remove(index)
+                                        //monmod.remove(index)
+                                        model.color = "test"
+                                    }
+
+                                    onClicked: {
+                                        console.log("click on cam")
+                                        model.color = "test"
                                     }
                                 }
 
@@ -367,7 +373,7 @@ ApplicationWindow {
                                     MouseArea {
                                         anchors.fill: parent
                                         onClicked: {
-                                            colorModel.remove(index)
+                                            monmod.remove(index)
                                         }
                                     }
                                 }
