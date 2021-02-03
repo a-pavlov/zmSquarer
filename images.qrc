@@ -6,5 +6,8 @@
         <file>images/no_signal.jpg</file>
         <file>images/Goodmark.png</file>
         <file>images/Badmark.png</file>
+        <file>images/Add.png</file>
+        <file>images/Goback.png</file>
+        <file>images/Goforward.png</file>
     </qresource>
 </RCC>

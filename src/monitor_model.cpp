@@ -44,7 +44,7 @@ QString camType2String(CamType ct) {
 QVariant MonitorModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid()) return QVariant();
     Q_ASSERT(index.row() < monitors.size());
-    Q_ASSERT(monitors.size() == checked.size());
+    //Q_ASSERT(monitors.size() == checked.size());
     const ZMMonitor& mon = monitors.at(index.row());
     switch(role) {
         case Qt::DisplayRole:   return mon.name;

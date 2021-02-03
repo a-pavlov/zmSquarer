@@ -1,6 +1,8 @@
 import QtQuick 2.12
 import QtQml.Models 2.1
 import QtQuick.Controls 2.12
+import QtQuick.Layouts 1.0
+import QtGraphicalEffects 1.0
 import Qt.labs.qmlmodels 1.0
 import ZMClient 0.1
 import MonitorModel 0.1
@@ -25,15 +27,10 @@ ApplicationWindow {
 
     MonitorModel {
         id: monmod
-        onDataIncoming: {
-            //monsList.visible = mc>0
-            //monsTitle.visible = mc>0
-            //monsStart.visible = mc>0
-        }
     }
 
     Component.onCompleted: {
-        console.log("component is ready");
+        console.log("component is ready")
         monmod.testAdd()
         monmod.testAdd()
         monmod.testAdd()
@@ -46,7 +43,7 @@ ApplicationWindow {
 
     Rectangle {
         id: itm
-        width: 320
+        width: 420
         height: 400
         color: "white"
         anchors.centerIn: parent
@@ -131,10 +128,9 @@ ApplicationWindow {
             }
         }
 
-        //! [1]
         Button {
-            id: btnNL
-            text: qsTr("Add \\n")
+            id: btnBack
+            text: qsTr("<<< Back")
             anchors {
                 top: parent.top
                 left: parent.left
@@ -142,15 +138,20 @@ ApplicationWindow {
             }
 
             onClicked: {
-                colorModel.append({
-                                      "color": "lightgray",
-                                      "name": qsTr("New line marker"),
-                                      "mid": "-1",
-                                      "type": "newline",
-                                      "monStatus": "xxx"
-                                  })
-                monmod.testAdd()
-                monmod.testAdd()
+                console.log("back")
+            }
+        }
+
+        Button {
+            id: btnNL
+            text: qsTr("Add \\n")
+            anchors {
+                top: parent.top
+                left: btnBack.right
+                margins: base_margins
+            }
+
+            onClicked: {
                 monmod.addNewLine()
             }
         }
@@ -173,12 +174,26 @@ ApplicationWindow {
             }
         }
 
+        Button {
+            id: btnPlay
+            text: qsTr("Show")
+            anchors {
+                top: parent.top
+                left: btnState.right
+                margins: base_margins
+            }
+
+            onClicked: {
+                console.log("show")
+            }
+        }
+
         GridView {
             id: root
             anchors.top: btnNL.bottom
             anchors.left: parent.left
 
-            width: 300
+            width: parent.width
             height: 300
             cellWidth: cell_width
             cellHeight: cell_height
@@ -194,9 +209,7 @@ ApplicationWindow {
                 }
             }
 
-            //! [0]
             model: DelegateModel {
-                //! [0]
                 id: visualModel
                 model: monmod
 
@@ -276,8 +289,8 @@ ApplicationWindow {
 
                                 MouseArea {
                                     anchors.fill: parent
-                                    //propagateComposedEvents: true
 
+                                    //propagateComposedEvents: true
                                     onDoubleClicked: {
                                         console.log("double click on visual index "
                                                     + parent.visualIndex + " indx " + index)

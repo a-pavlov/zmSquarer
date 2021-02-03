@@ -27,6 +27,9 @@ public:
     static size_t camsLimit() {
         return CC_MAX;
     }
+
+    void load();
+    void save();
 };
 
 #endif

@@ -1,4 +1,4 @@
-QT += testlib network
+QT += testlib network qml
 
 SOURCES = main.cpp \
     test.cpp \
@@ -8,7 +8,8 @@ SOURCES = main.cpp \
     httpparsertest.cpp \
     zmclienttest.cpp \
     colorarraytest.cpp \
-    ../src/colormatrix.cpp
+    ../src/colormatrix.cpp \
+    ../src/preferences.cpp
 
 INCLUDEPATH += ../src
 
@@ -23,7 +24,9 @@ HEADERS += \
     httpparsertest.h \
     zmclienttest.h \
     colorarraytest.h \
-    ../src/colormatrix.h
+    ../src/colormatrix.h\
+    ../src/qinisettings.h\
+    ../src/preferences.h
 
 RESOURCES += \
     res.qrc

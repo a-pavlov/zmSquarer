@@ -3,6 +3,8 @@
 #include <numeric>
 #include <QDebug>
 
+#include "preferences.h"
+
 const std::array<const char*, CC_MAX> ColorMatrix::colors= {
    "aliceblue", "antiquewhite", "aqua", "aquamarine", "azure",
    "beige", "bisque", "blanchedalmond", "cornsilk", "cyan",
@@ -68,5 +70,39 @@ size_t ColorMatrix::addCam(size_t camIndex) {
     Q_ASSERT(camIndex < CC_MAX);
     matrix[lastColor++][camIndex] = 1;
     return ++camsCount;
+}
+
+void ColorMatrix::save() {
+    Preferences pref;
+    pref.setValue("Common/ColorMatrix/Size", camsCount);
+    pref.beginWriteArray("Common/ColorMatrix");
+    for(size_t index = 0; index < matrix.size(); ++index) {
+        QStringList line;
+        std::transform(matrix[index].begin()
+                       , matrix[index].end()
+                       , std::back_inserter(line)
+                       , [](int i) -> QString { return QString::number(i); });
+        pref.setArrayIndex(static_cast<int>(index));
+        pref.setValue("Line", line.join(","));
+    }
+
+    pref.endArray();
+    pref.sync();
+}
+
+void ColorMatrix::load() {
+    Preferences pref;
+    camsCount = static_cast<size_t>(pref.value("Common/ColorMatrix/Size", 0).toInt());
+    size_t matrixHeight = static_cast<size_t>(pref.beginReadArray("Common/ColorMatrix"));
+    for(size_t index = 0; index < matrixHeight; ++index) {
+        pref.setArrayIndex(static_cast<int>(index));
+        QStringList line = pref.value("Line", "").toString().split(",");
+        std::transform(line.begin()
+                       , line.end()
+                       , matrix[index].begin()
+                       , [](QString elem) -> size_t { return elem.toUInt(); });
+    }
+
+    pref.endArray();
 }
 
