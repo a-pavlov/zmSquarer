@@ -81,9 +81,7 @@ bool MonitorModel::setData(const QModelIndex& index, const QVariant &value, int 
         }
 
         if (role == ColorRole) {
-            qDebug() << "color role called " << index.row() << " current color index " << colorMatrix.findCamColorIndex(monitors.at(index.row()).colorIndex);
             colorMatrix.nextColorIndex(monitors.at(index.row()).colorIndex, false);
-            qDebug() << "next color index " << colorMatrix.findCamColorIndex(monitors.at(index.row()).colorIndex);
             emit dataChanged(index, index);
             return true;
         }
@@ -352,7 +350,7 @@ void MonitorModel::load() {
         zm.function = pref.value("Function").toString();
         zm.captureFPS   = pref.value("CaptureFPS").toString();
         zm.visualIndex  = pref.value("VisualIndex").toInt();
-        zm.colorIndex   = pref.value("ColorIndex").toInt();
+        zm.colorIndex   = pref.value("ColorIndex").toUInt();
         mons.append(zm);
     }
 

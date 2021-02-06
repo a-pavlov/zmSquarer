@@ -15,7 +15,7 @@ private:
     QList<ZMMonitor>  monitors;
     QList<bool> checked;
     ColorMatrix colorMatrix;
-    //QList<int> colorProxy;
+    QList<int> colorProxy;
 public:
     enum ServerRoles {
         IdRole   = Qt::UserRole + 1,

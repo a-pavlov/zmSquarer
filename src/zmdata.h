@@ -19,7 +19,7 @@ struct ZMMonitor {
       QString captureFPS;
       CamType type;
       int visualIndex;
-      int colorIndex;
+      size_t colorIndex;
       ZMMonitor();
       ZMMonitor(const ZMMonitor&);
       ~ZMMonitor();
