@@ -45,7 +45,6 @@ QString camType2String(CamType ct) {
 QVariant MonitorModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid()) return QVariant();
     Q_ASSERT(index.row() < monitors.size());
-    //Q_ASSERT(monitors.size() == checked.size());
     const ZMMonitor& mon = monitors.at(index.row());
     switch(role) {
         case Qt::DisplayRole:   return mon.name;
@@ -58,11 +57,9 @@ QVariant MonitorModel::data(const QModelIndex& index, int role) const {
         case CaptureFPSRole:    return mon.captureFPS;
         case CheckedRole:       return checked.at(index.row());
         case TypeRole:
-            qDebug() << "cam type " << camType2String(mon.type);
             return camType2String(mon.type);
         case ColorRole:
-            //qDebug() << "color for " << index.row() << " color " << colorMatrix.getColor(colorMatrix.findCamColorIndex(index.row()));
-            qDebug() << "get color for index " << index.row() << " type " << camType2String(mon.type);
+            //qDebug() << "get color for index " << index.row() << " type " << camType2String(mon.type);
             return mon.type==CamType::CAM?colorMatrix.getColor(colorMatrix.findCamColorIndex(mon.colorIndex)):"lightgrey";
     default:
         break;
@@ -110,13 +107,11 @@ void MonitorModel::add(const ZMMonitor& mon) {
         colorMatrix.addCam(colorMatrix.size());
         monitors.back().colorIndex = colorMatrix.size() - 1;
     }
-    //colorProxy.append(colorProxy.size());
     Q_ASSERT(static_cast<size_t>(monitors.size()) >= colorMatrix.size());
     while(checked.size() < monitors.size()) checked.append(pref.isCheckedMon(monitors[checked.size()].id));
     endInsertRows();
     emit dataIncoming(monitors.size());
     emit checkedCountChanged();
-    qDebug() << "item was added";
 }
 
 void MonitorModel::addAll(const QList<ZMMonitor>& monitors) {
@@ -164,7 +159,6 @@ void MonitorModel::changeColor(int index) {
 void MonitorModel::setVisualIndex(int modelIndex, int visualIndex) {
     Q_ASSERT(modelIndex < monitors.size());
     monitors[modelIndex].visualIndex = visualIndex;
-    qDebug() << "set visual index " << visualIndex << " on model index " << modelIndex;
 }
 
 void MonitorModel::clear() {
@@ -356,16 +350,6 @@ void MonitorModel::load() {
 
     pref.endArray();
 
-    qDebug() << "load mons " << mons.size();
-
-    //colorProxy.reserve(mons.size());
-    //for(int i = 0; i < mons.size(); ++i) colorProxy.append(0);
-
-    //for(int i = 0; i < mons.size(); ++i) {
-    //    colorProxy[mons[i].visualIndex] = i;
-    //    qDebug() << "color proxy pos " << mons[i].visualIndex << " value " << i;
-    //}
-
     std::sort(mons.begin(), mons.end(), [](const ZMMonitor& a, const ZMMonitor& b) -> bool { return a.visualIndex < b.visualIndex; });
     clear();
     colorMatrix.load();
@@ -374,5 +358,4 @@ void MonitorModel::load() {
         monitors << mons;
         emit endInsertRows();
     }
-    //addAll(mons);
 }

@@ -87,7 +87,6 @@ void ColorMatrix::reset() {
 
 void ColorMatrix::save() const {
     Preferences pref;
-    qDebug() << "save cams count " << camsCount;
     pref.setValue("Common/ColorMatrix/CamsCount", camsCount);
     pref.setValue("Common/ColorMatrix/LastColor", lastColor);
     pref.beginWriteArray("Common/ColorMatrix");
@@ -109,12 +108,10 @@ void ColorMatrix::load() {
     Preferences pref;
     camsCount = static_cast<size_t>(pref.value("Common/ColorMatrix/CamsCount", 0).toInt());
     lastColor = static_cast<size_t>(pref.value("Common/ColorMatrix/LastColor", 0).toInt());
-    qDebug() << "cams count " << camsCount << " last color " << lastColor;
     size_t matrixHeight = static_cast<size_t>(pref.beginReadArray("Common/ColorMatrix"));
     for(size_t index = 0; index < matrixHeight; ++index) {
         pref.setArrayIndex(static_cast<int>(index));
         QStringList line = pref.value("Line", "").toString().split(",");
-        qDebug() << "line: " << line;
         std::transform(line.begin()
                        , line.end()
                        , matrix[index].begin()
