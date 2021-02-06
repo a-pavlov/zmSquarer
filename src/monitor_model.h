@@ -28,6 +28,7 @@ public:
         CheckedRole,
         TypeRole,
         ColorRole,
+        ColorIndexRole,
         VisualIndexRole
     };
 

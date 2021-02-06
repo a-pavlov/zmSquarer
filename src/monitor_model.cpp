@@ -25,6 +25,7 @@ QHash<int, QByteArray> MonitorModel::roleNames() const {
     roles[CheckedRole]      = "selected";
     roles[TypeRole]         = "type";
     roles[ColorRole]        = "color";
+    roles[ColorIndexRole]   = "colorIndex";
     roles[VisualIndexRole]  = "visualIndex";
     return roles;
 }
@@ -35,11 +36,12 @@ int MonitorModel::rowCount(const QModelIndex&) const {
 
 QString camType2String(CamType ct) {
     switch (ct) {
-    case CamType::CAM: return "cam";
-    case CamType::NEW_LINE: return "newline";
-    case CamType::END_SCREEN: return "stopper";
-    default: return "_|_";
+        case CamType::CAM: return "cam";
+        case CamType::NEW_LINE: return "newline";
+        case CamType::END_SCREEN: return "stopper";
     }
+
+    return "_|_";
 }
 
 QVariant MonitorModel::data(const QModelIndex& index, int role) const {
@@ -58,6 +60,8 @@ QVariant MonitorModel::data(const QModelIndex& index, int role) const {
         case CheckedRole:       return checked.at(index.row());
         case TypeRole:
             return camType2String(mon.type);
+        case ColorIndexRole:
+            return colorMatrix.findCamColorIndex(mon.colorIndex);
         case ColorRole:
             //qDebug() << "get color for index " << index.row() << " type " << camType2String(mon.type);
             return mon.type==CamType::CAM?colorMatrix.getColor(colorMatrix.findCamColorIndex(mon.colorIndex)):"lightgrey";
@@ -127,7 +131,7 @@ void MonitorModel::testAdd() {
     mon.name = "Test " + QString::number(monitors.size());
     mon.type = CamType::CAM;
     mon.size = QSize(1920, 1080);
-    mon.status = "on";
+    mon.status = "Connected";
     add(mon);
 }
 

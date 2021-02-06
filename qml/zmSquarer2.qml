@@ -29,95 +29,109 @@ ApplicationWindow {
         id: monmod
     }
 
+    ZMClient {
+        id: zmc
+        url: prefs.url
+        onMonitors: {
+            monmod.clear()
+            monmod.addAll(mons)
+            monmod.addStopper()
+            btnUrl.text = qsTr("Check")
+            btnUrl.enabled = true
+            btnUrl.checkMode = true
+            zmUrlProgress.visible = false
+            zmClientError.visible = false
+            // flush settings in case of successfull connection
+            prefs.url = url
+            prefs.flush()
+        }
+
+        onError: {
+            monmod.clean()
+            btnUrl.text = qsTr("Check")
+            btnUrl.enabled = true
+            btnUrl.checkMode = true
+            zmUrlProgress.visible = false
+            zmClientError.text = qsTr(
+                        "<font color=\"#FF0000\">Error:</font> ") + msg
+            zmClientError.visible = true
+        }
+    }
+
     Component.onCompleted: {
-        console.log("component is ready")
+        monmod.load()
+    }
+
+    GroupBox {
+        id: setup
+        anchors {
+            top: parent.top
+            horizontalCenter: parent.horizontalCenter
+        }
+
+        title: qsTr("Setup connection")
+
+        ColumnLayout {
+            Label {
+                id: lb
+                text: qsTr("Enter ZM url with scheme")
+            }
+
+            RowLayout {
+                id: r
+                TextField {
+                    id: zmUrl
+                    placeholderText: qsTr("http://")
+                    text: prefs.url
+                    onTextChanged: {
+                        zmc.url = text
+                    }
+                }
+
+                Button {
+                    id: btnUrl
+                    property bool checkMode: true
+                    enabled: zmUrl.text.length > 0
+                    text: qsTr("Connect")
+                    onClicked: {
+                        if (checkMode) {
+                            text = qsTr("Cancel")
+                            zmc.getMonitors()
+                        } else {
+                            text = qsTr("Check")
+                        }
+
+                        console.log("check " + checkMode)
+                        zmUrl.enabled = checkMode
+                        zmUrlProgress.visible = checkMode
+                        checkMode = !checkMode
+                    }
+                }
+            }
+
+            ProgressBar {
+                id: zmUrlProgress
+                visible: false
+                width: parent.width
+                indeterminate: true
+            }
+
+            Label {
+                id: zmClientError
+                text: qsTr("<font color=\"#FF0000\">Error:</font> ")
+                visible: false
+            }
+        }
     }
 
     Rectangle {
         id: itm
         width: 420
-        height: 400
+        height: 500
         color: "white"
-        anchors.centerIn: parent
-
-        ListModel {
-            id: colorModel
-            ListElement {
-                mid: "1"
-                name: "Name1: camera 1"
-                host: "192.168.100.11"
-                size: "1920x1080"
-                color: "red"
-                type: "cam"
-                vi: ""
-                monStatus: "on"
-            }
-
-            ListElement {
-                mid: "2"
-                name: "Name2: camera 2 test line"
-                host: "192.168.100.11"
-                size: "1920x1080"
-                color: "green"
-                type: "cam"
-                vi: ""
-                monStatus: "on"
-            }
-
-            ListElement {
-                mid: "3"
-                name: "Name3: xxx aaa"
-                host: "192.168.100.11"
-                size: "1920x1080"
-                color: "blue"
-                type: "cam"
-                vi: ""
-                monStatus: "off"
-            }
-
-            ListElement {
-                mid: "4"
-                name: "Name4: mmm"
-                host: "192.168.100.11"
-                size: "1920x1080"
-                color: "goldenrod"
-                type: "cam"
-                vi: ""
-                monStatus: "on"
-            }
-
-            ListElement {
-                mid: "1"
-                name: "Name1"
-                host: "192.168.100.11"
-                size: "1920x1080"
-                color: "pink"
-                type: "cam"
-                vi: ""
-                monStatus: "on"
-            }
-
-            ListElement {
-                mid: "1"
-                name: "Name1"
-                host: "192.168.100.11"
-                size: "1920x1080"
-                color: "violet"
-                type: "cam"
-                vi: ""
-                monStatus: "off"
-            }
-
-            ListElement {
-                mid: "1"
-                name: qsTr("End marker")
-                host: "192.168.100.11"
-                size: "1920x1080"
-                color: "lightgray"
-                type: "stopper"
-                vi: ""
-                monStatus: "active"
-            }
+        anchors {
+            top: setup.bottom
+            horizontalCenter: parent.horizontalCenter
         }
 
         Button {
@@ -131,7 +145,7 @@ ApplicationWindow {
 
             onClicked: {
                 console.log("load")
-                monmod.load();
+                monmod.load()
             }
         }
 
@@ -160,14 +174,15 @@ ApplicationWindow {
 
             onClicked: {
                 for (var i = 0; i < visualModel.count; ++i) {
-                    visualModel.model.setVisualIndex(visualModel.items.get(i).model.index, i);
+                    visualModel.model.setVisualIndex(visualModel.items.get(
+                                                         i).model.index, i)
 
                     //console.log("visual item " + i + " name: " + visualModel.items.get(
                     //                i).model.name + " base index: " + visualModel.items.get(
                     //                i).model.index)
                 }
 
-                monmod.save();
+                monmod.save()
             }
         }
 
@@ -216,8 +231,8 @@ ApplicationWindow {
             }
 
             onClicked: {
-                console.log("clear");
-                monmod.clear();
+                console.log("clear")
+                monmod.clear()
             }
         }
 
@@ -227,7 +242,7 @@ ApplicationWindow {
             anchors.left: parent.left
 
             width: parent.width
-            height: 300
+            height: 460
             cellWidth: cell_width
             cellHeight: cell_height
             clip: true
@@ -298,6 +313,17 @@ ApplicationWindow {
                                 }
 
                                 Label {
+                                    id: groupId
+                                    anchors {
+                                        left: parent.left
+                                        top: name.bottom
+                                        margins: base_margins
+                                    }
+
+                                    text: qsTr("Group: %1").arg(model.colorIndex)
+                                }
+
+                                Label {
                                     id: camSize
                                     anchors {
                                         left: parent.left
@@ -310,7 +336,7 @@ ApplicationWindow {
 
                                 Image {
                                     id: camMark
-                                    source: model.monStatus == "on" ? "qrc:/images/Goodmark.png" : "qrc:/images/Badmark.png"
+                                    source: model.monStatus === "Connected" ? "qrc:/images/Goodmark.png" : "qrc:/images/Badmark.png"
                                     width: 12
                                     height: 12
                                     anchors {
