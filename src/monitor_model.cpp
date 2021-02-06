@@ -81,9 +81,9 @@ bool MonitorModel::setData(const QModelIndex& index, const QVariant &value, int 
         }
 
         if (role == ColorRole) {
-            qDebug() << "color role called " << index.row() << " current color index " << colorMatrix.findCamColorIndex(index.row());
+            qDebug() << "color role called " << index.row() << " current color index " << colorMatrix.findCamColorIndex(monitors.at(index.row()).colorIndex);
             colorMatrix.nextColorIndex(monitors.at(index.row()).colorIndex, false);
-            qDebug() << "next color index " << colorMatrix.findCamColorIndex(index.row());
+            qDebug() << "next color index " << colorMatrix.findCamColorIndex(monitors.at(index.row()).colorIndex);
             emit dataChanged(index, index);
             return true;
         }
