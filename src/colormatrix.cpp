@@ -14,9 +14,7 @@ const std::array<const char*, CC_MAX> ColorMatrix::colors= {
 ColorMatrix::ColorMatrix()
     : camsCount(0)
     , lastColor(0) {
-    for(size_t i = 0; i < CC_MAX; ++i)
-        for(size_t j = 0; j < CC_MAX; ++j)
-            matrix[i][j] = 0;
+   reset();
 }
 
 size_t ColorMatrix::findCamColorIndex(size_t camIndex) const {
@@ -72,9 +70,26 @@ size_t ColorMatrix::addCam(size_t camIndex) {
     return ++camsCount;
 }
 
-void ColorMatrix::save() {
+void ColorMatrix::removeCam(size_t camIndex) {
+    Q_ASSERT(camIndex < camsCount);
+    for(size_t i = 0; i < CC_MAX; ++i) {
+        matrix[i][camIndex] = 0;
+    }
+}
+
+void ColorMatrix::reset() {
+    for(size_t i = 0; i < CC_MAX; ++i)
+        for(size_t j = 0; j < CC_MAX; ++j)
+            matrix[i][j] = 0;
+    lastColor = 0;
+    camsCount = 0;
+}
+
+void ColorMatrix::save() const {
     Preferences pref;
-    pref.setValue("Common/ColorMatrix/Size", camsCount);
+    qDebug() << "save cams count " << camsCount;
+    pref.setValue("Common/ColorMatrix/CamsCount", camsCount);
+    pref.setValue("Common/ColorMatrix/LastColor", lastColor);
     pref.beginWriteArray("Common/ColorMatrix");
     for(size_t index = 0; index < matrix.size(); ++index) {
         QStringList line;
@@ -92,11 +107,14 @@ void ColorMatrix::save() {
 
 void ColorMatrix::load() {
     Preferences pref;
-    camsCount = static_cast<size_t>(pref.value("Common/ColorMatrix/Size", 0).toInt());
+    camsCount = static_cast<size_t>(pref.value("Common/ColorMatrix/CamsCount", 0).toInt());
+    lastColor = static_cast<size_t>(pref.value("Common/ColorMatrix/LastColor", 0).toInt());
+    qDebug() << "cams count " << camsCount << " last color " << lastColor;
     size_t matrixHeight = static_cast<size_t>(pref.beginReadArray("Common/ColorMatrix"));
     for(size_t index = 0; index < matrixHeight; ++index) {
         pref.setArrayIndex(static_cast<int>(index));
         QStringList line = pref.value("Line", "").toString().split(",");
+        qDebug() << "line: " << line;
         std::transform(line.begin()
                        , line.end()
                        , matrix[index].begin()

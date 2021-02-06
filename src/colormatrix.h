@@ -15,6 +15,7 @@ private:
 public:
     ColorMatrix();
     size_t addCam(size_t camIndex);
+    void removeCam(size_t camIndex);
     size_t findCamColorIndex(size_t camIndex) const;
     const char* getColor(size_t colorIndex) const;
 
@@ -28,8 +29,10 @@ public:
         return CC_MAX;
     }
 
+    void reset();
+
     void load();
-    void save();
+    void save() const;
 };
 
 #endif

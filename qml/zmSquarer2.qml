@@ -31,14 +31,6 @@ ApplicationWindow {
 
     Component.onCompleted: {
         console.log("component is ready")
-        monmod.testAdd()
-        monmod.testAdd()
-        monmod.testAdd()
-        monmod.testAdd()
-        monmod.testAdd()
-        monmod.testAdd()
-        monmod.addNewLine()
-        monmod.addStopper()
     }
 
     Rectangle {
@@ -130,7 +122,7 @@ ApplicationWindow {
 
         Button {
             id: btnBack
-            text: qsTr("<<< Back")
+            text: qsTr("<<< Load")
             anchors {
                 top: parent.top
                 left: parent.left
@@ -138,7 +130,8 @@ ApplicationWindow {
             }
 
             onClicked: {
-                console.log("back")
+                console.log("load")
+                monmod.load();
             }
         }
 
@@ -158,7 +151,7 @@ ApplicationWindow {
 
         Button {
             id: btnState
-            text: qsTr("State")
+            text: qsTr("Save")
             anchors {
                 top: parent.top
                 left: btnNL.right
@@ -167,16 +160,20 @@ ApplicationWindow {
 
             onClicked: {
                 for (var i = 0; i < visualModel.count; ++i) {
-                    console.log("visual item " + i + " name: " + visualModel.items.get(
-                                    i).model.name + " base index: " + visualModel.items.get(
-                                    i).model.index)
+                    visualModel.model.setVisualIndex(visualModel.items.get(i).model.index, i);
+
+                    //console.log("visual item " + i + " name: " + visualModel.items.get(
+                    //                i).model.name + " base index: " + visualModel.items.get(
+                    //                i).model.index)
                 }
+
+                monmod.save();
             }
         }
 
         Button {
             id: btnPlay
-            text: qsTr("Show")
+            text: qsTr("NU")
             anchors {
                 top: parent.top
                 left: btnState.right
@@ -185,6 +182,42 @@ ApplicationWindow {
 
             onClicked: {
                 console.log("show")
+            }
+        }
+
+        Button {
+            id: btnTest
+            text: qsTr("Test")
+            anchors {
+                top: parent.top
+                left: btnPlay.right
+                margins: base_margins
+            }
+
+            onClicked: {
+                monmod.testAdd()
+                monmod.testAdd()
+                monmod.testAdd()
+                monmod.testAdd()
+                monmod.testAdd()
+                monmod.testAdd()
+                monmod.addNewLine()
+                monmod.addStopper()
+            }
+        }
+
+        Button {
+            id: btnClear
+            text: qsTr("Clear")
+            anchors {
+                top: parent.top
+                left: btnTest.right
+                margins: base_margins
+            }
+
+            onClicked: {
+                console.log("clear");
+                monmod.clear();
             }
         }
 

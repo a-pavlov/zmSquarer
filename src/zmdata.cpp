@@ -34,6 +34,8 @@ ZMMonitor ZMMonitor::fromJson(const QJsonObject& doc) {
     res.status      = monStatus.value("Status").toString();
     res.captureFPS  = monStatus.value("CaptureFPS").toString();
     res.type        = CamType::CAM;
+    res.visualIndex = 0;
+    res.colorIndex  = -1;
     return res;
 }
 
@@ -52,6 +54,8 @@ ZMMonitor::ZMMonitor(const ZMMonitor& zmmon) {
     status      = zmmon.status;
     captureFPS  = zmmon.captureFPS;
     type        = zmmon.type;
+    visualIndex = zmmon.visualIndex;
+    colorIndex  = zmmon.colorIndex;
 }
 
 ZMMonitor::~ZMMonitor(){}

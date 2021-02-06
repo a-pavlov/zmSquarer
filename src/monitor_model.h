@@ -15,6 +15,7 @@ private:
     QList<ZMMonitor>  monitors;
     QList<bool> checked;
     ColorMatrix colorMatrix;
+    //QList<int> colorProxy;
 public:
     enum ServerRoles {
         IdRole   = Qt::UserRole + 1,
@@ -26,7 +27,8 @@ public:
         CaptureFPSRole,
         CheckedRole,
         TypeRole,
-        ColorRole
+        ColorRole,
+        VisualIndexRole
     };
 
     static void registerQmlType();
@@ -43,8 +45,8 @@ public:
 
     Q_PROPERTY(int checkedCount READ getCheckedCount NOTIFY checkedCountChanged)
 
-    void save() const;    // save servers list to disk
-    void load();    // load servers list from disk
+    Q_INVOKABLE void save() const;    // save servers list to disk
+    Q_INVOKABLE void load();    // load servers list from disk
     Q_INVOKABLE void clean();
     Q_INVOKABLE void add(const ZMMonitor& mon);
     Q_INVOKABLE void addAll(const QList<ZMMonitor>&);
@@ -53,6 +55,8 @@ public:
     Q_INVOKABLE void addStopper();
     Q_INVOKABLE void remove(int);
     Q_INVOKABLE void changeColor(int);
+    Q_INVOKABLE void setVisualIndex(int modelIndex, int visualIndex);
+    Q_INVOKABLE void clear();
 signals:
     void dataIncoming(int mc);
     void checkedCountChanged();
