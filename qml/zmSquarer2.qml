@@ -21,6 +21,8 @@ ApplicationWindow {
     property int base_radius: 4
     property int base_margins: 4
 
+    property var mms: monmod.monitorsCount
+
     ZMSQPreferences {
         id: prefs
     }
@@ -62,6 +64,12 @@ ApplicationWindow {
         monmod.load()
     }
 
+    function setVisualIndexes() {
+        for (var i = 0; i < visualModel.count; ++i) {
+            visualModel.model.setVisualIndex(visualModel.items.get(i).model.index, i)
+        }
+    }
+
     GroupBox {
         id: setup
         anchors {
@@ -92,6 +100,7 @@ ApplicationWindow {
                     id: btnUrl
                     property bool checkMode: true
                     enabled: zmUrl.text.length > 0
+                    anchors.margins: base_margins
                     text: qsTr("Connect")
                     onClicked: {
                         if (checkMode) {
@@ -105,6 +114,26 @@ ApplicationWindow {
                         zmUrl.enabled = checkMode
                         zmUrlProgress.visible = checkMode
                         checkMode = !checkMode
+                    }
+                }
+
+                Button {
+                    id: btnNewLine
+                    anchors.margins: base_margins
+                    enabled: (monmod.monitorsCount > 0)
+                    text: qsTr("Add line sep")
+                    onClicked: {
+
+                    }
+                }
+
+                Button {
+                    id: startView
+                    anchors.margins: base_margins
+                    enabled: monmod.monitorsCount > 0
+                    text: qsTr("Start")
+                    onClicked: {
+                        setVisualIndexes();
                     }
                 }
             }
@@ -128,7 +157,7 @@ ApplicationWindow {
         id: itm
         width: 420
         height: 500
-        color: "white"
+
         anchors {
             top: setup.bottom
             horizontalCenter: parent.horizontalCenter

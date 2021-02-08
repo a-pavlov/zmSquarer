@@ -115,7 +115,7 @@ void MonitorModel::add(const ZMMonitor& mon) {
     while(checked.size() < monitors.size()) checked.append(pref.isCheckedMon(monitors[checked.size()].id));
     endInsertRows();
     emit dataIncoming(monitors.size());
-    emit checkedCountChanged();
+    emit monitorsCountChanged();
 }
 
 void MonitorModel::addAll(const QList<ZMMonitor>& monitors) {
@@ -154,6 +154,7 @@ void MonitorModel::remove(int index) {
     qDebug() << "remove " << index;
     monitors.removeAt(index);
     endRemoveRows();
+    emit monitorsCountChanged();
 }
 
 void MonitorModel::changeColor(int index) {
@@ -171,6 +172,7 @@ void MonitorModel::clear() {
         emit beginRemoveRows(QModelIndex(), 0, monitors.size() - 1);
         monitors.clear();
         endRemoveRows();
+        emit monitorsCountChanged();
     }
 }
 
@@ -187,6 +189,10 @@ QString MonitorModel::getCheckedMonId(int row) const {
 
 int MonitorModel::getCheckedCount() const {
     return static_cast<int>(std::count_if(checked.begin(), checked.end(), [](bool i) {return i; }));
+}
+
+int MonitorModel::getMonitorsCount() const {
+    return static_cast<int>(std::count_if(monitors.begin(), monitors.end(), [](const ZMMonitor& m) -> bool { return m.type == CamType::CAM; }));
 }
 
 /*
@@ -305,6 +311,7 @@ void MonitorModel::clean() {
         beginRemoveRows(QModelIndex(), 0, monitors.size() - 1);
         monitors.clear();
         endRemoveRows();
+        emit monitorsCountChanged();
     }
 }
 
@@ -362,4 +369,6 @@ void MonitorModel::load() {
         monitors << mons;
         emit endInsertRows();
     }
+
+    monitorsCountChanged();
 }

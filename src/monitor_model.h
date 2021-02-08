@@ -43,8 +43,10 @@ public:
 
     Q_INVOKABLE QString getCheckedMonId(int) const;
     Q_INVOKABLE int getCheckedCount() const;
+    Q_INVOKABLE int getMonitorsCount() const;
 
     Q_PROPERTY(int checkedCount READ getCheckedCount NOTIFY checkedCountChanged)
+    Q_PROPERTY(int monitorsCount READ getMonitorsCount NOTIFY monitorsCountChanged)
 
     Q_INVOKABLE void save() const;    // save servers list to disk
     Q_INVOKABLE void load();    // load servers list from disk
@@ -61,6 +63,7 @@ public:
 signals:
     void dataIncoming(int mc);
     void checkedCountChanged();
+    void monitorsCountChanged();
 public slots:
     void onMonitors(const QList<ZMMonitor>&);
 };
