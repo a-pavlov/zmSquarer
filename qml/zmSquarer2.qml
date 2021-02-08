@@ -21,8 +21,6 @@ ApplicationWindow {
     property int base_radius: 4
     property int base_margins: 4
 
-    property var mms: monmod.monitorsCount
-
     ZMSQPreferences {
         id: prefs
     }
@@ -123,7 +121,7 @@ ApplicationWindow {
                     enabled: (monmod.monitorsCount > 0)
                     text: qsTr("Add line sep")
                     onClicked: {
-
+                         monmod.addNewLine()
                     }
                 }
 
@@ -163,7 +161,7 @@ ApplicationWindow {
             horizontalCenter: parent.horizontalCenter
         }
 
-        Button {
+        /*Button {
             id: btnBack
             text: qsTr("<<< Load")
             anchors {
@@ -190,42 +188,20 @@ ApplicationWindow {
             onClicked: {
                 monmod.addNewLine()
             }
-        }
+        }*/
 
         Button {
             id: btnState
             text: qsTr("Save")
             anchors {
                 top: parent.top
-                left: btnNL.right
+                left: parent.left
                 margins: base_margins
             }
 
             onClicked: {
-                for (var i = 0; i < visualModel.count; ++i) {
-                    visualModel.model.setVisualIndex(visualModel.items.get(
-                                                         i).model.index, i)
-
-                    //console.log("visual item " + i + " name: " + visualModel.items.get(
-                    //                i).model.name + " base index: " + visualModel.items.get(
-                    //                i).model.index)
-                }
-
+                setVisualIndexes();
                 monmod.save()
-            }
-        }
-
-        Button {
-            id: btnPlay
-            text: qsTr("NU")
-            anchors {
-                top: parent.top
-                left: btnState.right
-                margins: base_margins
-            }
-
-            onClicked: {
-                console.log("show")
             }
         }
 
@@ -234,7 +210,7 @@ ApplicationWindow {
             text: qsTr("Test")
             anchors {
                 top: parent.top
-                left: btnPlay.right
+                left: btnState.right
                 margins: base_margins
             }
 
@@ -267,7 +243,7 @@ ApplicationWindow {
 
         GridView {
             id: root
-            anchors.top: btnNL.bottom
+            anchors.top: btnClear.bottom
             anchors.left: parent.left
 
             width: parent.width
