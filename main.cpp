@@ -9,6 +9,7 @@
 #include "monitor_model.h"
 #include "zmdata.h"
 #include "preferences.h"
+#include "scenebuilder.h"
 
 
 int main(int argc, char *argv[]) {
@@ -18,6 +19,7 @@ int main(int argc, char *argv[]) {
     ZMClient::registerQmlType();
     MonitorModel::registerQmlType();
     Preferences::registerQmlType();
+    SceneBuilder::registerQmlType();
 
     ZMSQApplication app(argc, argv);
     //MonitorModel monmod;

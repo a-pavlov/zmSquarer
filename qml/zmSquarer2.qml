@@ -7,6 +7,7 @@ import Qt.labs.qmlmodels 1.0
 import ZMClient 0.1
 import MonitorModel 0.1
 import ZMSQPreferences 0.1
+import SceneBuilder 0.1
 
 ApplicationWindow {
     id: wnd
@@ -56,6 +57,10 @@ ApplicationWindow {
                         "<font color=\"#FF0000\">Error:</font> ") + msg
             zmClientError.visible = true
         }
+    }
+
+    SceneBuilder {
+        id: sceneBuilder
     }
 
     Component.onCompleted: {
@@ -132,6 +137,10 @@ ApplicationWindow {
                     text: qsTr("Start")
                     onClicked: {
                         setVisualIndexes();
+                        var scene = sceneBuilder.buildScene(zmc, monmod);
+                        var newObject = Qt.createQmlObject(scene,wnd,"scene1");
+                        newObject.destroy(2000)
+
                     }
                 }
             }
