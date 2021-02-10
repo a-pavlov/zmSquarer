@@ -4,8 +4,7 @@ QT += qml quick multimedia widgets network
 
 SOURCES += main.cpp
 
-RESOURCES += qml.qrc \
-    images.qrc
+RESOURCES += qml.qrc images.qrc text.qrc
 
 QMAKE_CFLAGS += -Dsysconfdir=\"xxx\"
 QMAKE_CXXFLAGS += -Dsysconfdir=\"xxx\" -DWITH_TURBOJPEG

@@ -61,6 +61,14 @@ ApplicationWindow {
 
     SceneBuilder {
         id: sceneBuilder
+        onSuccess: {
+            var newObject = Qt.createQmlObject(code,wnd,"scene1");
+            newObject.destroy(2000)
+        }
+
+        onFail: {
+            console.log("fail " + code);
+        }
     }
 
     Component.onCompleted: {
@@ -137,10 +145,7 @@ ApplicationWindow {
                     text: qsTr("Start")
                     onClicked: {
                         setVisualIndexes();
-                        var scene = sceneBuilder.buildScene(zmc, monmod);
-                        var newObject = Qt.createQmlObject(scene,wnd,"scene1");
-                        newObject.destroy(2000)
-
+                        sceneBuilder.buildScene(zmc,monmod)
                     }
                 }
             }

@@ -1,0 +1,14 @@
+import QtQuick 2.7
+import QtQuick.Controls 2.12
+import QtMultimedia 5.0
+import CamVideoProducer 0.1
+
+Item {
+    id: main
+    anchors.fill: parent    
+    focus: true
+
+    %1
+
+    %2
+}

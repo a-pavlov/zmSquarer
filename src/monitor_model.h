@@ -60,6 +60,9 @@ public:
     Q_INVOKABLE void changeColor(int);
     Q_INVOKABLE void setVisualIndex(int modelIndex, int visualIndex);
     Q_INVOKABLE void clear();
+    const QList<ZMMonitor>& getMonitors() const {
+        return monitors;
+    }
 signals:
     void dataIncoming(int mc);
     void checkedCountChanged();

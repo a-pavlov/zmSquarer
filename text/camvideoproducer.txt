@@ -1,0 +1,4 @@
+CamVideoProducer {
+    id: videoProducer_%1
+    url: %2
+}
