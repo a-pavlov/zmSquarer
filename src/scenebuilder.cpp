@@ -54,12 +54,51 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
     }
 
     Q_ASSERT(line.isEmpty());
+    QString camVideoProducer = readFile(":/text/camvideoproducer.txt");
+    QString camVideoOutput = readFile(":/text/videooutput.txt");
+
     int height = monLines.size();
+    QFile resFile("c:/dev/test.qml");
+    bool resOpened = resFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream resStream(&resFile);
+    QString topAnchor("parent.top");
+
     for(const QList<ZMMonitor>& m: monLines) {
-        QStringList out;
-        std::transform(m.begin(), m.end(), std::back_inserter(out), [](const ZMMonitor& mon) -> QString { return mon.id;});
-        qDebug() << out.join(",");
+        QStringList videoProducer;
+        std::transform(m.begin(), m.end(), std::back_inserter(videoProducer), [&](const ZMMonitor& mon) ->
+                       QString { return camVideoProducer.arg(mon.id).arg(zmc->getMonitorUrl(mon.id.toInt()));});
+
+        QString leftAnchor("parent.left");
+        QString output("output_%1.right");
+
+        QStringList videoOutput;
+        std::transform(m.begin(), m.end(), std::back_inserter(videoOutput), [&](const ZMMonitor& mon) ->
+                       QString {
+            QString res = camVideoOutput
+                        .arg(mon.id)
+                        .arg(leftAnchor)
+                        .arg(topAnchor)
+                        .arg(m.size())
+                        .arg(height);
+            leftAnchor = QString("output_%1.right").arg(mon.id);
+            return res;
+        });
+
+        topAnchor = QString("output_%1.bottom").arg(m.begin()->id);
+
+        if (resOpened) {
+            qDebug() << "store line";
+            resStream << videoProducer.join("\n");
+            resStream << "\n\n";
+            resStream << videoOutput.join("\n");
+            resStream << "\n\n";
+        } else {
+            qDebug() << "file is not open";
+        }
     }
+
+    if (resFile.isOpen()) resFile.close();
+
 
     qDebug() << "template " << readFile(":/text/template.txt");
     qDebug() << "video provider " << readFile(":/text/camvideoproducer.txt");
