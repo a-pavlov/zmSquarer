@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>text/template.txt</file>
         <file>text/camvideoproducer.txt</file>
         <file>text/videooutput.txt</file>
+        <file>text/header.txt</file>
     </qresource>
 </RCC>

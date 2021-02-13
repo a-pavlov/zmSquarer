@@ -12,6 +12,7 @@ ApplicationWindow {
     width: 640
     height: 480
     property var comp: ""
+    //flags: Qt.FramelessWindowHint
 
     ZMSQPreferences {
         id: prefs

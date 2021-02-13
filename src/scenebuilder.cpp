@@ -23,8 +23,6 @@ SceneBuilder::SceneBuilder() {
 }
 
 QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
-    Q_UNUSED(zmc);
-    Q_UNUSED(monmod);
     QList<ZMMonitor> mons;
     mons.append(monmod->getMonitors());
     std::sort(mons.begin(), mons.end(), [](const ZMMonitor& a, const ZMMonitor& b) -> bool { return a.visualIndex < b.visualIndex; });
@@ -56,11 +54,16 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
     Q_ASSERT(line.isEmpty());
     QString camVideoProducer = readFile(":/text/camvideoproducer.txt");
     QString camVideoOutput = readFile(":/text/videooutput.txt");
+    QString camViewHeader = readFile(":/text/header.txt");
 
     int height = monLines.size();
     QFile resFile("c:/dev/test.qml");
     bool resOpened = resFile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream resStream(&resFile);
+    QString buffer;
+    QTextStream bufferStream(&buffer);
+    bufferStream << camViewHeader << "\n";
+    resStream << camViewHeader << "\n";
     QString topAnchor("parent.top");
 
     for(const QList<ZMMonitor>& m: monLines) {
@@ -79,32 +82,28 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
                         .arg(leftAnchor)
                         .arg(topAnchor)
                         .arg(m.size())
-                        .arg(height);
+                        .arg(height)
+                        .arg(mon.id);
             leftAnchor = QString("output_%1.right").arg(mon.id);
             return res;
         });
 
         topAnchor = QString("output_%1.bottom").arg(m.begin()->id);
 
-        if (resOpened) {
-            qDebug() << "store line";
-            resStream << videoProducer.join("\n");
-            resStream << "\n\n";
-            resStream << videoOutput.join("\n");
-            resStream << "\n\n";
-        } else {
-            qDebug() << "file is not open";
-        }
+        bufferStream << videoProducer.join("\n") << "\n\n" << videoOutput.join("\n") << "\n";
+        resStream << videoProducer.join("\n") << "\n\n" << videoOutput.join("\n") << "\n";
     }
+
+    resStream << "}\n";
+    bufferStream << "}\n";
 
     if (resFile.isOpen()) resFile.close();
 
-
+    qDebug() << "buffer size " << buffer.size();
     qDebug() << "template " << readFile(":/text/template.txt");
     qDebug() << "video provider " << readFile(":/text/camvideoproducer.txt");
     qDebug() << "video output " << readFile(":/text/videooutput.txt");
 
-    emit success("import QtQuick 2.0; Rectangle {color: \"red\"; anchors.fill: parent; }");
-
-    return "import QtQuick 2.0; Rectangle {color: \"red\"; anchors.fill: parent; }";
+    emit success(buffer);
+    return buffer;
 }

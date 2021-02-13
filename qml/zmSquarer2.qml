@@ -21,6 +21,7 @@ ApplicationWindow {
     property int delegate_heigth: 92
     property int base_radius: 4
     property int base_margins: 4
+    property var camsView: ""
 
     ZMSQPreferences {
         id: prefs
@@ -62,8 +63,11 @@ ApplicationWindow {
     SceneBuilder {
         id: sceneBuilder
         onSuccess: {
-            var newObject = Qt.createQmlObject(code,wnd,"scene1");
-            newObject.destroy(2000)
+            camsView = Qt.createQmlObject(code,viewPlace,"scene1");
+            viewPlace.visible = true;
+            btnBack.visible = true;
+            setup.visible = false;
+            itm.visible = false;
         }
 
         onFail: {
@@ -80,6 +84,39 @@ ApplicationWindow {
             visualModel.model.setVisualIndex(visualModel.items.get(i).model.index, i)
         }
     }
+
+    Button {
+        id: btnBack
+        text: qsTr("Back")
+        anchors {
+            left: parent.left
+            top: parent.top
+        }
+
+        onClicked: {
+            console.log("back clicked");
+            camsView.destroy();
+            viewPlace.visible = false
+            setup.visible = true
+            itm.visible = true
+            btnBack.visible = false
+        }
+
+        visible: false
+    }
+
+    Item {
+        id: viewPlace
+        anchors {
+            left: parent.left
+            top: btnBack.bottom
+            right: parent.right
+            bottom: parent.bottom
+        }
+
+        visible: false
+    }
+
 
     GroupBox {
         id: setup

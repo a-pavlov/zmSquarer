@@ -5,10 +5,5 @@ import CamVideoProducer 0.1
 
 Item {
     id: main
-    anchors.fill: parent    
+    anchors.fill: parent
     focus: true
-
-    %1
-
-    %2
-}
