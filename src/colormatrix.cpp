@@ -17,11 +17,11 @@ ColorMatrix::ColorMatrix()
    reset();
 }
 
-size_t ColorMatrix::findCamColorIndex(size_t camIndex) const {
+uint ColorMatrix::findCamColorIndex(size_t camIndex) const {
     Q_ASSERT(camIndex < camsCount);
     for(auto itrColor = matrix.begin(); itrColor != matrix.end(); ++itrColor) {
         if ((*itrColor)[camIndex] == 1) {
-            return static_cast<size_t>((itrColor - matrix.begin()));
+            return static_cast<uint>((itrColor - matrix.begin()));
         }
     }
 
