@@ -210,12 +210,9 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
         qDebug() << "unable to decompress header " << err;
     }
 #else
-
-
-    qDebug() << "incoming size " << ptr->getContentLength() - ptr->getSoiPos();
     QImage screenImage; //("/home/inkpot/dev/" + frames.at(currentFrame++ % frames.size()));
 
-    bool res = screenImage.loadFromData(data + ptr->getSoiPos(), ptr->getContentLength() - ptr->getSoiPos(), "JPG");
+    bool res = screenImage.loadFromData(data, length, "JPG");
     if (res) {
         QVideoFrame::PixelFormat pixelFormat = QVideoFrame::pixelFormatFromImageFormat( screenImage.format() );
 
