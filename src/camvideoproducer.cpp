@@ -226,6 +226,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
                 QVideoSurfaceFormat( screenImage.size(),
                                      pixelFormat );
             _surface->start( _format );
+            if (counter == 0) ++counter;
         }
 
         //передадим полученный кадр на отрисовку
