@@ -4,7 +4,7 @@
 #include <QtGlobal>
 #include <QTimer>
 
-#define RETRY_COUNT 5
+#define RETRY_COUNT 3
 #define IMG_REQ_TIMEOUT 5
 #define WATCH_DOG_INTERVAL_SEC 5
 
@@ -62,7 +62,7 @@ NetCam::NetCam(const QString& u, QObject *parent) : QObject(parent)
 }
 
 NetCam::~NetCam() {
-    qDebug() << "delete netcam";
+    //qDebug() << "delete netcam";
     if(socket != nullptr) {
         socket->close();
         socket->deleteLater();
@@ -74,8 +74,11 @@ void NetCam::start() {
 }
 
 void NetCam::connect() {
+    qDebug() << Q_FUNC_INFO;
     Q_ASSERT(!url.isEmpty());
-    qDebug() << "netcam th id " << thread()->currentThreadId();
+    // prepare for connection
+    headerBytesRead = 0;
+    rsp.reset();
 
     if (watchdog == nullptr) {
         watchdog = new QTimer(this);
@@ -109,7 +112,6 @@ void NetCam::connect() {
     if (socket == nullptr) {
         socket = new QTcpSocket;
         QObject::connect(socket, &QTcpSocket::connected,[=](){
-           qDebug() << "connected";
            QByteArray array;
            array.append("GET ")
                    .append(url.path().toStdString().c_str())
@@ -117,7 +119,7 @@ void NetCam::connect() {
                    .append(url.query().toStdString().c_str())
                    .append(" HTTP/1.0\r\nHost: " + url.host() + "\r\nUser-Agent: zmSquarer-netcam/0.1\r\nConnection: close\r\n\r\n");
 
-           qDebug() << "request " << array.constData();
+           //qDebug() << "request " << array.constData();
            socket->write(array.constData(), array.size());
            emit success();
         });
@@ -152,19 +154,19 @@ void NetCam::connect() {
                         settings.on_header_value = (http_data_cb)&NetCam::header_value_callback;
                         settings.on_headers_complete = &NetCam::headers_complete;
                         size_t nparsed = http_parser_execute(&parser, &settings, &headersBuffer[0], headersBuffer.size());
-                        qDebug() << "parsed " << nparsed << " input " << headersBuffer.size() << " last header value pos " << lastHeaderValueOffset;
-                        qDebug() << "remain " << headersBuffer.size() - lastHeaderValueOffset;
-                        qDebug() << QString::fromLocal8Bit(&headersBuffer[lastHeaderValueOffset], qMin<size_t>(20ul, headersBuffer.size() - lastHeaderValueOffset));
+                        //qDebug() << "parsed " << nparsed << " input " << headersBuffer.size() << " last header value pos " << lastHeaderValueOffset;
+                        //qDebug() << "remain " << headersBuffer.size() - lastHeaderValueOffset;
+                        //qDebug() << QString::fromLocal8Bit(&headersBuffer[lastHeaderValueOffset], qMin<size_t>(20ul, headersBuffer.size() - lastHeaderValueOffset));
                         Q_ASSERT(headersEndOffset < headersBuffer.size());
                         // calculate the rest of data in the buffer and write it to target
                         Q_ASSERT(hdrKeys.size() == hdrValues.size());
 
-                        for(int i = 0; i < hdrKeys.size(); ++i) {
-                            qDebug() << hdrKeys[i] << "=" << hdrValues[i];
-                        }
+                        //for(int i = 0; i < hdrKeys.size(); ++i) {
+                        //    qDebug() << hdrKeys[i] << "=" << hdrValues[i];
+                        //}
 
-                        qDebug() << "boundary " << boundary;
-                        qDebug() << "content-type " << contentType;
+                        //qDebug() << "boundary " << boundary;
+                        //qDebug() << "content-type " << contentType;
                         this->rsp.setPattern(boundary);
                         // read the remain data in the headers buffer
                         rsp.read(&headersBuffer[lastHeaderValueOffset], headersBuffer.size() - lastHeaderValueOffset);
@@ -183,14 +185,29 @@ void NetCam::connect() {
         });
 
         QObject::connect(socket, &QTcpSocket::disconnected, [=] () {
-            qDebug()<< "DISCONNECTED ";
-            headerBytesRead  = 0;
+            qDebug()<< "disconnected";
             emit disconnected();
         });
 
         QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
-        (&QAbstractSocket::error), [&](QAbstractSocket::SocketError) {
-            qDebug()<< "ERROR " << socket->errorString() << " error: " << socket->error();
+        (&QAbstractSocket::error), [&](QAbstractSocket::SocketError socketError) {
+            switch (socketError) {
+                case QAbstractSocket::RemoteHostClosedError:
+                    qDebug() << "remote host closed connection";
+                    break;
+                case QAbstractSocket::HostNotFoundError:
+                    qDebug() << "The host was not found. Please check the host name and port settings.";
+                    break;
+                case QAbstractSocket::ConnectionRefusedError:
+                    qDebug() << "The connection was refused by the peer. "
+                                                "Make sure the fortune server is running, "
+                                                "and check that the host name and port "
+                                                "settings are correct.";
+                    break;
+                default:
+                    qDebug() << socket->errorString();
+            }
+
             emit error();
             if (!restartRequested) {
                 Q_ASSERT(watchdog != nullptr);
