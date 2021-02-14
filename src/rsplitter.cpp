@@ -25,7 +25,7 @@ RSplitter::~RSplitter() {
 }
 
 void RSplitter::read(char* data, size_t size) {
-    qDebug() << Q_FUNC_INFO << " size " << size;
+    //qDebug() << Q_FUNC_INFO << " size " << size << " current rbuf " << currentRBuf;
     if (size <= 0) return;
     QSharedPointer<RBuffer> prbuf = rbuffers[currentRBuf];
     prbuf->append(data, size);

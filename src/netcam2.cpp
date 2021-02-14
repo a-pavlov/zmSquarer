@@ -124,7 +124,8 @@ void NetCam::connect() {
 
         QObject::connect(socket, &QTcpSocket::readyRead, [&]() {
             qint64 bytesAvailable = socket->bytesAvailable();
-            failCount = 0;
+            //failCount = 0;
+            //qDebug() << "read ready, fail count reset";
             //qDebug() << "bytes available " << bytesAvailable;
 
             while(bytesAvailable > 0) {
@@ -183,6 +184,7 @@ void NetCam::connect() {
 
         QObject::connect(socket, &QTcpSocket::disconnected, [=] () {
             qDebug()<< "DISCONNECTED ";
+            headerBytesRead  = 0;
             emit disconnected();
         });
 
@@ -202,7 +204,7 @@ void NetCam::connect() {
         });
     } else {
         qDebug() << "force close";
-        socket->close();
+        socket->abort();
     }
 
     watchdog->start(WATCH_DOG_INTERVAL_SEC*1000);
@@ -210,7 +212,7 @@ void NetCam::connect() {
 }
 
 void NetCam::restartConnection() {
-    qDebug() << "restart connection to " << url;   
+    qDebug() << "restart connection to " << url;
     connect();
     restartRequested = false;
 }

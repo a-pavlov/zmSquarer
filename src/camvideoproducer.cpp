@@ -37,7 +37,11 @@ CamVideoProducer::CamVideoProducer(QObject *parent )
 
 CamVideoProducer::~CamVideoProducer() {
     qDebug() << "cam video producer close";
+    if (timerId != -1) {
+        killTimer(timerId);
+    }
     closeSurface();
+
     if (netCam) {
         netCam->deleteLater();
     }
@@ -60,7 +64,10 @@ QString CamVideoProducer::setUrl(const QString& u) {
     qDebug() << "video producer set url " << u << " thread ";
     netCam = app->getCamController().createCam(u);
 
-    QObject::connect(netCam, &NetCam::error, [&] () {
+
+    /*
+     * disabled. need to fix cam restarting when can not connect
+     * QObject::connect(netCam, &NetCam::error, [&] () {
         errorOnCam = true;
     });
 
@@ -71,7 +78,7 @@ QString CamVideoProducer::setUrl(const QString& u) {
 
     QObject::connect(netCam, &NetCam::disconnected, [&] () {
         camDisconnected = true;
-    });
+    });*/
 
     urlCurrent = u;
     return u;
@@ -85,8 +92,10 @@ void CamVideoProducer::setVideoSurface( QAbstractVideoSurface* s )
 
 void CamVideoProducer::closeSurface()
 {
-    if( _surface && _surface->isActive() )
+    if( _surface && _surface->isActive() ) {
+        qDebug() << "stop surface";
         _surface->stop();
+    }
 }
 
 void CamVideoProducer::drawNoSignal() {
@@ -121,11 +130,11 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
     if( !_surface )
         return;
 
-    QScreen* screen = QGuiApplication::primaryScreen();
-    QDesktopWidget* desktop = QApplication::desktop();
+    //QScreen* screen = QGuiApplication::primaryScreen();
+    //QDesktopWidget* desktop = QApplication::desktop();
 
-    if( !screen || !desktop )
-        return;
+    //if( !screen || !desktop )
+    //    return;
 
     if (netCam == nullptr) {
         drawNoSignal();
