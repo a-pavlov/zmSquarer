@@ -7,7 +7,7 @@ Item {
     property string url_1: ""
     property string url_2: ""
     property string url_3: ""
-    property string url_4: ""
+    property var url_4: ""
 
     anchors.fill: parent
     CamVideoProducer {
@@ -25,6 +25,7 @@ Item {
         anchors.fill: parent
         onClicked: {
             square_1.destroy()
+            console.log("xx" + url_4)
         }
     }
 }

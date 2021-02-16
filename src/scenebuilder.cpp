@@ -69,7 +69,13 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
     for(const QList<ZMMonitor>& m: monLines) {
         QStringList videoProducer;
         std::transform(m.begin(), m.end(), std::back_inserter(videoProducer), [&](const ZMMonitor& mon) ->
-                       QString { return camVideoProducer.arg(mon.id).arg(zmc->getMonitorUrl(mon.id.toInt()));});
+                       QString {
+            return camVideoProducer
+                    .arg(mon.id)
+                    .arg(zmc->getMonitorUrl(mon.id.toInt()))
+                    // search from the end of monitors to the beginning by the color index. if no such index - self index returns
+                    .arg(zmc->getMonitorUrl((std::find_if(m.rbegin(), m.rend(), [&](const ZMMonitor& mon2) -> bool { return mon2.colorIndex == mon.colorIndex;}))->id.toInt()));
+        });
 
         QString leftAnchor("parent.left");
         QString output("output_%1.right");
@@ -83,6 +89,7 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
                         .arg(topAnchor)
                         .arg(m.size())
                         .arg(height)
+                        .arg(mon.id)
                         .arg(mon.id);
             leftAnchor = QString("output_%1.right").arg(mon.id);
             return res;
