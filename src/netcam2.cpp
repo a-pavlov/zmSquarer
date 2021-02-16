@@ -67,6 +67,7 @@ NetCam::~NetCam() {
         socket->close();
         socket->deleteLater();
     }
+    qDebug() << "netcam removed";
 }
 
 void NetCam::start() {

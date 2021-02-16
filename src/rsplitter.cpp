@@ -16,11 +16,11 @@ RSplitter::RSplitter(QObject *parent) :
 
 RSplitter::~RSplitter() {
     if (!timeouts.isEmpty()) {
-        qDebug() << "average timeout msec: " << std::accumulate(timeouts.begin(), timeouts.end(), 0)/timeouts.size();
-        qDebug() << "max timeout msec:     " <<  *std::max_element(timeouts.begin(), timeouts.end());
-        qDebug() << "min timeout msec:     " <<  *std::min_element(timeouts.begin(), timeouts.end());
+        //qDebug() << "average timeout msec: " << std::accumulate(timeouts.begin(), timeouts.end(), 0)/timeouts.size();
+        //qDebug() << "max timeout msec:     " <<  *std::max_element(timeouts.begin(), timeouts.end());
+        //qDebug() << "min timeout msec:     " <<  *std::min_element(timeouts.begin(), timeouts.end());
     } else {
-        qDebug() << "no statistics are available";
+        //qDebug() << "no statistics are available";
     }
 }
 

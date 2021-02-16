@@ -12,6 +12,16 @@ extern "C" {
 
 class NetCam;
 
+class BufferHolder : public QObject {
+    Q_OBJECT
+public:
+    ~BufferHolder();
+    void allocate(unsigned int);
+    unsigned char* data();
+private:
+    std::vector<unsigned char> buffer;
+};
+
 class CamVideoProducer : public QObject {
     Q_OBJECT
 public:
@@ -44,7 +54,7 @@ private:
     QStringList frames;
     QString urlCurrent;
     NetCam* netCam;
-    std::vector<unsigned char> buffer;
+    BufferHolder* bufferHolder;
     int counter;
     bool errorOnCam;
     bool camDisconnected;

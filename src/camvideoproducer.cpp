@@ -16,6 +16,17 @@
 
 #include <stdio.h>
 
+BufferHolder::~BufferHolder() {
+    qDebug() << "close buffer size " << buffer.size();
+}
+
+void BufferHolder::allocate(unsigned int sz) {
+    if (buffer.empty()) buffer.resize(sz);
+}
+
+unsigned char* BufferHolder::data() {
+    return &buffer[0];
+}
 
 void CamVideoProducer::registerQmlType() {
     qmlRegisterType<CamVideoProducer>(
@@ -26,6 +37,7 @@ CamVideoProducer::CamVideoProducer(QObject *parent )
     : QObject( parent )
     , _surface( nullptr )
     , netCam(nullptr)
+    , bufferHolder(new BufferHolder())
     , errorOnCam(false)
     , camDisconnected(true) {
     timerId = startTimer( 1000 / 10 ); //15 fps
@@ -40,14 +52,19 @@ CamVideoProducer::~CamVideoProducer() {
     if (timerId != -1) {
         killTimer(timerId);
     }
+
     closeSurface();
+    _surface = nullptr;
+
+#ifdef WITH_TURBOJPEG
+    tjDestroy(_jpegDecompressor);
+#endif
 
     if (netCam) {
         netCam->deleteLater();
     }
-#ifdef WITH_TURBOJPEG
-    tjDestroy(_jpegDecompressor);
-#endif
+
+    bufferHolder->deleteLater();
 }
 
 QAbstractVideoSurface* CamVideoProducer::videoSurface() const {
@@ -130,12 +147,6 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
     if( !_surface )
         return;
 
-    //QScreen* screen = QGuiApplication::primaryScreen();
-    //QDesktopWidget* desktop = QApplication::desktop();
-
-    //if( !screen || !desktop )
-    //    return;
-
     if (netCam == nullptr) {
         drawNoSignal();
         return;
@@ -144,7 +155,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
     QSharedPointer<RBuffer> ptr = netCam->getImageBuffer();
 
     // check we have the new buffer
-    if (ptr.isNull()) {
+    if (ptr.isNull() || (ptr->getContentLength() == 0 && ptr->getSoiPos() == 0)) {
         if (errorOnCam || (counter == 0)) drawNoSignal();
 
         // start netcam if it is still not started
@@ -168,6 +179,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
     //    qDebug() << "write " << bytes;
     //}
 #ifdef WITH_TURBOJPEG
+    //_jpegDecompressor = tjInitDecompress();
     int width, height, jpegSubsamp, jpegColorspace;
     const TJPF pf = TJPF_BGRX;
 
@@ -178,17 +190,20 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
                             , &height
                             , &jpegSubsamp
                             , &jpegColorspace) == 0) {
-        buffer.resize(static_cast<size_t>(width * height * tjPixelSize[pf]));
+
+        bufferHolder->allocate(width * height * tjPixelSize[pf]);
+
+
         if (tjDecompress2(_jpegDecompressor
                           , data
                           , length
-                          , &buffer[0]
+                          , bufferHolder->data()
                           , width
                           , 0/*pitch*/
                           , height
                           , pf
                           , TJFLAG_FASTDCT | TJFLAG_NOREALLOC) == 0) {
-           QImage screenImage(&buffer[0], width, height, tjPixelSize[pf]*width, QImage::Format_RGB32);
+           QImage screenImage(bufferHolder->data(), width, height, tjPixelSize[pf]*width, QImage::Format_RGB32);
            QVideoFrame::PixelFormat pixelFormat = QVideoFrame::pixelFormatFromImageFormat( screenImage.format() );
 
            if( screenImage.size() != _format.frameSize() ||
@@ -209,6 +224,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
         int err = tjGetErrorCode(_jpegDecompressor);
         qDebug() << "unable to decompress header " << err;
     }
+    //tjDestroy(_jpegDecompressor);
 #else
     QImage screenImage; //("/home/inkpot/dev/" + frames.at(currentFrame++ % frames.size()));
 
