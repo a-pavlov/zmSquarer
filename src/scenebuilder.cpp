@@ -26,6 +26,10 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
     QList<ZMMonitor> mons;
     mons.append(monmod->getMonitors());
     std::sort(mons.begin(), mons.end(), [](const ZMMonitor& a, const ZMMonitor& b) -> bool { return a.visualIndex < b.visualIndex; });
+
+    for(const ZMMonitor& zmm: mons) {
+        qDebug() << "zmm " << zmm.visualIndex << ":" << zmm.id << " color " << zmm.colorIndex << " cam color index " << ((zmm.type==CamType::CAM)?monmod->camColorIndex(zmm.colorIndex):1000);
+    }
     QList<QList<ZMMonitor>> monLines;
     QList<ZMMonitor> line;
 
@@ -74,7 +78,7 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
                     .arg(mon.id)
                     .arg(zmc->getMonitorUrl(mon.id.toInt()))
                     // search from the end of monitors to the beginning by the color index. if no such index - self index returns
-                    .arg(zmc->getMonitorUrl((std::find_if(m.rbegin(), m.rend(), [&](const ZMMonitor& mon2) -> bool { return mon2.colorIndex == mon.colorIndex;}))->id.toInt()));
+                    .arg(zmc->getMonitorUrl((std::find_if(mons.rbegin(), mons.rend(), [&](const ZMMonitor& mon2) -> bool { return (mon.type==CamType::CAM&&mon2.type==CamType::CAM)?(monmod->camColorIndex(mon2.colorIndex) == monmod->camColorIndex(mon.colorIndex)):false;}))->id.toInt()));
         });
 
         QString leftAnchor("parent.left");

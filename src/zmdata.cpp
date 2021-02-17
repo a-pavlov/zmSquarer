@@ -39,8 +39,19 @@ ZMMonitor ZMMonitor::fromJson(const QJsonObject& doc) {
     return res;
 }
 
-ZMMonitor::ZMMonitor() {
-
+ZMMonitor::ZMMonitor():
+    id("1000")
+    , name("n/a")
+    , function("n/a")
+    , host("n/a")
+    , path("n/a")
+    , size(QSize(0,0))
+    , status("n/a")
+    , captureFPS("n/a")
+    , type(CamType::UNKNOWN)
+    , visualIndex(0)
+    , colorIndex(1000)
+{
 }
 
 ZMMonitor::ZMMonitor(const ZMMonitor& zmmon) {

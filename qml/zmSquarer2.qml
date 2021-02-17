@@ -4,10 +4,12 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.0
 import QtGraphicalEffects 1.0
 import Qt.labs.qmlmodels 1.0
+import QtMultimedia 5.0
 import ZMClient 0.1
 import MonitorModel 0.1
 import ZMSQPreferences 0.1
 import SceneBuilder 0.1
+import CamVideoProducer 0.1
 
 ApplicationWindow {
     id: wnd
@@ -22,6 +24,23 @@ ApplicationWindow {
     property int base_radius: 4
     property int base_margins: 4
     property var camsView: ""
+    property string hiResUrl: ""
+
+    function runHiRes() {
+        console.log("start " + hiResUrl)
+        //var component = Qt.createComponent("square_hi_res.qml");
+        //if (component.status === Component.Ready) {
+        //    var item = component.createObject(wnd);
+        //    item.url_hi_res = hiResUrl;
+        //}
+        hiResLoader.active = true
+        viewPlace.visible = false;
+
+    }
+
+    function test() {
+        console.log("function test")
+    }
 
     ZMSQPreferences {
         id: prefs
@@ -117,6 +136,12 @@ ApplicationWindow {
         visible: false
     }
 
+    Loader {
+        id: hiResLoader
+        active: false
+        anchors.fill: parent
+        sourceComponent: hiResView
+    }
 
     GroupBox {
         id: setup
@@ -597,6 +622,56 @@ ApplicationWindow {
                                 ]
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: hiResView
+        Rectangle {
+
+            CamVideoProducer {
+                id: videoProducer_1
+                url: hiResUrl
+            }
+
+            VideoOutput {
+                id: output1
+                anchors.fill: parent
+                source: videoProducer_1
+
+                Button {
+                    id: button
+                    visible: true
+
+                    background: Image {
+                        mipmap: true
+                        source: "qrc:/images/delete.png"
+                        sourceSize.width: parent.width
+                        sourceSize.height: parent.height
+                    }
+
+                    focusPolicy: Qt.NoFocus
+
+                    Component.onCompleted: {
+                        if (button.topInset !== undefined)
+                        {
+                            button.topInset = 0;
+                            button.bottomInset = 0;
+                        }
+                    }
+
+                    width: 16
+                    height: 16
+                    anchors.right: parent.right
+                    anchors.rightMargin: 8
+                    anchors.bottom: parent.verticalCenter
+                    anchors.topMargin: 16
+                    onClicked: {
+                        hiResLoader.active = false
+                        viewPlace.visible = true
                     }
                 }
             }

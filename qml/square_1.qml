@@ -21,11 +21,5 @@ Item {
         source: videoProducer_1
     }
 
-    MouseArea {
-        anchors.fill: parent
-        onClicked: {
-            square_1.destroy()
-            console.log("xx" + url_4)
-        }
-    }
+    MouseArea {  anchors.fill: parent;  onClicked: {  } }
 }

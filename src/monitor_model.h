@@ -63,6 +63,10 @@ public:
     const QList<ZMMonitor>& getMonitors() const {
         return monitors;
     }
+
+    unsigned int camColorIndex(unsigned int colorIndex) const {
+        return colorMatrix.findCamColorIndex(colorIndex);
+    }
 signals:
     void dataIncoming(int mc);
     void checkedCountChanged();

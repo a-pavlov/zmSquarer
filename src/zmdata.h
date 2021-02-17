@@ -6,7 +6,7 @@
 #include <QJsonDocument>
 #include <QSize>
 
-enum class CamType: std::int8_t { CAM = 1, NEW_LINE = 2, END_SCREEN = 3 };
+enum class CamType: std::int8_t { CAM = 1, NEW_LINE = 2, END_SCREEN = 3, UNKNOWN = 4 };
 
 struct ZMMonitor {
       QString id;

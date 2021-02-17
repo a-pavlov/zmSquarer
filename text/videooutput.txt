@@ -5,10 +5,14 @@ VideoOutput {
     width: parent.width/%4
     height: parent.height/%5
     source: videoProducer_%6
+    //property string hurl: "xxx"
+
     MouseArea {
         anchors.fill: parent
         onDoubleClicked: {
-            console.log("starting url " + videoProducer_%6.hiResUrl)
+            //console.log("starting url " + videoProducer_%7.hiResUrl)
+            wnd.hiResUrl = videoProducer_%7.hiResUrl
+            wnd.runHiRes();
         }
     }
 }
