@@ -88,4 +88,59 @@ ApplicationWindow {
             }
         }
     }
+
+    Button {
+        anchors {
+            left: del.right
+            top: parent.top
+        }
+
+        text: "Open"
+        onClicked: popup.open()
+    }
+
+
+    Popup {
+        id: popup
+        x: 100
+        y: 100
+        width: 200
+        height: 300
+        modal: true
+        focus: true
+
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+    }
+
+
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: {
+            if (mouse.button === Qt.RightButton)
+                contextMenu.popup()
+        }
+        onPressAndHold: {
+            if (mouse.source === Qt.MouseEventNotSynthesized)
+                contextMenu.popup()
+        }
+
+        Menu {
+            id: contextMenu
+            MenuItem {
+                text: qsTr("Back")
+                onClicked: {
+
+                }
+
+            }
+
+            MenuItem {
+                text: qsTr("Copy")
+                onClicked: {
+
+                }
+            }
+        }
+    }
 }

@@ -27,19 +27,18 @@ ApplicationWindow {
     property string hiResUrl: ""
 
     function runHiRes() {
-        console.log("start " + hiResUrl)
-        //var component = Qt.createComponent("square_hi_res.qml");
-        //if (component.status === Component.Ready) {
-        //    var item = component.createObject(wnd);
-        //    item.url_hi_res = hiResUrl;
-        //}
         hiResLoader.active = true
-        viewPlace.visible = false;
-
+        camsView.visible = false
     }
 
     function test() {
         console.log("function test")
+    }
+
+    function showStartScreen() {
+        camsView.destroy();
+        setup.visible = true
+        itm.visible = true
     }
 
     ZMSQPreferences {
@@ -82,9 +81,7 @@ ApplicationWindow {
     SceneBuilder {
         id: sceneBuilder
         onSuccess: {
-            camsView = Qt.createQmlObject(code,viewPlace,"scene1");
-            viewPlace.visible = true;
-            btnBack.visible = true;
+            camsView = Qt.createQmlObject(code,wnd,"scene1");
             setup.visible = false;
             itm.visible = false;
         }
@@ -102,38 +99,6 @@ ApplicationWindow {
         for (var i = 0; i < visualModel.count; ++i) {
             visualModel.model.setVisualIndex(visualModel.items.get(i).model.index, i)
         }
-    }
-
-    Button {
-        id: btnBack
-        text: qsTr("Back")
-        anchors {
-            left: parent.left
-            top: parent.top
-        }
-
-        onClicked: {
-            console.log("back clicked");
-            camsView.destroy();
-            viewPlace.visible = false
-            setup.visible = true
-            itm.visible = true
-            btnBack.visible = false
-        }
-
-        visible: false
-    }
-
-    Item {
-        id: viewPlace
-        anchors {
-            left: parent.left
-            top: btnBack.bottom
-            right: parent.right
-            bottom: parent.bottom
-        }
-
-        visible: false
     }
 
     Loader {
@@ -671,7 +636,7 @@ ApplicationWindow {
                     anchors.topMargin: 16
                     onClicked: {
                         hiResLoader.active = false
-                        viewPlace.visible = true
+                        camsView.visible = true
                     }
                 }
             }

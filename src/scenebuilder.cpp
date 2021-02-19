@@ -27,9 +27,10 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
     mons.append(monmod->getMonitors());
     std::sort(mons.begin(), mons.end(), [](const ZMMonitor& a, const ZMMonitor& b) -> bool { return a.visualIndex < b.visualIndex; });
 
-    for(const ZMMonitor& zmm: mons) {
-        qDebug() << "zmm " << zmm.visualIndex << ":" << zmm.id << " color " << zmm.colorIndex << " cam color index " << ((zmm.type==CamType::CAM)?monmod->camColorIndex(zmm.colorIndex):1000);
-    }
+    //for(const ZMMonitor& zmm: mons) {
+    //    qDebug() << "zmm " << zmm.visualIndex << ":" << zmm.id << " color " << zmm.colorIndex << " cam color index " << ((zmm.type==CamType::CAM)?monmod->camColorIndex(zmm.colorIndex):1000);
+    //}
+
     QList<QList<ZMMonitor>> monLines;
     QList<ZMMonitor> line;
 
@@ -94,7 +95,12 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
                         .arg(m.size())
                         .arg(height)
                         .arg(mon.id)
+                        .arg(mon.id)
+                        .arg(mon.id)
+                        .arg(mon.id)
+                        .arg(mon.id)
                         .arg(mon.id);
+
             leftAnchor = QString("output_%1.right").arg(mon.id);
             return res;
         });

@@ -9,10 +9,38 @@ VideoOutput {
 
     MouseArea {
         anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+        onClicked: {
+            if (mouse.button === Qt.RightButton)
+                contextMenu_%8.popup()
+        }
+        onPressAndHold: {
+            if (mouse.source === Qt.MouseEventNotSynthesized)
+                contextMenu_%9.popup()
+        }
+
         onDoubleClicked: {
-            //console.log("starting url " + videoProducer_%7.hiResUrl)
             wnd.hiResUrl = videoProducer_%7.hiResUrl
             wnd.runHiRes();
+        }
+
+        Menu {
+            id: contextMenu_%10
+            MenuItem {
+                text: qsTr("Back")
+                onClicked: {
+                    wnd.showStartScreen();
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Show hi resolution")
+                onClicked: {
+                    wnd.hiResUrl = videoProducer_%11.hiResUrl
+                    wnd.runHiRes();
+                }
+            }
         }
     }
 }
