@@ -607,36 +607,29 @@ ApplicationWindow {
                 anchors.fill: parent
                 source: videoProducer_1
 
-                Button {
-                    id: button
-                    visible: true
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-                    background: Image {
-                        mipmap: true
-                        source: "qrc:/images/delete.png"
-                        sourceSize.width: parent.width
-                        sourceSize.height: parent.height
-                    }
-
-                    focusPolicy: Qt.NoFocus
-
-                    Component.onCompleted: {
-                        if (button.topInset !== undefined)
-                        {
-                            button.topInset = 0;
-                            button.bottomInset = 0;
-                        }
-                    }
-
-                    width: 16
-                    height: 16
-                    anchors.right: parent.right
-                    anchors.rightMargin: 8
-                    anchors.bottom: parent.verticalCenter
-                    anchors.topMargin: 16
                     onClicked: {
-                        hiResLoader.active = false
-                        camsView.visible = true
+                        if (mouse.button === Qt.RightButton)
+                            contextMenu_hiRes.popup()
+                    }
+                    onPressAndHold: {
+                        if (mouse.source === Qt.MouseEventNotSynthesized)
+                            contextMenu_hiRes.popup()
+                    }
+
+
+                    Menu {
+                        id: contextMenu_hiRes
+                        MenuItem {
+                            text: qsTr("Close")
+                            onClicked: {
+                                hiResLoader.active = false
+                                camsView.visible = true
+                            }
+                        }
                     }
                 }
             }
