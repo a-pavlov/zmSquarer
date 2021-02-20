@@ -35,10 +35,17 @@ VideoOutput {
             }
 
             MenuItem {
-                text: qsTr("Show hi resolution")
+                text: qsTr("Show HI resolution")
                 onClicked: {
                     wnd.hiResUrl = videoProducer_%1.hiResUrl
                     wnd.runHiRes();
+                }
+            }
+
+            MenuItem {
+                text: qsTr("Quit application")
+                onClicked: {
+                    Qt.quit()
                 }
             }
         }

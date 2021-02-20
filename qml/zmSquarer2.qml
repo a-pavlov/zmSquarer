@@ -16,6 +16,8 @@ ApplicationWindow {
     visible: true
     width: 640
     height: 480
+    visibility: cbFullScreen.checked?Qt.WindowFullScreen:Qt.WindowMinimized
+    flags: cbFullScreen.checked?(Qt.FramelessWindowHint | Qt.Window):Qt.Window
     property var comp: ""
     property int cell_width: 100
     property int cell_height: 100
@@ -31,10 +33,6 @@ ApplicationWindow {
         camsView.visible = false
     }
 
-    function test() {
-        console.log("function test")
-    }
-
     function showStartScreen() {
         camsView.destroy();
         setup.visible = true
@@ -47,6 +45,11 @@ ApplicationWindow {
 
     MonitorModel {
         id: monmod
+    }
+
+    onClosing: {
+        prefs.fullScreen = cbFullScreen.checked
+        prefs.flush()
     }
 
     ZMClient {
@@ -84,11 +87,6 @@ ApplicationWindow {
             camsView = Qt.createQmlObject(code,wnd,"scene1");
             setup.visible = false;
             itm.visible = false;
-            for(var i = 0; i < camsView.children.length; ++i) {
-                if (camsView.children[i].type === "VideoOutput") {
-                    console.log("VideoOutput: " + camsView.children[i].propname);
-                }
-            }
         }
 
         onFail: {
@@ -171,7 +169,7 @@ ApplicationWindow {
                 }
 
                 Button {
-                    id: startView
+                    id: btnStartView
                     anchors.margins: base_margins
                     enabled: monmod.monitorsCount > 0
                     text: qsTr("Start")
@@ -179,6 +177,27 @@ ApplicationWindow {
                         setVisualIndexes();
                         sceneBuilder.buildScene(zmc,monmod)
                     }
+                }
+
+                Button {
+                    id: btnExit
+                    anchors.margins: base_margins
+                    enabled: monmod.monitorsCount > 0
+                    text: qsTr("Quit")
+                    onClicked: {
+                        prefs.fullScreen = cbFullScreen.checked
+                        prefs.flush()
+                        Qt.quit();
+                    }
+                }
+            }
+
+            CheckBox {
+                id: cbFullScreen
+                text: qsTr("Full screen mode")
+                checked: prefs.fullScreen
+                onCheckedChanged: {
+
                 }
             }
 
@@ -620,6 +639,7 @@ ApplicationWindow {
                         if (mouse.button === Qt.RightButton)
                             contextMenu_hiRes.popup()
                     }
+
                     onPressAndHold: {
                         if (mouse.source === Qt.MouseEventNotSynthesized)
                             contextMenu_hiRes.popup()
@@ -633,6 +653,15 @@ ApplicationWindow {
                             onClicked: {
                                 hiResLoader.active = false
                                 camsView.visible = true
+                            }
+                        }
+
+                        MenuItem {
+                            text: qsTr("Quit application")
+                            onClicked: {
+                                prefs.fullScreen = cbFullScreen.checked
+                                prefs.flush()
+                                Qt.quit()
                             }
                         }
                     }

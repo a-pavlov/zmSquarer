@@ -5,6 +5,7 @@
 
 const QString pathUrl = "Network/Url";
 const QString pathMons = "Common/Monitors";
+const QString pathFullScreen = "Common/FullScreen";
 
 
 void Preferences::registerQmlType() {
@@ -59,4 +60,13 @@ void Preferences::setUrl(const QString &url) {
 
 int Preferences::checkedMonsCount() const {
     return checkedMons.size();
+}
+
+bool Preferences::fullScreen() const {
+    return value(pathFullScreen, false).toBool();
+}
+
+void Preferences::setFullScreen(bool b) {
+    setValue(pathFullScreen, b);
+    emit fullScreenChanged(b);
 }

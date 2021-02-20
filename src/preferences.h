@@ -39,6 +39,7 @@ class Preferences : public QIniSettings {
     Q_OBJECT
     Q_DISABLE_COPY(Preferences)
     Q_PROPERTY(QString url READ url WRITE setUrl NOTIFY urlChanged)
+    Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY fullScreenChanged)
     Q_PROPERTY(int checkedMons READ checkedMonsCount)
 public:
     static void registerQmlType();
@@ -52,10 +53,13 @@ public:
     QString url() const;
     void setUrl(const QString& nick);
     int checkedMonsCount() const;
+    bool fullScreen() const;
+    void setFullScreen(bool);
 private:
     QStringList checkedMons;
 signals:
      void urlChanged(QString);
+     void fullScreenChanged(bool);
 };
 
 #endif // PREFERENCES_H
