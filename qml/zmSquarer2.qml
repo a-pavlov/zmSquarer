@@ -84,6 +84,11 @@ ApplicationWindow {
             camsView = Qt.createQmlObject(code,wnd,"scene1");
             setup.visible = false;
             itm.visible = false;
+            for(var i = 0; i < camsView.children.length; ++i) {
+                if (camsView.children[i].type === "VideoOutput") {
+                    console.log("VideoOutput: " + camsView.children[i].propname);
+                }
+            }
         }
 
         onFail: {

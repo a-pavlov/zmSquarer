@@ -133,6 +133,10 @@ void CamVideoProducer::updateTimer(bool start) {
         if (timerId == -1) {
             timerId = startTimer( 1000 / 10 );
             qDebug() << "start timer " << timerId;
+            if (netCam != nullptr) {
+                ZMSQApplication* app = static_cast<ZMSQApplication*>(QApplication::instance());
+                app->getCamController().startCam(netCam);
+            }
         }
     } else {
         if (timerId != -1) {

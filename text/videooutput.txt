@@ -4,7 +4,7 @@ VideoOutput {
     anchors.top: %3
     width: parent.width/%4
     height: parent.height/%5
-    source: videoProducer_%6
+    source: videoProducer_%1
     //property string hurl: "xxx"
 
     MouseArea {
@@ -13,20 +13,20 @@ VideoOutput {
 
         onClicked: {
             if (mouse.button === Qt.RightButton)
-                contextMenu_%8.popup()
+                contextMenu_%1.popup()
         }
         onPressAndHold: {
             if (mouse.source === Qt.MouseEventNotSynthesized)
-                contextMenu_%9.popup()
+                contextMenu_%1.popup()
         }
 
         onDoubleClicked: {
-            wnd.hiResUrl = videoProducer_%7.hiResUrl
+            wnd.hiResUrl = videoProducer_%1.hiResUrl
             wnd.runHiRes();
         }
 
         Menu {
-            id: contextMenu_%10
+            id: contextMenu_%1
             MenuItem {
                 text: qsTr("Back")
                 onClicked: {
@@ -37,10 +37,14 @@ VideoOutput {
             MenuItem {
                 text: qsTr("Show hi resolution")
                 onClicked: {
-                    wnd.hiResUrl = videoProducer_%11.hiResUrl
+                    wnd.hiResUrl = videoProducer_%1.hiResUrl
                     wnd.runHiRes();
                 }
             }
         }
+    }
+
+    onVisibleChanged: {
+        source.updateTimer(visible)
     }
 }

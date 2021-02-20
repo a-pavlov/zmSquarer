@@ -93,13 +93,7 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
                         .arg(leftAnchor)
                         .arg(topAnchor)
                         .arg(m.size())
-                        .arg(height)
-                        .arg(mon.id)
-                        .arg(mon.id)
-                        .arg(mon.id)
-                        .arg(mon.id)
-                        .arg(mon.id)
-                        .arg(mon.id);
+                        .arg(height);
 
             leftAnchor = QString("output_%1.right").arg(mon.id);
             return res;
