@@ -5,7 +5,6 @@ VideoOutput {
     width: parent.width/%4
     height: parent.height/%5
     source: videoProducer_%1
-    //property string hurl: "xxx"
 
     MouseArea {
         anchors.fill: parent
@@ -45,6 +44,7 @@ VideoOutput {
             MenuItem {
                 text: qsTr("Quit application")
                 onClicked: {
+                    wnd.saveParameters()
                     Qt.quit()
                 }
             }

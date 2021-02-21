@@ -47,9 +47,16 @@ ApplicationWindow {
         id: monmod
     }
 
-    onClosing: {
+    function saveParameters() {
+        setVisualIndexes();
+        monmod.save()
         prefs.fullScreen = cbFullScreen.checked
+        prefs.url = zmUrl.text
         prefs.flush()
+    }
+
+    onClosing: {
+        saveParameters()
     }
 
     ZMClient {
@@ -253,7 +260,7 @@ ApplicationWindow {
             onClicked: {
                 monmod.addNewLine()
             }
-        }*/
+        }
 
         Button {
             id: btnState
@@ -304,11 +311,11 @@ ApplicationWindow {
                 console.log("clear")
                 monmod.clear()
             }
-        }
+        }*/
 
         GridView {
             id: root
-            anchors.top: btnClear.bottom
+            anchors.top: parent.top
             anchors.left: parent.left
 
             width: parent.width
@@ -418,17 +425,11 @@ ApplicationWindow {
 
                                 MouseArea {
                                     anchors.fill: parent
-
-                                    //propagateComposedEvents: true
                                     onDoubleClicked: {
-                                        console.log("double click on visual index "
-                                                    + parent.visualIndex + " indx " + index)
-                                        //monmod.remove(index)
                                         model.color = "test"
                                     }
 
                                     onClicked: {
-                                        console.log("click on cam")
                                         model.color = "test"
                                     }
                                 }
@@ -645,7 +646,6 @@ ApplicationWindow {
                             contextMenu_hiRes.popup()
                     }
 
-
                     Menu {
                         id: contextMenu_hiRes
                         MenuItem {
@@ -659,8 +659,7 @@ ApplicationWindow {
                         MenuItem {
                             text: qsTr("Quit application")
                             onClicked: {
-                                prefs.fullScreen = cbFullScreen.checked
-                                prefs.flush()
+                                saveParameters()
                                 Qt.quit()
                             }
                         }
