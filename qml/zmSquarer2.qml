@@ -97,7 +97,8 @@ ApplicationWindow {
         }
 
         onFail: {
-            console.log("fail " + code);
+            zmClientError.text = qsTr("<font color=\"#FF0000\">Error: %1</font> ").arg(code)
+            zmClientError.visible = true
         }
     }
 
@@ -159,6 +160,7 @@ ApplicationWindow {
                         }
 
                         console.log("check " + checkMode)
+                        zmClientError.visible = false
                         zmUrl.enabled = checkMode
                         zmUrlProgress.visible = checkMode
                         checkMode = !checkMode
@@ -181,6 +183,7 @@ ApplicationWindow {
                     enabled: monmod.monitorsCount > 0
                     text: qsTr("Start")
                     onClicked: {
+                        zmClientError.visible = false
                         setVisualIndexes();
                         sceneBuilder.buildScene(zmc,monmod)
                     }

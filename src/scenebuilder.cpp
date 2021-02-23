@@ -28,6 +28,22 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
     mons.append(monmod->getMonitors());
     std::sort(mons.begin(), mons.end(), [](const ZMMonitor& a, const ZMMonitor& b) -> bool { return a.visualIndex < b.visualIndex; });
 
+    for(int i = 0; i < mons.size(); ++i) {
+         if (mons[i].type == CamType::NEW_LINE || mons[i].type == CamType::END_SCREEN) {
+            if (i == 0) {
+                emit fail("New line of end of screen in the beginning of the scene");
+                return QString();
+            } else {
+                if (mons[i-1].type == CamType::NEW_LINE || mons[i-1].type == CamType::END_SCREEN) {
+                    emit fail("Adjacent elements are new line or end of screen");
+                    return QString();
+                }
+            }
+        }
+
+        if (mons[i].type == CamType::END_SCREEN) break;
+    }
+
     //for(const ZMMonitor& zmm: mons) {
     //    qDebug() << "zmm " << zmm.visualIndex << ":" << zmm.id << " color " << zmm.colorIndex << " cam color index " << ((zmm.type==CamType::CAM)?monmod->camColorIndex(zmm.colorIndex):1000);
     //}
