@@ -19,7 +19,6 @@ Preferences::Preferences()
     for (int i = 0; i < size; ++i) {
         setArrayIndex(i);
         checkedMons.append(value("monId").toString());
-        //qDebug() << "append " << value("monId").toString();
     }
     endArray();
 }
@@ -29,12 +28,10 @@ void Preferences::flush() {
     for(int i = 0; i < checkedMons.size(); ++i) {
         setArrayIndex(i);
         setValue("monId", checkedMons.at(i));
-        //qDebug() << "set mon " << checkedMons.at(i);
     }
 
     endArray();
     sync();
-    //qDebug() << "sync prefs";
 }
 
 bool Preferences::isCheckedMon(const QString& id) {

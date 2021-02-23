@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <algorithm>
 
+//#define TOFILE 1
 
 void SceneBuilder::registerQmlType() {
     qmlRegisterType<SceneBuilder>(
@@ -62,13 +63,16 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
     QString camViewHeader = readFile(":/text/header.txt");
 
     int height = monLines.size();
+#ifdef TOFILE
     QFile resFile("c:/dev/test.qml");
     bool resOpened = resFile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream resStream(&resFile);
+    resStream << camViewHeader << "\n";
+#endif
+
     QString buffer;
     QTextStream bufferStream(&buffer);
     bufferStream << camViewHeader << "\n";
-    resStream << camViewHeader << "\n";
     QString topAnchor("parent.top");
 
     for(const QList<ZMMonitor>& m: monLines) {
@@ -102,18 +106,21 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
         topAnchor = QString("output_%1.bottom").arg(m.begin()->id);
 
         bufferStream << videoProducer.join("\n") << "\n\n" << videoOutput.join("\n") << "\n";
+#ifdef TOFILE
         resStream << videoProducer.join("\n") << "\n\n" << videoOutput.join("\n") << "\n";
+#endif
     }
 
-    resStream << "}\n";
     bufferStream << "}\n";
 
+#ifdef TOFILE
+    resStream << "}\n";
     if (resFile.isOpen()) resFile.close();
-
     qDebug() << "buffer size " << buffer.size();
     qDebug() << "template " << readFile(":/text/template.txt");
     qDebug() << "video provider " << readFile(":/text/camvideoproducer.txt");
     qDebug() << "video output " << readFile(":/text/videooutput.txt");
+#endif
 
     emit success(buffer);
     return buffer;

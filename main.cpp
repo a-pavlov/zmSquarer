@@ -11,10 +11,8 @@
 #include "preferences.h"
 #include "scenebuilder.h"
 
-
 int main(int argc, char *argv[]) {
     CamVideoProducer::registerQmlType();
-
     ZMClient::registerMetaType();
     ZMClient::registerQmlType();
     MonitorModel::registerQmlType();
@@ -22,12 +20,8 @@ int main(int argc, char *argv[]) {
     SceneBuilder::registerQmlType();
 
     ZMSQApplication app(argc, argv);
-    //MonitorModel monmod;
-    qDebug() << "app thread id " << app.thread()->currentThreadId();
     QQmlApplicationEngine engine;
     //engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
-    //engine.rootContext()->setContextProperty("monmod", &monmod);
     engine.load(QUrl(QStringLiteral("qrc:///zmSquarer2.qml")));
-    //engine.load(QUrl(QStringLiteral("qrc:///title.qml")));
     return app.exec();
 }
