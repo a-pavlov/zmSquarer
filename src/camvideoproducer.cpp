@@ -176,14 +176,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
     const unsigned char* data = reinterpret_cast<const unsigned char*>(ptr->getPtr() + ptr->getSoiPos());
     const unsigned long length = static_cast<unsigned long>(ptr->getContentLength() - ptr->getSoiPos());
 
-    //FILE* f = fopen(QString("c:\\dev\\img\\file_%1.jpg").arg(++counter).toStdString().c_str(), "wb+");
-    //if (f != nullptr) {
-    //    int bytes  = fwrite(ptr->getPtr() + ptr->getSoiPos(), ptr->getContentLength() - ptr->getSoiPos(), 1, f);
-    //    fclose(f);
-    //    qDebug() << "write " << bytes;
-    //}
 #ifdef WITH_TURBOJPEG
-    //_jpegDecompressor = tjInitDecompress();
     int width, height, jpegSubsamp, jpegColorspace;
     const TJPF pf = TJPF_BGRX;
 
@@ -195,8 +188,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
                             , &jpegSubsamp
                             , &jpegColorspace) == 0) {
 
-        bufferHolder->allocate(width * height * tjPixelSize[pf]);
-
+        bufferHolder->allocate(static_cast<unsigned int>(width * height * tjPixelSize[pf]));
 
         if (tjDecompress2(_jpegDecompressor
                           , data
@@ -228,7 +220,6 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
         int err = tjGetErrorCode(_jpegDecompressor);
         qDebug() << "unable to decompress header " << err;
     }
-    //tjDestroy(_jpegDecompressor);
 #else
     QImage screenImage; //("/home/inkpot/dev/" + frames.at(currentFrame++ % frames.size()));
 
