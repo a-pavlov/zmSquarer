@@ -66,7 +66,7 @@ ApplicationWindow {
             monmod.clear()
             monmod.addAll(mons)
             monmod.addStopper()
-            btnUrl.text = qsTr("Check")
+            btnUrl.text = qsTr("Connect")
             btnUrl.enabled = true
             btnUrl.checkMode = true
             zmUrlProgress.visible = false
@@ -78,12 +78,11 @@ ApplicationWindow {
 
         onError: {
             monmod.clean()
-            btnUrl.text = qsTr("Check")
+            btnUrl.text = qsTr("Connect")
             btnUrl.enabled = true
             btnUrl.checkMode = true
             zmUrlProgress.visible = false
-            zmClientError.text = qsTr(
-                        "<font color=\"#FF0000\">Error:</font> ") + msg
+            zmClientError.text = qsTr("<font color=\"#FF0000\">Error: %1</font> ").arg(msg)
             zmClientError.visible = true
         }
     }
@@ -152,18 +151,19 @@ ApplicationWindow {
                     anchors.margins: base_margins
                     text: qsTr("Connect")
                     onClicked: {
-                        if (checkMode) {
-                            text = qsTr("Cancel")
+                        //if (checkMode) {
+                            text = qsTr("Connecting...")
                             zmc.getMonitors()
-                        } else {
-                            text = qsTr("Check")
-                        }
+                        //} else {
+                        //    text = qsTr("Check")
+                        //}
 
                         console.log("check " + checkMode)
                         zmClientError.visible = false
                         zmUrl.enabled = checkMode
                         zmUrlProgress.visible = checkMode
-                        checkMode = !checkMode
+                        //checkMode = !checkMode
+                        btnUrl.enabled = false
                     }
                 }
 

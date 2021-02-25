@@ -14,7 +14,7 @@ void Preferences::registerQmlType() {
 }
 
 Preferences::Preferences()
-    : QIniSettings("ZM",  "squarer") {
+    : QIniSettings("ZMSQ",  "squarer") {
     int size = beginReadArray(pathMons);
     for (int i = 0; i < size; ++i) {
         setArrayIndex(i);
