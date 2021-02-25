@@ -16,7 +16,14 @@ MVP application for ZM on http and no authorization.
 * [Motion](https://github.com/Motion-Project/motion): an example of MJPEG parsing. Not in the build now.
 * [LibJpeg-Turbo](https://github.com/libjpeg-turbo/libjpeg-turbo): decompress JPEG frames
 
-### Configuration
+### Build
+Requirements:
+* Qt 5.13 or higher
+* libjpeg-turbo. Set environment variable TJPEG_ROOT. Or unset WITH_TURBOJPEG in camvideoproducer.cpp and remove libjpeg-turbo from pri files to build on Qt image decompressor.
+
+The project file is zmSquarer.pro.
+
+### Configuration/usage
 * Insert ZoneMinder url and click connect to obtain configured cameras
 * Use NewLine to add new horizontal lines
 * The End marked uses to stop scene
