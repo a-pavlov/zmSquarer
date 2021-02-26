@@ -36,3 +36,6 @@ The project file is zmSquarer.pro.
 ### Examples
 ![zmSquarer](images/zmSquarer.png)
 ![zmSquarer2](images/zmSquarer2.png)
+
+### Binaries
+[Win x64](https://disk.yandex.ru/d/acwBnyuOkU72Lw)
