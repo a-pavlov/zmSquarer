@@ -6,13 +6,20 @@ SOURCES += main.cpp
 
 RESOURCES += qml.qrc images.qrc text.qrc
 
-QMAKE_CFLAGS += -Dsysconfdir=\"xxx\"
-QMAKE_CXXFLAGS += -Dsysconfdir=\"xxx\" -DWITH_TURBOJPEG
-#LIBS += -lpthread -ljpeg
+QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic -Wformat-security
+
+CONFIG(debug, debug|release): message(Project is built in DEBUG mode.)
+CONFIG(release, debug|release): message(Project is built in RELEASE mode.)
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 
-QML_IMPORT_PATH += $$PWD/qml C:/dev/zmSquarer/qml
+QML_IMPORT_PATH += $$PWD/qml
+
+TJPEG_ROOT = $$(TJPEG_ROOT)
+
+!isEmpty(TJPEG_ROOT) {
+    QMAKE_CXXFLAGS += -DWITH_TURBOJPEG
+}
 
 win32 {
     include(winconf.pri)

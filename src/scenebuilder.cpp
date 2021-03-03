@@ -1,6 +1,7 @@
 #include "scenebuilder.h"
 #include <QtQml/qqml.h>
 #include <QDebug>
+#include <QFile>
 #include <algorithm>
 
 //#define TOFILE 1
