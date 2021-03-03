@@ -39,6 +39,8 @@ QString camType2String(CamType ct) {
         case CamType::CAM: return "cam";
         case CamType::NEW_LINE: return "newline";
         case CamType::END_SCREEN: return "stopper";
+    default:
+        break;
     }
 
     return "_|_";
@@ -154,10 +156,6 @@ void MonitorModel::remove(int index) {
     monitors.removeAt(index);
     endRemoveRows();
     emit monitorsCountChanged();
-}
-
-void MonitorModel::changeColor(int index) {
-    //emit dataChanged(QModelIndex())
 }
 
 void MonitorModel::setVisualIndex(int modelIndex, int visualIndex) {

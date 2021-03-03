@@ -9,6 +9,8 @@
 #define WATCH_DOG_INTERVAL_SEC 5
 
 int NetCam::url_callback(http_parser* p, const char* c, unsigned long len) {
+    Q_UNUSED(c);
+    Q_UNUSED(len);
     NetCam* pnc = static_cast<NetCam*>(p->data);
     Q_ASSERT(pnc != nullptr);
     return 0;
@@ -49,6 +51,7 @@ int NetCam::headers_complete(http_parser* p) {
 }
 
 NetCam::NetCam(const QString& u, QObject *parent) : QObject(parent)
+    , socket(nullptr)
     , url(u)
     , headersEndOffset(0)
     , headerBytesRead(0)
@@ -56,7 +59,6 @@ NetCam::NetCam(const QString& u, QObject *parent) : QObject(parent)
     , lastHeaderValueOffset(0)
     , getCLValue(false)
     , failCount(0)
-    , socket(nullptr)
     , watchdog(nullptr)
     , restartRequested(false) {
 }
@@ -118,7 +120,7 @@ void NetCam::connect() {
                    .append(url.path().toStdString().c_str())
                    .append("?")
                    .append(url.query().toStdString().c_str())
-                   .append(" HTTP/1.0\r\nHost: " + url.host() + "\r\nUser-Agent: zmSquarer-netcam/0.1\r\nConnection: close\r\n\r\n");
+                   .append(" HTTP/1.0\r\nHost: " + url.host().toLocal8Bit() + "\r\nUser-Agent: zmSquarer-netcam/0.1\r\nConnection: close\r\n\r\n");
 
            //qDebug() << "request " << array.constData();
            socket->write(array.constData(), array.size());
@@ -155,6 +157,7 @@ void NetCam::connect() {
                         settings.on_header_value = (http_data_cb)&NetCam::header_value_callback;
                         settings.on_headers_complete = &NetCam::headers_complete;
                         size_t nparsed = http_parser_execute(&parser, &settings, &headersBuffer[0], headersBuffer.size());
+                        Q_UNUSED(nparsed);
                         //qDebug() << "parsed " << nparsed << " input " << headersBuffer.size() << " last header value pos " << lastHeaderValueOffset;
                         //qDebug() << "remain " << headersBuffer.size() - lastHeaderValueOffset;
                         //qDebug() << QString::fromLocal8Bit(&headersBuffer[lastHeaderValueOffset], qMin<size_t>(20ul, headersBuffer.size() - lastHeaderValueOffset));
@@ -191,7 +194,7 @@ void NetCam::connect() {
         });
 
         QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
-        (&QAbstractSocket::error), [&](QAbstractSocket::SocketError socketError) {
+        (&QAbstractSocket::errorOccurred), [&](QAbstractSocket::SocketError socketError) {
             switch (socketError) {
                 case QAbstractSocket::RemoteHostClosedError:
                     qDebug() << "remote host closed connection";

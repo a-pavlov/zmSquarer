@@ -69,4 +69,20 @@ ZMMonitor::ZMMonitor(const ZMMonitor& zmmon) {
     colorIndex  = zmmon.colorIndex;
 }
 
+ZMMonitor& ZMMonitor::operator=(const ZMMonitor& zmmon) {
+    id          = zmmon.id;
+    name        = zmmon.name;
+    function    = zmmon.function;
+    host        = zmmon.host;
+    path        = zmmon.path;
+    name        = zmmon.name;
+    size        = zmmon.size;
+    status      = zmmon.status;
+    captureFPS  = zmmon.captureFPS;
+    type        = zmmon.type;
+    visualIndex = zmmon.visualIndex;
+    colorIndex  = zmmon.colorIndex;
+    return *this;
+}
+
 ZMMonitor::~ZMMonitor(){}

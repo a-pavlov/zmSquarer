@@ -36,7 +36,7 @@ void RSplitter::processCB(QSharedPointer<RBuffer> prbuf) {
     size_t remaining = prbuf->getUnmarkedSize();
 
     while(remaining > 0) {
-        int ppos = (lastBufferSize != -1 && (prbuf->getUsed() < (lastBufferSize*9/10)))?-1:prbuf->findCharacter(pattern[0]);
+        int ppos = (lastBufferSize != -1 && (prbuf->getUsed() < static_cast<size_type>(lastBufferSize*9/10)))?-1:prbuf->findCharacter(pattern[0]);
 
         //qDebug() <<  "remaining " << remaining << " pattern starting position " << ppos;
 

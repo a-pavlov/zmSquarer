@@ -57,7 +57,6 @@ public:
     Q_INVOKABLE void addNewLine();
     Q_INVOKABLE void addStopper();
     Q_INVOKABLE void remove(int);
-    Q_INVOKABLE void changeColor(int);
     Q_INVOKABLE void setVisualIndex(int modelIndex, int visualIndex);
     Q_INVOKABLE void clear();
     const QList<ZMMonitor>& getMonitors() const {

@@ -22,11 +22,12 @@ struct ZMMonitor {
       uint colorIndex;
       ZMMonitor();
       ZMMonitor(const ZMMonitor&);
+      ZMMonitor& operator=(const ZMMonitor&);
       ~ZMMonitor();
       static QList<ZMMonitor> fromJson(const QJsonDocument&);
       static ZMMonitor fromJson(const QJsonObject&);
 };
 
-Q_DECLARE_METATYPE(ZMMonitor);
+Q_DECLARE_METATYPE(ZMMonitor)
 
 #endif // ZMDATA_H
