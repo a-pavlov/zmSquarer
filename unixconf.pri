@@ -4,3 +4,4 @@
     INCLUDEPATH += $$(TJPEG_ROOT)
 }
 
+QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic -Wformat-security

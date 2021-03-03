@@ -6,8 +6,6 @@ SOURCES += main.cpp
 
 RESOURCES += qml.qrc images.qrc text.qrc
 
-QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic -Wformat-security
-
 CONFIG(debug, debug|release): message(Project is built in DEBUG mode.)
 CONFIG(release, debug|release): message(Project is built in RELEASE mode.)
 

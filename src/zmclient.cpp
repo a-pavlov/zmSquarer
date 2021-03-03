@@ -37,7 +37,7 @@ QString ZMClient::getMonitors() {
         // do nothing here
     });*/
 
-    QObject::connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::errorOccurred), [this](QNetworkReply::NetworkError code) {
+    QObject::connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), [this](QNetworkReply::NetworkError code) {
         qDebug() << "network error occurred " << code;
         switch (code) {
             case QNetworkReply::NetworkError::ConnectionRefusedError:       emit error(QString("Connection refused")); break;

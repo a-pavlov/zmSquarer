@@ -194,7 +194,7 @@ void NetCam::connect() {
         });
 
         QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
-        (&QAbstractSocket::errorOccurred), [&](QAbstractSocket::SocketError socketError) {
+        (&QAbstractSocket::error), [&](QAbstractSocket::SocketError socketError) {
             switch (socketError) {
                 case QAbstractSocket::RemoteHostClosedError:
                     qDebug() << "remote host closed connection";
