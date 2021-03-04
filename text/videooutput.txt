@@ -11,7 +11,7 @@ VideoOutput {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onClicked: {
-            if (mouse.button === Qt.RightButton)
+            //if (mouse.button === Qt.RightButton)
                 contextMenu_%1.popup()
         }
         onPressAndHold: {

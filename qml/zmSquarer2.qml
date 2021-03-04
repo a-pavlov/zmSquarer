@@ -14,15 +14,15 @@ import CamVideoProducer 0.1
 ApplicationWindow {
     id: wnd
     visible: true
-    width: 640
-    height: 480
+    width: 1024
+    height: 768
     visibility: cbFullScreen.checked?Qt.WindowFullScreen:Qt.WindowMinimized
     flags: cbFullScreen.checked?(Qt.FramelessWindowHint | Qt.Window):Qt.Window
     property var comp: ""
-    property int cell_width: 100
-    property int cell_height: 100
-    property int delegate_width: 92
-    property int delegate_heigth: 92
+    property int cell_width: 160
+    property int cell_height: 160
+    property int delegate_width: 152
+    property int delegate_heigth: 152
     property int base_radius: 4
     property int base_margins: 4
     property var camsView: ""
@@ -228,93 +228,15 @@ ApplicationWindow {
 
     Rectangle {
         id: itm
-        width: 420
-        height: 500
+        width: parent.width
+        //height: parent.height - setup.height - 30
 
         anchors {
             top: setup.bottom
+            bottom: parent.bottom
             horizontalCenter: parent.horizontalCenter
+            margins: base_margins
         }
-
-        /*Button {
-            id: btnBack
-            text: qsTr("<<< Load")
-            anchors {
-                top: parent.top
-                left: parent.left
-                margins: base_margins
-            }
-
-            onClicked: {
-                console.log("load")
-                monmod.load()
-            }
-        }
-
-        Button {
-            id: btnNL
-            text: qsTr("Add \\n")
-            anchors {
-                top: parent.top
-                left: btnBack.right
-                margins: base_margins
-            }
-
-            onClicked: {
-                monmod.addNewLine()
-            }
-        }
-
-        Button {
-            id: btnState
-            text: qsTr("Save")
-            anchors {
-                top: parent.top
-                left: parent.left
-                margins: base_margins
-            }
-
-            onClicked: {
-                setVisualIndexes();
-                monmod.save()
-            }
-        }
-
-        Button {
-            id: btnTest
-            text: qsTr("Test")
-            anchors {
-                top: parent.top
-                left: btnState.right
-                margins: base_margins
-            }
-
-            onClicked: {
-                monmod.testAdd()
-                monmod.testAdd()
-                monmod.testAdd()
-                monmod.testAdd()
-                monmod.testAdd()
-                monmod.testAdd()
-                monmod.addNewLine()
-                monmod.addStopper()
-            }
-        }
-
-        Button {
-            id: btnClear
-            text: qsTr("Clear")
-            anchors {
-                top: parent.top
-                left: btnTest.right
-                margins: base_margins
-            }
-
-            onClicked: {
-                console.log("clear")
-                monmod.clear()
-            }
-        }*/
 
         GridView {
             id: root
@@ -322,7 +244,7 @@ ApplicationWindow {
             anchors.left: parent.left
 
             width: parent.width
-            height: 460
+            height: parent.height
             cellWidth: cell_width
             cellHeight: cell_height
             clip: true
@@ -640,7 +562,7 @@ ApplicationWindow {
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                     onClicked: {
-                        if (mouse.button === Qt.RightButton)
+                        //if (mouse.button === Qt.RightButton)
                             contextMenu_hiRes.popup()
                     }
 

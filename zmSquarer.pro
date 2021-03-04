@@ -27,6 +27,10 @@ unix:!macx {
   include(unixconf.pri)
 }
 
+android {
+  include(android.pri)
+}
+
 #include(src/motion/motion.pri)
 include(src/http_parser/http_parser.pri)
 include(src/src.pri)
