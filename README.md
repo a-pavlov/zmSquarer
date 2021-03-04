@@ -18,8 +18,9 @@ MVP application for ZM on http and no authorization.
 
 ### Build
 Requirements:
-* Qt 5.13 or higher
-* libjpeg-turbo. Set environment variable TJPEG_ROOT. Or unset WITH_TURBOJPEG in camvideoproducer.cpp and remove libjpeg-turbo from pri files to build on Qt image decompressor.
+* Qt 5.12 or higher.
+* libjpeg-turbo. Set environment variable TJPEG_ROOT if you have libjpeg-turbo for faster jpeg decompression.
+* Android build is available, but UI requires adapting to the platform.
 
 The project file is zmSquarer.pro.
 
