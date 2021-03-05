@@ -5,23 +5,25 @@ VideoOutput {
     width: parent.width/%4
     height: parent.height/%5
     source: videoProducer_%1
+    focus: false
 
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onClicked: {
-            //if (mouse.button === Qt.RightButton)
+            focus=true
+            if (mouse.button === Qt.RightButton)
                 contextMenu_%1.popup()
         }
+
         onPressAndHold: {
             if (mouse.source === Qt.MouseEventNotSynthesized)
                 contextMenu_%1.popup()
         }
 
         onDoubleClicked: {
-            wnd.hiResUrl = videoProducer_%1.hiResUrl
-            wnd.runHiRes();
+            contextMenu_%1.popup()
         }
 
         Menu {
@@ -48,6 +50,12 @@ VideoOutput {
                     Qt.quit()
                 }
             }
+        }
+    }
+
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
+            wnd.showStartScreen();
         }
     }
 

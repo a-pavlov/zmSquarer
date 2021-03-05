@@ -16,8 +16,8 @@ ApplicationWindow {
     visible: true
     width: 1024
     height: 768
-    visibility: cbFullScreen.checked?Qt.WindowFullScreen:Qt.WindowMinimized
-    flags: cbFullScreen.checked?(Qt.FramelessWindowHint | Qt.Window):Qt.Window
+    visibility: cbFullScreen.checked ? Qt.WindowFullScreen : Qt.WindowMinimized
+    flags: cbFullScreen.checked ? (Qt.FramelessWindowHint | Qt.Window) : Qt.Window
     property var comp: ""
     property int cell_width: 160
     property int cell_height: 160
@@ -31,12 +31,14 @@ ApplicationWindow {
     function runHiRes() {
         hiResLoader.active = true
         camsView.visible = false
+        hiResLoader.focus = true
     }
 
     function showStartScreen() {
-        camsView.destroy();
+        camsView.destroy()
         setup.visible = true
         itm.visible = true
+        zmUrl.forceActiveFocus()
     }
 
     ZMSQPreferences {
@@ -45,10 +47,14 @@ ApplicationWindow {
 
     MonitorModel {
         id: monmod
+
+        onMonitorsCountChanged: {
+            fc.focus = true
+        }
     }
 
     function saveParameters() {
-        setVisualIndexes();
+        setVisualIndexes()
         monmod.save()
         prefs.fullScreen = cbFullScreen.checked
         prefs.url = zmUrl.text
@@ -82,7 +88,8 @@ ApplicationWindow {
             btnUrl.enabled = true
             btnUrl.checkMode = true
             zmUrlProgress.visible = false
-            zmClientError.text = qsTr("<font color=\"#FF0000\">Error: %1</font> ").arg(msg)
+            zmClientError.text = qsTr(
+                        "<font color=\"#FF0000\">Error: %1</font> ").arg(msg)
             zmClientError.visible = true
         }
     }
@@ -90,13 +97,15 @@ ApplicationWindow {
     SceneBuilder {
         id: sceneBuilder
         onSuccess: {
-            camsView = Qt.createQmlObject(code,wnd,"scene1");
-            setup.visible = false;
-            itm.visible = false;
+            camsView = Qt.createQmlObject(code, wnd, "scene1")
+            camsView.focus = true
+            setup.visible = false
+            itm.visible = false
         }
 
         onFail: {
-            zmClientError.text = qsTr("<font color=\"#FF0000\">Error: %1</font> ").arg(code)
+            zmClientError.text = qsTr(
+                        "<font color=\"#FF0000\">Error: %1</font> ").arg(code)
             zmClientError.visible = true
         }
     }
@@ -107,7 +116,8 @@ ApplicationWindow {
 
     function setVisualIndexes() {
         for (var i = 0; i < visualModel.count; ++i) {
-            visualModel.model.setVisualIndex(visualModel.items.get(i).model.index, i)
+            visualModel.model.setVisualIndex(visualModel.items.get(
+                                                 i).model.index, i)
         }
     }
 
@@ -116,478 +126,516 @@ ApplicationWindow {
         active: false
         anchors.fill: parent
         sourceComponent: hiResView
+        focus: true
     }
 
-    GroupBox {
-        id: setup
-        anchors {
-            top: parent.top
-            horizontalCenter: parent.horizontalCenter
-        }
-
-        title: qsTr("Setup connection")
-
-        ColumnLayout {
-            Label {
-                id: lb
-                text: qsTr("Enter ZM url with scheme")
-            }
-
-            RowLayout {
-                id: r
-                TextField {
-                    id: zmUrl
-                    placeholderText: qsTr("http://")
-                    text: prefs.url
-                    onTextChanged: {
-                        zmc.url = text
-                    }
-                }
-
-                Button {
-                    id: btnUrl
-                    property bool checkMode: true
-                    enabled: zmUrl.text.length > 0
-                    anchors.margins: base_margins
-                    text: qsTr("Connect")
-                    onClicked: {
-                        //if (checkMode) {
-                            text = qsTr("Connecting...")
-                            zmc.getMonitors()
-                        //} else {
-                        //    text = qsTr("Check")
-                        //}
-
-                        console.log("check " + checkMode)
-                        zmClientError.visible = false
-                        zmUrl.enabled = checkMode
-                        zmUrlProgress.visible = checkMode
-                        //checkMode = !checkMode
-                        btnUrl.enabled = false
-                    }
-                }
-
-                Button {
-                    id: btnNewLine
-                    anchors.margins: base_margins
-                    enabled: (monmod.monitorsCount > 0)
-                    text: qsTr("Add line sep")
-                    onClicked: {
-                         monmod.addNewLine()
-                    }
-                }
-
-                Button {
-                    id: btnStartView
-                    anchors.margins: base_margins
-                    enabled: monmod.monitorsCount > 0
-                    text: qsTr("Start")
-                    onClicked: {
-                        zmClientError.visible = false
-                        setVisualIndexes();
-                        sceneBuilder.buildScene(zmc,monmod)
-                    }
-                }
-
-                Button {
-                    id: btnExit
-                    anchors.margins: base_margins
-                    enabled: monmod.monitorsCount > 0
-                    text: qsTr("Quit")
-                    onClicked: {
-                        prefs.fullScreen = cbFullScreen.checked
-                        prefs.flush()
-                        Qt.quit();
-                    }
-                }
-            }
-
-            CheckBox {
-                id: cbFullScreen
-                text: qsTr("Full screen mode")
-                checked: prefs.fullScreen
-                onCheckedChanged: {
-
-                }
-            }
-
-            ProgressBar {
-                id: zmUrlProgress
-                visible: false
-                width: parent.width
-                indeterminate: true
-            }
-
-            Label {
-                id: zmClientError
-                text: qsTr("<font color=\"#FF0000\">Error:</font> ")
-                visible: false
+    FocusScope {
+        id: fc
+        focus: true
+        anchors.fill: parent
+        Keys.onPressed: {
+            if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
+                Qt.quit()
             }
         }
-    }
-
-    Rectangle {
-        id: itm
-        width: parent.width
-        //height: parent.height - setup.height - 30
-
-        anchors {
-            top: setup.bottom
-            bottom: parent.bottom
-            horizontalCenter: parent.horizontalCenter
-            margins: base_margins
-        }
-
-        GridView {
-            id: root
-            anchors.top: parent.top
-            anchors.left: parent.left
-
-            width: parent.width
-            height: parent.height
-            cellWidth: cell_width
-            cellHeight: cell_height
-            clip: true
-            ScrollBar.vertical: ScrollBar {
-                visible: true // hides scrollbar
+        GroupBox {
+            id: setup
+            focus: true
+            anchors {
+                top: parent.top
+                horizontalCenter: parent.horizontalCenter
             }
 
-            displaced: Transition {
-                NumberAnimation {
-                    properties: "x,y"
-                    easing.type: Easing.OutQuad
+            title: qsTr("Setup connection")
+
+            ColumnLayout {
+                Label {
+                    id: lb
+                    text: qsTr("Enter ZM url with scheme")
                 }
-            }
 
-            model: DelegateModel {
-                id: visualModel
-                model: monmod
-
-                delegate: chooser
-                DelegateChooser {
-                    id: chooser
-                    role: "type"
-
-                    DelegateChoice {
-                        roleValue: "cam"
-                        DropArea {
-                            id: delegateRoot
-                            width: cell_width
-                            height: cell_height
-
-                            onEntered: {
-                                visualModel.items.move(drag.source.visualIndex,
-                                                       cam.visualIndex)
-                            }
-
-                            property int visualIndex: DelegateModel.itemsIndex
-                            Binding {
-                                target: cam
-                                property: "visualIndex"
-                                value: visualIndex
-                            }
-
-                            Rectangle {
-                                id: cam
-                                property int visualIndex: 0
-                                property int rootIndex: 0
-                                width: delegate_width
-                                height: delegate_heigth
-                                radius: base_radius
-                                color: model.color
-
-                                anchors {
-                                    horizontalCenter: parent.horizontalCenter
-                                    verticalCenter: parent.verticalCenter
-                                }
-
-                                Label {
-                                    id: name
-                                    anchors {
-                                        left: parent.left
-                                        top: parent.top
-                                        margins: base_margins
-                                    }
-
-                                    width: parent.width
-                                    text: model.name
-                                    wrapMode: Label.WordWrap
-                                }
-
-                                Label {
-                                    id: groupId
-                                    anchors {
-                                        left: parent.left
-                                        top: name.bottom
-                                        margins: base_margins
-                                    }
-
-                                    text: qsTr("Group: %1").arg(model.colorIndex)
-                                }
-
-                                Label {
-                                    id: camSize
-                                    anchors {
-                                        left: parent.left
-                                        bottom: parent.bottom
-                                        margins: base_margins
-                                    }
-
-                                    text: model.size
-                                }
-
-                                Image {
-                                    id: camMark
-                                    source: model.monStatus === "Connected" ? "qrc:/images/Goodmark.png" : "qrc:/images/Badmark.png"
-                                    width: 12
-                                    height: 12
-                                    anchors {
-                                        bottom: parent.bottom
-                                        right: parent.right
-                                        margins: base_margins
-                                    }
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onDoubleClicked: {
-                                        model.color = "test"
-                                    }
-
-                                    onClicked: {
-                                        model.color = "test"
-                                    }
-                                }
-
-                                DragHandler {
-                                    id: dragHandler
-                                }
-
-                                Drag.active: dragHandler.active
-                                Drag.source: cam
-                                Drag.hotSpot.x: 36
-                                Drag.hotSpot.y: 36
-
-                                states: [
-                                    State {
-                                        when: cam.Drag.active
-                                        ParentChange {
-                                            target: cam
-                                            parent: root
-                                        }
-
-                                        AnchorChanges {
-                                            target: cam
-                                            anchors.horizontalCenter: undefined
-                                            anchors.verticalCenter: undefined
-                                        }
-                                    }
-                                ]
-                            }
+                RowLayout {
+                    id: r
+                    TextField {
+                        id: zmUrl
+                        placeholderText: qsTr("http://")
+                        text: prefs.url
+                        onTextChanged: {
+                            zmc.url = text
                         }
                     }
 
-                    DelegateChoice {
-                        roleValue: "newline"
-                        DropArea {
-                            width: cell_width
-                            height: cell_height
+                    Button {
+                        id: btnUrl
+                        property bool checkMode: true
+                        enabled: zmUrl.text.length > 0
+                        anchors.margins: base_margins
+                        text: qsTr("Connect")
+                        onClicked: {
+                            //if (checkMode) {
+                            text = qsTr("Connecting...")
+                            zmc.getMonitors()
 
-                            onEntered: visualModel.items.move(
-                                           drag.source.visualIndex,
-                                           newLine.visualIndex)
+                            //} else {
+                            //    text = qsTr("Check")
+                            //}
+                            console.log("check " + checkMode)
+                            zmClientError.visible = false
+                            zmUrl.enabled = checkMode
+                            zmUrlProgress.visible = checkMode
+                            //checkMode = !checkMode
+                            btnUrl.enabled = false
+                        }
+                    }
 
-                            property int visualIndex: DelegateModel.itemsIndex
+                    Button {
+                        id: btnNewLine
+                        anchors.margins: base_margins
+                        enabled: (monmod.monitorsCount > 0)
+                        text: qsTr("Add line sep")
+                        onClicked: {
+                            monmod.addNewLine()
+                        }
+                    }
 
-                            Binding {
-                                target: newLine
-                                property: "visualIndex"
-                                value: visualIndex
-                            }
+                    Button {
+                        id: btnStartView
+                        anchors.margins: base_margins
+                        enabled: monmod.monitorsCount > 0
+                        text: qsTr("Start")
+                        onClicked: {
+                            zmClientError.visible = false
+                            setVisualIndexes()
+                            sceneBuilder.buildScene(zmc, monmod)
+                        }
+                    }
 
-                            Rectangle {
-                                id: newLine
-                                property int visualIndex: 0
-                                property int rootIndex: 0
-                                width: delegate_width
-                                height: delegate_heigth
+                    Button {
+                        id: btnExit
+                        anchors.margins: base_margins
+                        enabled: monmod.monitorsCount > 0
+                        text: qsTr("Quit")
+                        onClicked: {
+                            prefs.fullScreen = cbFullScreen.checked
+                            prefs.flush()
+                            Qt.quit()
+                        }
+                    }
+                }
 
-                                anchors {
-                                    horizontalCenter: parent.horizontalCenter
-                                    verticalCenter: parent.verticalCenter
+                CheckBox {
+                    id: cbFullScreen
+                    text: qsTr("Full screen mode")
+                    checked: prefs.fullScreen
+                    onCheckedChanged: {
+
+                    }
+                }
+
+                ProgressBar {
+                    id: zmUrlProgress
+                    visible: false
+                    width: parent.width
+                    indeterminate: true
+                }
+
+                Label {
+                    id: zmClientError
+                    text: qsTr("<font color=\"#FF0000\">Error:</font> ")
+                    visible: false
+                }
+            }
+
+            Keys.onPressed: {
+                if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
+                    Qt.quit()
+                }
+            }
+        }
+
+        Rectangle {
+            id: itm
+            width: parent.width
+
+            //height: parent.height - setup.height - 30
+            anchors {
+                top: setup.bottom
+                bottom: parent.bottom
+                horizontalCenter: parent.horizontalCenter
+                margins: base_margins
+            }
+
+            GridView {
+                id: root
+                anchors.top: parent.top
+                anchors.left: parent.left
+
+                width: parent.width
+                height: parent.height
+                cellWidth: cell_width
+                cellHeight: cell_height
+                clip: true
+                ScrollBar.vertical: ScrollBar {
+                    visible: true // hides scrollbar
+                }
+
+                displaced: Transition {
+                    NumberAnimation {
+                        properties: "x,y"
+                        easing.type: Easing.OutQuad
+                    }
+                }
+
+                model: DelegateModel {
+                    id: visualModel
+                    model: monmod
+
+                    delegate: chooser
+                    DelegateChooser {
+                        id: chooser
+                        role: "type"
+
+                        DelegateChoice {
+                            roleValue: "cam"
+                            DropArea {
+                                id: delegateRoot
+                                width: cell_width
+                                height: cell_height
+
+                                onEntered: {
+                                    visualModel.items.move(
+                                                drag.source.visualIndex,
+                                                cam.visualIndex)
                                 }
 
-                                Label {
-                                    id: name2
-                                    anchors.centerIn: parent
-                                    text: model.name
-                                    wrapMode: Label.WordWrap
+                                property int visualIndex: DelegateModel.itemsIndex
+                                Binding {
+                                    target: cam
+                                    property: "visualIndex"
+                                    value: visualIndex
                                 }
 
-                                radius: base_radius
-                                color: model.color
+                                Rectangle {
+                                    id: cam
+                                    property int visualIndex: 0
+                                    property int rootIndex: 0
+                                    width: delegate_width
+                                    height: delegate_heigth
+                                    radius: base_radius
+                                    color: model.color
 
-                                Image {
-                                    id: pictDel
-                                    source: "qrc:/images/delete.png"
-                                    width: 12
-                                    height: 12
                                     anchors {
-                                        top: parent.top
-                                        right: parent.right
-                                        margins: base_margins
+                                        horizontalCenter: parent.horizontalCenter
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Label {
+                                        id: name
+                                        anchors {
+                                            left: parent.left
+                                            top: parent.top
+                                            margins: base_margins
+                                        }
+
+                                        width: parent.width
+                                        text: model.name
+                                        wrapMode: Label.WordWrap
+                                    }
+
+                                    Label {
+                                        id: groupId
+                                        anchors {
+                                            left: parent.left
+                                            top: name.bottom
+                                            margins: base_margins
+                                        }
+
+                                        text: qsTr("Group: %1").arg(
+                                                  model.colorIndex)
+                                    }
+
+                                    Label {
+                                        id: camSize
+                                        anchors {
+                                            left: parent.left
+                                            bottom: parent.bottom
+                                            margins: base_margins
+                                        }
+
+                                        text: model.size
+                                    }
+
+                                    Image {
+                                        id: camMark
+                                        source: model.monStatus === "Connected" ? "qrc:/images/Goodmark.png" : "qrc:/images/Badmark.png"
+                                        width: 12
+                                        height: 12
+                                        anchors {
+                                            bottom: parent.bottom
+                                            right: parent.right
+                                            margins: base_margins
+                                        }
                                     }
 
                                     MouseArea {
                                         anchors.fill: parent
+                                        onDoubleClicked: {
+                                            model.color = "test"
+                                        }
+
                                         onClicked: {
-                                            monmod.remove(index)
+                                            model.color = "test"
                                         }
                                     }
-                                }
 
-                                DragHandler {
-                                    id: dragHandler2
-                                }
-
-                                Drag.active: dragHandler2.active
-                                Drag.source: newLine
-                                Drag.hotSpot.x: 36
-                                Drag.hotSpot.y: 36
-
-                                states: [
-                                    State {
-                                        when: newLine.Drag.active
-                                        ParentChange {
-                                            target: newLine
-                                            parent: root
-                                        }
-
-                                        AnchorChanges {
-                                            target: newLine
-                                            anchors.horizontalCenter: undefined
-                                            anchors.verticalCenter: undefined
-                                        }
+                                    DragHandler {
+                                        id: dragHandler
                                     }
-                                ]
+
+                                    Drag.active: dragHandler.active
+                                    Drag.source: cam
+                                    Drag.hotSpot.x: 36
+                                    Drag.hotSpot.y: 36
+
+                                    states: [
+                                        State {
+                                            when: cam.Drag.active
+                                            ParentChange {
+                                                target: cam
+                                                parent: root
+                                            }
+
+                                            AnchorChanges {
+                                                target: cam
+                                                anchors.horizontalCenter: undefined
+                                                anchors.verticalCenter: undefined
+                                            }
+                                        }
+                                    ]
+                                }
                             }
                         }
-                    }
 
-                    DelegateChoice {
-                        roleValue: "stopper"
-                        DropArea {
-                            id: stopperDrop
-                            width: cell_width
-                            height: cell_height
+                        DelegateChoice {
+                            roleValue: "newline"
+                            DropArea {
+                                width: cell_width
+                                height: cell_height
 
-                            onEntered: visualModel.items.move(
-                                           drag.source.visualIndex,
-                                           stopper.visualIndex)
-                            property int visualIndex: DelegateModel.itemsIndex
-                            Binding {
-                                target: stopper
-                                property: "visualIndex"
-                                value: visualIndex
-                            }
+                                onEntered: visualModel.items.move(
+                                               drag.source.visualIndex,
+                                               newLine.visualIndex)
 
-                            Rectangle {
-                                id: stopper
-                                property int visualIndex: 0
-                                width: delegate_width
-                                height: delegate_heigth
+                                property int visualIndex: DelegateModel.itemsIndex
 
-                                anchors {
-                                    horizontalCenter: parent.horizontalCenter
-                                    verticalCenter: parent.verticalCenter
+                                Binding {
+                                    target: newLine
+                                    property: "visualIndex"
+                                    value: visualIndex
                                 }
 
-                                radius: base_radius
-                                color: model.color
+                                Rectangle {
+                                    id: newLine
+                                    property int visualIndex: 0
+                                    property int rootIndex: 0
+                                    width: delegate_width
+                                    height: delegate_heigth
 
-                                Label {
-                                    anchors.centerIn: parent
-                                    text: model.name
-                                    wrapMode: Label.WordWrap
-                                }
+                                    anchors {
+                                        horizontalCenter: parent.horizontalCenter
+                                        verticalCenter: parent.verticalCenter
+                                    }
 
-                                DragHandler {
-                                    id: dragHandler3
-                                }
+                                    Label {
+                                        id: name2
+                                        anchors.centerIn: parent
+                                        text: model.name
+                                        wrapMode: Label.WordWrap
+                                    }
 
-                                Drag.active: dragHandler3.active
-                                Drag.source: stopper
-                                Drag.hotSpot.x: 36
-                                Drag.hotSpot.y: 36
+                                    radius: base_radius
+                                    color: model.color
 
-                                states: [
-                                    State {
-                                        when: stopper.Drag.active
-                                        ParentChange {
-                                            target: stopper
-                                            parent: root
+                                    Image {
+                                        id: pictDel
+                                        source: "qrc:/images/delete.png"
+                                        width: 12
+                                        height: 12
+                                        anchors {
+                                            top: parent.top
+                                            right: parent.right
+                                            margins: base_margins
                                         }
 
-                                        AnchorChanges {
-                                            target: stopper
-                                            anchors.horizontalCenter: undefined
-                                            anchors.verticalCenter: undefined
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                monmod.remove(index)
+                                            }
                                         }
                                     }
-                                ]
+
+                                    DragHandler {
+                                        id: dragHandler2
+                                    }
+
+                                    Drag.active: dragHandler2.active
+                                    Drag.source: newLine
+                                    Drag.hotSpot.x: 36
+                                    Drag.hotSpot.y: 36
+
+                                    states: [
+                                        State {
+                                            when: newLine.Drag.active
+                                            ParentChange {
+                                                target: newLine
+                                                parent: root
+                                            }
+
+                                            AnchorChanges {
+                                                target: newLine
+                                                anchors.horizontalCenter: undefined
+                                                anchors.verticalCenter: undefined
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+
+                        DelegateChoice {
+                            roleValue: "stopper"
+                            DropArea {
+                                id: stopperDrop
+                                width: cell_width
+                                height: cell_height
+
+                                onEntered: visualModel.items.move(
+                                               drag.source.visualIndex,
+                                               stopper.visualIndex)
+                                property int visualIndex: DelegateModel.itemsIndex
+                                Binding {
+                                    target: stopper
+                                    property: "visualIndex"
+                                    value: visualIndex
+                                }
+
+                                Rectangle {
+                                    id: stopper
+                                    property int visualIndex: 0
+                                    width: delegate_width
+                                    height: delegate_heigth
+
+                                    anchors {
+                                        horizontalCenter: parent.horizontalCenter
+                                        verticalCenter: parent.verticalCenter
+                                    }
+
+                                    radius: base_radius
+                                    color: model.color
+
+                                    Label {
+                                        anchors.centerIn: parent
+                                        text: model.name
+                                        wrapMode: Label.WordWrap
+                                    }
+
+                                    DragHandler {
+                                        id: dragHandler3
+                                    }
+
+                                    Drag.active: dragHandler3.active
+                                    Drag.source: stopper
+                                    Drag.hotSpot.x: 36
+                                    Drag.hotSpot.y: 36
+
+                                    states: [
+                                        State {
+                                            when: stopper.Drag.active
+                                            ParentChange {
+                                                target: stopper
+                                                parent: root
+                                            }
+
+                                            AnchorChanges {
+                                                target: stopper
+                                                anchors.horizontalCenter: undefined
+                                                anchors.verticalCenter: undefined
+                                            }
+                                        }
+                                    ]
+                                }
                             }
                         }
                     }
                 }
             }
         }
-    }
 
-    Component {
-        id: hiResView
-        Rectangle {
+        Component {
+            id: hiResView
+            Rectangle {
+                id: hiResRect
+                focus: true
 
-            CamVideoProducer {
-                id: videoProducer_1
-                url: hiResUrl
-            }
+                CamVideoProducer {
+                    id: videoProducer_1
+                    url: hiResUrl
+                }
 
-            VideoOutput {
-                id: output1
-                anchors.fill: parent
-                source: videoProducer_1
-
-                MouseArea {
+                VideoOutput {
+                    id: output1
                     anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    source: videoProducer_1
 
-                    onClicked: {
-                        //if (mouse.button === Qt.RightButton)
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                        onDoubleClicked: {
                             contextMenu_hiRes.popup()
-                    }
-
-                    onPressAndHold: {
-                        if (mouse.source === Qt.MouseEventNotSynthesized)
-                            contextMenu_hiRes.popup()
-                    }
-
-                    Menu {
-                        id: contextMenu_hiRes
-                        MenuItem {
-                            text: qsTr("Close")
-                            onClicked: {
-                                hiResLoader.active = false
-                                camsView.visible = true
-                            }
                         }
 
-                        MenuItem {
-                            text: qsTr("Quit application")
-                            onClicked: {
-                                saveParameters()
-                                Qt.quit()
+                        onClicked: {
+                            // do not set focus now to video output1
+                            //output1.focus=true
+                            if (mouse.button === Qt.RightButton)
+                                contextMenu_hiRes.popup()
+                        }
+
+                        onPressAndHold: {
+                            if (mouse.source === Qt.MouseEventNotSynthesized)
+                                contextMenu_hiRes.popup()
+                        }
+
+                        Menu {
+                            id: contextMenu_hiRes
+                            MenuItem {
+                                text: qsTr("Close")
+                                onClicked: {
+                                    hiResLoader.active = false
+                                    camsView.visible = true
+                                    camsView.focus = true
+                                }
+                            }
+
+                            MenuItem {
+                                text: qsTr("Quit application")
+                                onClicked: {
+                                    saveParameters()
+                                    Qt.quit()
+                                }
                             }
                         }
+                    }
+                }
+
+                Keys.onPressed: {
+                    if (event.key === Qt.Key_Escape
+                            || event.key === Qt.Key_Back) {
+                        hiResLoader.active = false
+                        camsView.visible = true
+                        camsView.focus = true
                     }
                 }
             }

@@ -7,3 +7,9 @@ Item {
     id: main
     anchors.fill: parent
     focus: true
+
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
+            wnd.showStartScreen();
+        }
+    }
