@@ -135,6 +135,7 @@ ApplicationWindow {
         anchors.fill: parent
         Keys.onPressed: {
             if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
+                event.accepted = true
                 Qt.quit()
             }
         }
@@ -248,6 +249,7 @@ ApplicationWindow {
 
             Keys.onPressed: {
                 if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
+                    event.accepted = true
                     Qt.quit()
                 }
             }
@@ -633,6 +635,7 @@ ApplicationWindow {
                 Keys.onPressed: {
                     if (event.key === Qt.Key_Escape
                             || event.key === Qt.Key_Back) {
+                        event.accepted = true
                         hiResLoader.active = false
                         camsView.visible = true
                         camsView.focus = true

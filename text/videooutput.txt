@@ -56,6 +56,7 @@ VideoOutput {
     Keys.onPressed: {
         if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
             wnd.showStartScreen();
+            event.accepted = true
         }
     }
 
