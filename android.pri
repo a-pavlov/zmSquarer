@@ -12,3 +12,8 @@ DISTFILES += \
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/platform/android
 DISTFILES += $$ANDROID_PACKAGE_SOURCE_DIR/src/org/dkfsoft/zmSquarer/ZMSquarerActivity.java
+
+!isEmpty(TJPEG_ROOT) {
+    LIBS += -L$$(TJPEG_ROOT)/build -lturbojpeg
+    INCLUDEPATH += $$(TJPEG_ROOT)
+}
