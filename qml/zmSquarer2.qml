@@ -38,7 +38,7 @@ ApplicationWindow {
         camsView.destroy()
         setup.visible = true
         itm.visible = true
-        zmUrl.forceActiveFocus()
+        btnStartView.forceActiveFocus()
     }
 
     ZMSQPreferences {
