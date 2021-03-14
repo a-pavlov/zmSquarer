@@ -152,11 +152,12 @@ ApplicationWindow {
             ColumnLayout {
                 Label {
                     id: lb
-                    text: qsTr("Enter ZM url with scheme")
+                    text: qsTr("Enter ZM url with scheme. ") + (zmc.supportsSsl?qsTr("<font color=\"green\">SSL supported</font>"):qsTr("<font color=\"yellow\">SSL not supported</font>"))
                 }
 
                 RowLayout {
                     id: r
+
                     TextField {
                         id: zmUrl
                         placeholderText: qsTr("http://")

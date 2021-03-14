@@ -57,6 +57,12 @@ QString ZMClient::getMonitors() {
     });
 
     QObject::connect(reply, &QNetworkReply::sslErrors, [reply](const QList<QSslError> &errors) {
+        QList<QSslError> canBeIgnoredErrors;
+        canBeIgnoredErrors << QSslError::HostNameMismatch << QSslError::SelfSignedCertificate;
+        for (const QSslError& sslError: errors) {
+            if (!canBeIgnoredErrors.contains(sslError.error())) return;
+        }
+
         reply->ignoreSslErrors(errors);
     });
 
@@ -82,6 +88,10 @@ void ZMClient::setUrl(const QString &u) {
 
 QString ZMClient::url() const {
     return baseUrl;
+}
+
+bool ZMClient::supportsSsl() const {
+    return QSslSocket::supportsSsl();
 }
 
 QString ZMClient::getMonitorUrl(int monId) const {

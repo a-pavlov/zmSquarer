@@ -3,6 +3,7 @@
 #include <QTcpSocket>
 #include <QtGlobal>
 #include <QTimer>
+#include <QSslSocket>
 
 #define RETRY_COUNT 3
 #define IMG_REQ_TIMEOUT 5
@@ -113,7 +114,24 @@ void NetCam::connect() {
     }
 
     if (socket == nullptr) {
-        socket = new QTcpSocket;
+        socket = (url.scheme() == "https")?new QSslSocket:new QTcpSocket;
+
+        if (url.scheme() == "https") {
+            QSslSocket* sslSocket = dynamic_cast<QSslSocket*>(socket);
+
+            QObject::connect(sslSocket, QOverload<const QList<QSslError> &>::of(&QSslSocket::sslErrors),
+                [=](const QList<QSslError> &errors){
+                    QList<QSslError> canBeIgnoredErrors;
+                    canBeIgnoredErrors << QSslError::HostNameMismatch << QSslError::SelfSignedCertificate;
+                    for (const QSslError& sslError: errors) {
+                        if (!canBeIgnoredErrors.contains(sslError.error())) return;
+                    }
+
+                    sslSocket->ignoreSslErrors(errors);
+                }
+            );
+        }
+
         QObject::connect(socket, &QTcpSocket::connected,[=](){
            QByteArray array;
            array.append("GET ")
@@ -229,7 +247,13 @@ void NetCam::connect() {
     }
 
     watchdog->start(WATCH_DOG_INTERVAL_SEC*1000);
-    socket->connectToHost(url.host(), 80);
+
+    if (url.scheme() == "https") {
+        qDebug() << "connect to host encrypted started " << url;
+        (dynamic_cast<QSslSocket*>(socket))->connectToHostEncrypted(url.host(), url.port(443));
+    } else {
+        socket->connectToHost(url.host(), url.port(80));
+    }
 }
 
 void NetCam::restartConnection() {

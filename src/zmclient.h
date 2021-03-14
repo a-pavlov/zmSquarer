@@ -27,14 +27,16 @@ public:
     explicit ZMClient(QObject *parent = nullptr);
     void setUrl(const QString& url);
     QString url() const;
+    bool supportsSsl() const;
     Q_PROPERTY(QString url READ url WRITE setUrl NOTIFY urlChanged)
+    Q_PROPERTY(bool supportsSsl READ supportsSsl NOTIFY supportsSslChanged)
     Q_INVOKABLE QString getMonitors();
     Q_INVOKABLE QString getMonitorUrl(int monId) const;
 signals:
     void monitors(const QList<ZMMonitor>& mons);
     void error(const QString& msg);
     void urlChanged(const QString& url);
-
+    void supportsSslChanged(bool);
 public slots:
 private:
     QString baseUrl;
