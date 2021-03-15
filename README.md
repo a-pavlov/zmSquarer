@@ -10,7 +10,7 @@ Supports only http protocol for now and no-authentication.
 * Convenient view capabilities. Build montage window. Link low res sources to hi res sources using color groups.
 
 ### Current state
-MVP application for ZM on http and no authorization.
+MVP application for ZM on http/https(if OpenSSL is available) and no authorization.
 
 ### 3dparty source code used
 * [Motion](https://github.com/Motion-Project/motion): an example of MJPEG parsing. Not in the build now.
