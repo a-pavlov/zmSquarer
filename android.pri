@@ -17,3 +17,15 @@ DISTFILES += $$ANDROID_PACKAGE_SOURCE_DIR/src/org/dkfsoft/zmSquarer/ZMSquarerAct
     LIBS += -L$$(TJPEG_ROOT)/build -lturbojpeg
     INCLUDEPATH += $$(TJPEG_ROOT)
 }
+
+#####################################################################
+#   OpenSSL for Android                                             #
+#   https://doc.qt.io/qt-5/android-openssl-support.html             #
+#   https://github.com/KDAB/android_openssl                         #
+#   comment it if no OpenSSL support is required                    #
+#   some modifications are possibly required like:                  #
+#   set ssl_versions to NDK root ~/android/ndk/21.3.6528147         #
+#   qt_versions to 1.1 qt_architectures to armeabi-v7a explicitly   #
+#   run build_ssl.sh                                                #
+include(/home/inkpot/dev/android_openssl/openssl.pri)
+#####################################################################
