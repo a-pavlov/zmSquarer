@@ -14,7 +14,30 @@ ANDROID_PACKAGE_SOURCE_DIR = $$PWD/platform/android
 DISTFILES += $$ANDROID_PACKAGE_SOURCE_DIR/src/org/dkfsoft/zmSquarer/ZMSquarerActivity.java
 
 !isEmpty(TJPEG_ROOT) {
-    LIBS += -L$$(TJPEG_ROOT)/build -lturbojpeg
+    contains(ANDROID_TARGET_ARCH, armeabi-v7a) {
+        #ANDROID_EXTRA_LIBS += \
+        #    $$(TJPEG_ROOT)/arm/libjpeg.so
+        LIBS += -L$$(TJPEG_ROOT)/arm -lturbojpeg
+    }
+
+    contains(ANDROID_TARGET_ARCH, arm64-v8a) {
+        #ANDROID_EXTRA_LIBS += \
+        #    $$(TJPEG_ROOT)/arm64/libjpeg.so
+        LIBS += -L$$(TJPEG_ROOT)/arm64 -lturbojpeg
+    }
+
+    contains(ANDROID_TARGET_ARCH, x86) {
+        #ANDROID_EXTRA_LIBS += \
+        #    $$(TJPEG_ROOT)/x86/libjpeg.so
+        LIBS += -L$$(TJPEG_ROOT)/x86 -lturbojpeg
+    }
+
+    contains(ANDROID_TARGET_ARCH, x86_64) {
+        #ANDROID_EXTRA_LIBS += \
+        #    $$(TJPEG_ROOT)/x86_64/libjpeg.so
+        LIBS += -L$$(TJPEG_ROOT)/x86_64 -lturbojpeg
+    }
+
     INCLUDEPATH += $$(TJPEG_ROOT)
 }
 
