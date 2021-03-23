@@ -24,7 +24,9 @@ win32 {
 }
 
 unix:!macx {
-  include(unixconf.pri)
+    linux:!android {
+        include(unixconf.pri)
+    }
 }
 
 android {
@@ -36,3 +38,4 @@ include(src/http_parser/http_parser.pri)
 include(src/src.pri)
 
 HEADERS +=
+android: include(/home/inkpot/dev/android/android_openssl/openssl.pri)
