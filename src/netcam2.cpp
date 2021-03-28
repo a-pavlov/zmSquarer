@@ -47,7 +47,7 @@ int NetCam::header_value_callback(http_parser* p, const char* c, unsigned long l
 
 int NetCam::headers_complete(http_parser* p) {
     Q_UNUSED(p)
-    qDebug() << "headers completed";
+    //qDebug() << "headers completed";
     return 0;
 }
 
@@ -70,7 +70,7 @@ NetCam::~NetCam() {
         socket->close();
         socket->deleteLater();
     }
-    qDebug() << "netcam removed";
+    //qDebug() << "netcam removed";
 }
 
 void NetCam::start() {
@@ -78,7 +78,7 @@ void NetCam::start() {
 }
 
 void NetCam::connect() {
-    qDebug() << Q_FUNC_INFO;
+    //qDebug() << Q_FUNC_INFO;
     Q_ASSERT(!url.isEmpty());
     // prepare for connection
     headerBytesRead = 0;
@@ -207,7 +207,7 @@ void NetCam::connect() {
         });
 
         QObject::connect(socket, &QTcpSocket::disconnected, [=] () {
-            qDebug()<< "disconnected";
+            //qDebug()<< "disconnected";
             emit disconnected();
         });
 
@@ -242,14 +242,14 @@ void NetCam::connect() {
             }
         });
     } else {
-        qDebug() << "force close";
+        //qDebug() << "force close";
         socket->abort();
     }
 
     watchdog->start(WATCH_DOG_INTERVAL_SEC*1000);
 
     if (url.scheme() == "https") {
-        qDebug() << "connect to host encrypted started " << url;
+        //qDebug() << "connect to host encrypted started " << url;
         (dynamic_cast<QSslSocket*>(socket))->connectToHostEncrypted(url.host(), url.port(443));
     } else {
         socket->connectToHost(url.host(), url.port(80));
@@ -257,7 +257,7 @@ void NetCam::connect() {
 }
 
 void NetCam::restartConnection() {
-    qDebug() << "restart connection to " << url;
+    //qDebug() << "restart connection to " << url;
     connect();
     restartRequested = false;
 }

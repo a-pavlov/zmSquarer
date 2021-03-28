@@ -4,5 +4,6 @@
         <file alias="zmSquarer.qml">qml/zmSquarer.qml</file>
         <file alias="zmSquarer2.qml">qml/zmSquarer2.qml</file>
         <file alias="square_hi_res.qml">qml/square_hi_res.qml</file>
+        <file alias="ImageButton.qml">qml/ImageButton.qml</file>
     </qresource>
 </RCC>

@@ -5,5 +5,10 @@
         <file>images/no_signal.jpg</file>
         <file>images/Goodmark.png</file>
         <file>images/Badmark.png</file>
+        <file>images/Application.png</file>
+        <file>images/Back.png</file>
+        <file>images/Exit.png</file>
+        <file>images/Goback.png</file>
+        <file>images/Zoom.png</file>
     </qresource>
 </RCC>

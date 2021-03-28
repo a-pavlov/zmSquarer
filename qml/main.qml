@@ -47,6 +47,17 @@ ApplicationWindow {
         }
     }
 
+    ImageButton {
+        id: xx
+        anchors.left: load.right
+        anchors.top: load.top
+        image:  "qrc:/images/Back.png"
+        onClicked: {
+            console.log("clicked")
+        }
+
+    }
+
     Loader {
         id: loader
         active: true

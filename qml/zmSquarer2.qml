@@ -32,6 +32,7 @@ ApplicationWindow {
         hiResLoader.active = true
         camsView.visible = false
         hiResLoader.focus = true
+        hiResLoader.forceActiveFocus()
     }
 
     function showStartScreen() {
@@ -133,12 +134,14 @@ ApplicationWindow {
         id: fc
         focus: true
         anchors.fill: parent
+
         Keys.onPressed: {
             if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
                 event.accepted = true
                 Qt.quit()
             }
         }
+
         GroupBox {
             id: setup
             focus: true
@@ -591,6 +594,26 @@ ApplicationWindow {
                     anchors.fill: parent
                     source: videoProducer_1
 
+                    ImageButton {
+                        id: backBtn
+                        width: 24
+                        height: 24
+                        anchors {
+                            margins: base_margins
+                            right: parent.right
+                            top: parent.top
+                        }
+
+                        image:  "qrc:/images/Goback.png"
+
+                        onClicked: {
+                            hiResLoader.active = false
+                            camsView.visible = true
+                            camsView.focus = true
+                        }
+                    }
+
+/*
                     MouseArea {
                         anchors.fill: parent
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -630,12 +653,11 @@ ApplicationWindow {
                                 }
                             }
                         }
-                    }
+                    }*/
                 }
 
                 Keys.onPressed: {
-                    if (event.key === Qt.Key_Escape
-                            || event.key === Qt.Key_Back) {
+                    if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
                         event.accepted = true
                         hiResLoader.active = false
                         camsView.visible = true

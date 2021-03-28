@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 BufferHolder::~BufferHolder() {
-    qDebug() << "close buffer size " << buffer.size();
+    //qDebug() << "close buffer size " << buffer.size();
 }
 
 void BufferHolder::allocate(unsigned int sz) {
@@ -48,7 +48,7 @@ CamVideoProducer::CamVideoProducer(QObject *parent )
 }
 
 CamVideoProducer::~CamVideoProducer() {
-    qDebug() << "cam video producer close";
+    //qDebug() << "cam video producer close";
     if (timerId != -1) {
         killTimer(timerId);
     }
@@ -78,7 +78,7 @@ QString CamVideoProducer::url() const {
 QString CamVideoProducer::setUrl(const QString& u) {
     if (u.isEmpty() || u.isNull()) return u;
     ZMSQApplication* app = static_cast<ZMSQApplication*>(QApplication::instance());
-    qDebug() << "video producer set url " << u << " thread ";
+    //qDebug() << "video producer set url " << u << " thread ";
     netCam = app->getCamController().createCam(u);
 
 
@@ -110,7 +110,7 @@ void CamVideoProducer::setVideoSurface( QAbstractVideoSurface* s )
 void CamVideoProducer::closeSurface()
 {
     if( _surface && _surface->isActive() ) {
-        qDebug() << "stop surface";
+        //qDebug() << "stop surface";
         _surface->stop();
     }
 }
@@ -140,7 +140,7 @@ void CamVideoProducer::updateTimer(bool start) {
         }
     } else {
         if (timerId != -1) {
-            qDebug() << "stop timer " << timerId;
+            //qDebug() << "stop timer " << timerId;
             killTimer(timerId);
             timerId = -1;
         }
@@ -218,7 +218,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
         }
     } else {
         int err = tjGetErrorCode(_jpegDecompressor);
-        qDebug() << "unable to decompress header " << err;
+        //qDebug() << "unable to decompress header " << err;
     }
 #else
     QImage screenImage; //("/home/inkpot/dev/" + frames.at(currentFrame++ % frames.size()));

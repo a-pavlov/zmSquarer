@@ -7,56 +7,89 @@ VideoOutput {
     source: videoProducer_%1
     focus: false
 
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
+    ImageButton {
+        id: backBtn_%1
+        width: 24
+        height: 24
+        anchors {
+            margins: base_margins
+            right: parent.right
+            top: parent.top
+        }
+
+        image:  "qrc:/images/Goback.png"
 
         onClicked: {
-            focus=true
-            if (mouse.button === Qt.RightButton)
-                contextMenu_%1.popup()
-        }
-
-        onPressAndHold: {
-            if (mouse.source === Qt.MouseEventNotSynthesized)
-                contextMenu_%1.popup()
-        }
-
-        onDoubleClicked: {
-            contextMenu_%1.popup()
-        }
-
-        Menu {
-            id: contextMenu_%1
-            MenuItem {
-                text: qsTr("Back")
-                onClicked: {
-                    wnd.showStartScreen();
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Show HI resolution")
-                onClicked: {
-                    wnd.hiResUrl = videoProducer_%1.hiResUrl
-                    wnd.runHiRes();
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Quit application")
-                onClicked: {
-                    wnd.saveParameters()
-                    Qt.quit()
-                }
-            }
+            wnd.showStartScreen();
         }
     }
 
+    ImageButton {
+        id: zoomBtn_%1
+        width: 24
+        height: 24
+        anchors {
+            margins: base_margins
+            right: backBtn_%1.right
+            top: backBtn_%1.bottom
+        }
+
+        image:  "qrc:/images/Zoom.png"
+
+        onClicked: {
+            wnd.hiResUrl = videoProducer_%1.hiResUrl
+            wnd.runHiRes();
+        }
+    }
+
+    ImageButton {
+        id: exitBtn_%1
+        width: 24
+        height: 24
+        anchors {
+            margins: base_margins
+            right: zoomBtn_%1.right
+            top: zoomBtn_%1.bottom
+        }
+
+        image:  "qrc:/images/Exit.png"
+
+        onClicked: {
+            wnd.saveParameters()
+            Qt.quit()
+        }
+    }
+
+    /*Menu {
+        id: contextMenu_%1
+        MenuItem {
+            text: qsTr("Back")
+            onClicked: {
+                wnd.showStartScreen();
+            }
+        }
+
+        MenuItem {
+            text: qsTr("Show HI resolution")
+            onClicked: {
+                wnd.hiResUrl = videoProducer_%1.hiResUrl
+                wnd.runHiRes();
+            }
+        }
+
+        MenuItem {
+            text: qsTr("Quit application")
+            onClicked: {
+                wnd.saveParameters()
+                Qt.quit()
+            }
+        }
+    }*/
+
     Keys.onPressed: {
         if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
-            wnd.showStartScreen();
             event.accepted = true
+            wnd.showStartScreen();
         }
     }
 
