@@ -596,10 +596,10 @@ ApplicationWindow {
 
                     ImageButton {
                         id: backBtn
-                        width: 24
-                        height: 24
+                        width: 32
+                        height: 32
                         anchors {
-                            margins: base_margins
+                            margins: base_margins*2
                             right: parent.right
                             top: parent.top
                         }

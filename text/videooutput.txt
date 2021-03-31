@@ -9,10 +9,10 @@ VideoOutput {
 
     ImageButton {
         id: backBtn_%1
-        width: 24
-        height: 24
+        width: 32
+        height: 32
         anchors {
-            margins: base_margins
+            margins: base_margins*2
             right: parent.right
             top: parent.top
         }
@@ -26,10 +26,10 @@ VideoOutput {
 
     ImageButton {
         id: zoomBtn_%1
-        width: 24
-        height: 24
+        width: 32
+        height: 32
         anchors {
-            margins: base_margins
+            margins: base_margins*2
             right: backBtn_%1.right
             top: backBtn_%1.bottom
         }
@@ -44,10 +44,10 @@ VideoOutput {
 
     ImageButton {
         id: exitBtn_%1
-        width: 24
-        height: 24
+        width: 32
+        height: 32
         anchors {
-            margins: base_margins
+            margins: base_margins*2
             right: zoomBtn_%1.right
             top: zoomBtn_%1.bottom
         }
