@@ -165,6 +165,7 @@ void MonitorModel::setVisualIndex(int modelIndex, int visualIndex) {
 
 void MonitorModel::clear() {
     if (!monitors.isEmpty()) {
+        Q_ASSERT(colorMatrix.size() > 0);
         colorMatrix.reset();
         emit beginRemoveRows(QModelIndex(), 0, monitors.size() - 1);
         monitors.clear();
@@ -190,15 +191,6 @@ int MonitorModel::getCheckedCount() const {
 
 int MonitorModel::getMonitorsCount() const {
     return static_cast<int>(std::count_if(monitors.begin(), monitors.end(), [](const ZMMonitor& m) -> bool { return m.type == CamType::CAM; }));
-}
-
-void MonitorModel::clean() {
-    if (!monitors.empty()) {
-        beginRemoveRows(QModelIndex(), 0, monitors.size() - 1);
-        monitors.clear();
-        endRemoveRows();
-        emit monitorsCountChanged();
-    }
 }
 
 void MonitorModel::save() const {

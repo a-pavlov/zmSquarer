@@ -50,7 +50,6 @@ public:
 
     Q_INVOKABLE void save() const;    // save servers list to disk
     Q_INVOKABLE void load();    // load servers list from disk
-    Q_INVOKABLE void clean();
     Q_INVOKABLE void add(const ZMMonitor& mon);
     Q_INVOKABLE void addAll(const QList<ZMMonitor>&);
     Q_INVOKABLE void testAdd();
