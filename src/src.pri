@@ -2,6 +2,7 @@ INCLUDEPATH += $$PWD
 
 HEADERS +=  $$PWD/rbuffer.h\
             $$PWD/colormanager.h \
+            $$PWD/networksmodel.h \
             $$PWD/rsplitter.h\
             $$PWD/netcam2.h \
             $$PWD/camcontroller.h \
@@ -17,6 +18,7 @@ HEADERS +=  $$PWD/rbuffer.h\
 
 SOURCES +=  $$PWD/rbuffer.cpp\
             $$PWD/colormanager.cpp \
+            $$PWD/networksmodel.cpp \
             $$PWD/rsplitter.cpp\
             $$PWD/netcam2.cpp \
             $$PWD/camcontroller.cpp \

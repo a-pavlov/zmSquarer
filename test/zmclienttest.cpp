@@ -26,3 +26,15 @@ void ZMClientTest::testMonitors() {
     QCOMPARE(monitors[0].status, "Connected");
     QCOMPARE(monitors[0].captureFPS, "12.50");
 }
+
+void ZMClientTest::testVersion() {
+    QString fileName(":/zmclient/version.json");
+    QFile file(fileName);
+    bool isOpened = file.open(QIODevice::ReadOnly);
+    QVERIFY(isOpened);
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    file.close();
+    ZMVersion version = ZMVersion::fromJson(doc);
+    QCOMPARE(version.version, "1.34.21");
+    QCOMPARE(version.apiversion, "2.0");
+}

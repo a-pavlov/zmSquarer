@@ -1,5 +1,6 @@
 <RCC>
-    <qresource prefix="zmclient">
+    <qresource prefix="/zmclient">
         <file alias="monitors.json">res/monitors.json</file>
+        <file alias="version.json">res/version.json</file>
     </qresource>
 </RCC>

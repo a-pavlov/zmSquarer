@@ -4,6 +4,7 @@ import QtMultimedia 5.0
 import QtQuick.Layouts 1.11
 import CamVideoProducer 0.1
 import QtQuick.Controls 2.12
+import NetworksModel 0.1
 
 ApplicationWindow {
     id: wnd
@@ -12,6 +13,11 @@ ApplicationWindow {
     height: 480
     property var newObject: ""
     property var base_margins: 4
+
+
+    NetworksModel {
+        id: netmon
+    }
 
     Button {
         id: test
@@ -47,15 +53,18 @@ ApplicationWindow {
         }
     }
 
-    ImageButton {
-        id: xx
-        anchors.left: load.right
-        anchors.top: load.top
-        image:  "qrc:/images/Back.png"
-        onClicked: {
-            console.log("clicked")
+    Button {
+        id: refreshNetworks
+        anchors {
+            left: load.right
+            top: parent.top
+            margins: base_margins
         }
 
+        text: "refresh networks"
+        onClicked: {
+            netmon.refresh()
+        }
     }
 
     Loader {
@@ -74,6 +83,7 @@ ApplicationWindow {
     }
 
     Component {
+
         id: c1
 
         /*FocusScope {
@@ -167,34 +177,170 @@ ApplicationWindow {
     }
 
 
-    /*MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onClicked: {
-            if (mouse.button === Qt.RightButton)
-                contextMenu.popup()
-        }
-        onPressAndHold: {
-            if (mouse.source === Qt.MouseEventNotSynthesized)
-                contextMenu.popup()
+    Rectangle {
+        id: slots
+        anchors {
+            top: load.bottom
+            left: load.left
         }
 
-        Menu {
-            id: contextMenu
-            MenuItem {
-                text: qsTr("Back")
-                onClicked: {
+        width: 320; height: 320
 
+        Component {
+            id: contactDelegate
+            Item {
+                width: grid.cellWidth;
+                height: grid.cellHeight
+
+                Column {
+                    //anchors.fill: parent
+                    Text { text: name; anchors.horizontalCenter: parent.horizontalCenter }
+                    Text { text: num; anchors.horizontalCenter: parent.horizontalCenter; }
+                    Text { text: GridView.isCurrentItem ? "curr" : "nc"; anchors.horizontalCenter: parent.horizontalCenter}
                 }
 
-            }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        if (grid.currentIndex == (num - 1)) {
+                            console.log("start cam")
+                        } else {
+                            console.log("clicked " + model.num + " current item " + grid.currentIndex)
+                            grid.currentIndex = model.num - 1;
+                        }
+                    }
 
-            MenuItem {
-                text: qsTr("Copy")
-                onClicked: {
-
+                    onDoubleClicked: {
+                        console.log("dbl clk")
+                    }
                 }
             }
+
         }
-    }*/
+
+        GridView {
+            id: grid
+            anchors.fill: parent
+            cellWidth: 80; cellHeight: 80
+
+            model: ListModel {
+                ListElement {
+                    name: "Jim Williams"
+                    num: 1
+                }
+
+                ListElement {
+                    name: "John Brown"
+                    num: 2
+                }
+
+                ListElement {
+                    name: "Bill Smyth"
+                    num: 3
+                }
+
+                ListElement {
+                    name: "Sam Wise"
+                    num: 4
+                }
+
+                ListElement {
+                    name: "Jim Williams"
+                    num: 5
+                }
+
+                ListElement {
+                    name: "John Brown"
+                    num: 6
+                }
+
+                ListElement {
+                    name: "Bill Smyth"
+                    num: 7
+                }
+
+                ListElement {
+                    name: "Sam Wise"
+                    num: 8
+                }
+
+                ListElement {
+                    name: "Jim Williams"
+                    num: 9
+                }
+
+                ListElement {
+                    name: "John Brown"
+                    num: 10
+                }
+
+                ListElement {
+                    name: "Bill Smyth"
+                    num: 11
+                }
+
+                ListElement {
+                    name: "Sam Wise"
+                    num: 12
+                }
+
+                ListElement {
+                    name: "Jim Williams"
+                    num: 13
+                }
+
+                ListElement {
+                    name: "John Brown"
+                    num: 14
+                }
+
+                ListElement {
+                    name: "Bill Smyth"
+                    num: 15
+                }
+
+                ListElement {
+                    name: "Sam Wise"
+                    num: 16
+                }
+            }
+
+            delegate: contactDelegate
+            highlight: Rectangle {
+                width: grid.cellWidth; height: grid.cellHeight
+                        color: "lightsteelblue"; radius: 5
+                        x: grid.currentItem.x
+                        y: grid.currentItem.y
+                        Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
+                        Behavior on y { SpringAnimation { spring: 3; damping: 0.2 } }
+
+                //color: "lightsteelblue";
+                //radius: 5
+                //Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
+                //Behavior on y { SpringAnimation { spring: 3; damping: 0.2 } }
+            }
+
+            highlightFollowsCurrentItem: true
+            //keyNavigationEnabled : true
+            focus: true
+            //onCurrentItemChanged: console.log(model.get(list.currentIndex).name + ' selected')
+
+            Component.onCompleted: {
+                                      console.log("started")
+                                  }
+        }
+    }
+
+
+    ListView {
+        anchors.left: slots.right
+        anchors.top: slots.top
+        width: 100;
+        height: 80
+
+        model: netmon
+        delegate: Text {
+            text: address
+        }
+    }
 }
