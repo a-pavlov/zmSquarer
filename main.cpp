@@ -14,6 +14,7 @@
 #include "preferences.h"
 #include "scenebuilder.h"
 #include "networksmodel.h"
+#include "zmsearch.h"
 
 #ifdef Q_OS_WIN
 
@@ -62,6 +63,7 @@ int main(int argc, char *argv[]) {
     Preferences::registerQmlType();
     SceneBuilder::registerQmlType();
     NetworksModel::registerQmlType();
+    ZMSearch::registerQmlType();
 
 
     ZMSQApplication app(argc, argv);

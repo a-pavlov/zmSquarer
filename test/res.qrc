@@ -2,5 +2,6 @@
     <qresource prefix="/zmclient">
         <file alias="monitors.json">res/monitors.json</file>
         <file alias="version.json">res/version.json</file>
+        <file alias="version_bad.json">res/version_bad.json</file>
     </qresource>
 </RCC>

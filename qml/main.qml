@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.11
 import CamVideoProducer 0.1
 import QtQuick.Controls 2.12
 import NetworksModel 0.1
+import ZMSearch 0.1
 
 ApplicationWindow {
     id: wnd
@@ -17,6 +18,14 @@ ApplicationWindow {
 
     NetworksModel {
         id: netmon
+
+        onSelectedChanged: {
+           console.log("selected " + count)
+        }
+    }
+
+    ZMSearch {
+        id: zmsearch
     }
 
     Button {
@@ -333,14 +342,40 @@ ApplicationWindow {
 
 
     ListView {
+        id: networks
         anchors.left: slots.right
         anchors.top: slots.top
         width: 100;
         height: 80
 
+        Component {
+            id: comp
+            Row {
+                CheckBox {
+                    id: nm
+                    checked: selected
+                    text: address
+                    onCheckedChanged: {
+                        console.log("check " + checked)
+                        selected = checked
+                    }
+                }
+            }
+        }
+
+        delegate: comp
         model: netmon
-        delegate: Text {
-            text: address
+    }
+
+    Button {
+        id: startScanning
+        text: "Scan..."
+        anchors.top: networks.bottom
+        anchors.left: networks.left
+        enabled: netmon.selectedCount > 0
+        onClicked: {
+            console.log("start scanning")
+            zmsearch.search(netmon.getSelected())
         }
     }
 }

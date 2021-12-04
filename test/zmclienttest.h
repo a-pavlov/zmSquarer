@@ -12,6 +12,8 @@ public:
 private slots:
     void testMonitors();
     void testVersion();
+    void testVersionBad();
+    void testSearch();
 };
 
 #endif // ZMCLIENTTEST_H

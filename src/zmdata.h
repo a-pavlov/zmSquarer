@@ -34,6 +34,9 @@ struct ZMVersion {
     ZMVersion() = default;
     ZMVersion(const ZMVersion&) = default;
     ZMVersion& operator=(const ZMVersion&) = default;
+    bool isEmpty() const {
+        return version.isEmpty() && apiversion.isEmpty();
+    }
     static ZMVersion fromJson(const QJsonDocument&);
 };
 
