@@ -20,7 +20,8 @@ void ZMSearch::registerQmlType() {
 
 ZMSearch::ZMSearch(QObject* parent) :
     QAbstractListModel(parent)
-    , requestsInProgress(0) {
+    , requestsInProgress(0)
+    , cancelRequested(false) {
 }
 
 int ZMSearch::getTotalRequests() const {
@@ -74,9 +75,9 @@ void ZMSearch::startRequest(const QHostAddress& address) {
             if (!version.isEmpty()) {
                 qDebug() << "version " << version.version;
                 emit found(reply->request().url().toString());
-                hosts.append(qMakePair(reply->request().url().toString(), version));
+                //hosts.append(qMakePair(reply->request().url().toString(), version));
                 qDebug() << "found host " << reply->request().url();
-                this->addHost(reply->url().host(), version.version, version.apiversion);
+                this->addHost(reply->url().host(), version);
             }
         }
 
@@ -97,6 +98,7 @@ void ZMSearch::continueSearch() {
         if (requestsInProgress == 1) {
             emit inProgressChanged(true);
         }
+
         startRequest(pendingRequests.takeFirst());
 
     }
@@ -109,18 +111,31 @@ void ZMSearch::continueSearch() {
 void ZMSearch::search(const QList<QString>& addresses) {
     pendingRequests = ZMUtils::genTestHosts(addresses);
     totalRequests = pendingRequests.size();
-    hosts.clear();
-    requestsInProgress = 0;
+    if (!hosts.isEmpty()) {
+        beginRemoveRows(QModelIndex(), 0, hosts.size() - 1);
+        hosts.clear();
+        endRemoveRows();
+    }
+
+    cancelRequested = false;
+    // for now ignore next runs search the same again and add info multiple times
+    if (requestsInProgress != 0) {
+        // continue
+        emit inProgressChanged(true);
+        qDebug() << "in progress true";
+    }
     continueSearch();
 }
 
 void ZMSearch::cancel() {
+    cancelRequested = true;
+    emit inProgressChanged(false);
     pendingRequests.clear();
 }
 
-void ZMSearch::addHost(const QString& ip, const QString& version, const QString& apiversion) {
-    beginInsertRows(QModelIndex(), knownHosts.size(), knownHosts.size());
-    knownHosts.append(qMakePair(ip, qMakePair(version, apiversion)));
+void ZMSearch::addHost(const QString& ip, const ZMVersion& zmv) {
+    beginInsertRows(QModelIndex(), hosts.size(), hosts.size());
+    hosts.append(qMakePair(ip, zmv));
     endInsertRows();
 }
 
@@ -134,18 +149,18 @@ QHash<int, QByteArray> ZMSearch::roleNames() const {
 }
 
 int ZMSearch::rowCount(const QModelIndex&) const {
-    return knownHosts.size();
+    return hosts.size();
 }
 
 QVariant ZMSearch::data(const QModelIndex & index, int role) const {
     if (!index.isValid()) return QVariant();
-    Q_ASSERT(index.row() < knownHosts.size());
-    const ZMHost& zh = knownHosts.at(index.row());
+    Q_ASSERT(index.row() < hosts.size());
+    const ZMHost& zh = hosts.at(index.row());
     switch(role) {
         case Qt::DisplayRole:   return zh.first;
         case AddressRole:       return zh.first;
-        case VersionRole:       return zh.second.first;
-        case ApiVersionRole:    return zh.second.second;
+        case VersionRole:       return zh.second.version;
+        case ApiVersionRole:    return zh.second.apiversion;
     default:
         break;
     }
@@ -154,5 +169,8 @@ QVariant ZMSearch::data(const QModelIndex & index, int role) const {
 }
 
 bool ZMSearch::getInProgress() const {
-    return requestsInProgress > 0;
+    bool res = !cancelRequested && requestsInProgress > 0;
+    qDebug() << "get in progress " << res;
+    return res;
 }
+

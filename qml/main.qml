@@ -370,8 +370,8 @@ ApplicationWindow {
 
     ListView {
         id: knownHosts
-        anchors.left: grid.left
-        anchors.top: grid.bottom
+        anchors.left: slots.left
+        anchors.top: slots.bottom
         width: 100;
         height: 80
 
@@ -414,6 +414,7 @@ ApplicationWindow {
 
     Button {
         id: cancelNetworkScan
+
         anchors {
             left: startScanning.right
             top: startScanning.top

@@ -9,16 +9,16 @@
 class ZMSearch : public QAbstractListModel {
     Q_OBJECT
 private:
-    typedef QPair<QString, QPair<QString, QString> > ZMHost;
+    typedef QPair<QString, ZMVersion> ZMHost;
     void continueSearch();
     int requestsInProgress;
     quint32 totalRequests;
     QList<QHostAddress> pendingRequests;
-    QList<QPair<QString, ZMVersion>> hosts;
+    QList<ZMHost> hosts;
     void startRequest(const QHostAddress&);
     quint32 seachListSize;
-    QList<ZMHost> knownHosts;
-    void addHost(const QString& ip, const QString& version, const QString& apiversion);
+    void addHost(const QString& ip, const ZMVersion&);
+    bool cancelRequested;
 public:
     enum ServerRoles {
         AddressRole   = Qt::UserRole + 1,
