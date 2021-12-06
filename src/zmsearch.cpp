@@ -76,6 +76,7 @@ void ZMSearch::startRequest(const QHostAddress& address) {
                 emit found(reply->request().url().toString());
                 hosts.append(qMakePair(reply->request().url().toString(), version));
                 qDebug() << "found host " << reply->request().url();
+                this->addHost(reply->url().host(), version.version, version.apiversion);
             }
         }
 
@@ -91,8 +92,17 @@ void ZMSearch::continueSearch() {
             break;
         }
 
+
         ++requestsInProgress;
+        if (requestsInProgress == 1) {
+            emit inProgressChanged(true);
+        }
         startRequest(pendingRequests.takeFirst());
+
+    }
+
+    if (requestsInProgress == 0) {
+        emit inProgressChanged(false);
     }
 }
 
@@ -108,10 +118,41 @@ void ZMSearch::cancel() {
     pendingRequests.clear();
 }
 
-int ZMSearch::rowCount(const QModelIndex & parent) const {
-    return 0;
+void ZMSearch::addHost(const QString& ip, const QString& version, const QString& apiversion) {
+    beginInsertRows(QModelIndex(), knownHosts.size(), knownHosts.size());
+    knownHosts.append(qMakePair(ip, qMakePair(version, apiversion)));
+    endInsertRows();
+}
+
+
+QHash<int, QByteArray> ZMSearch::roleNames() const {
+    QHash<int, QByteArray> roles;
+    roles[AddressRole]      = "ip";
+    roles[VersionRole]      = "version";
+    roles[ApiVersionRole]   = "apiversion";
+    return roles;
+}
+
+int ZMSearch::rowCount(const QModelIndex&) const {
+    return knownHosts.size();
 }
 
 QVariant ZMSearch::data(const QModelIndex & index, int role) const {
+    if (!index.isValid()) return QVariant();
+    Q_ASSERT(index.row() < knownHosts.size());
+    const ZMHost& zh = knownHosts.at(index.row());
+    switch(role) {
+        case Qt::DisplayRole:   return zh.first;
+        case AddressRole:       return zh.first;
+        case VersionRole:       return zh.second.first;
+        case ApiVersionRole:    return zh.second.second;
+    default:
+        break;
+    }
+
     return QVariant();
+}
+
+bool ZMSearch::getInProgress() const {
+    return requestsInProgress > 0;
 }

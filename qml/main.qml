@@ -76,6 +76,7 @@ ApplicationWindow {
         }
     }
 
+
     Loader {
         id: loader
         active: true
@@ -345,7 +346,7 @@ ApplicationWindow {
         id: networks
         anchors.left: slots.right
         anchors.top: slots.top
-        width: 100;
+        width: 120;
         height: 80
 
         Component {
@@ -367,6 +368,38 @@ ApplicationWindow {
         model: netmon
     }
 
+    ListView {
+        id: knownHosts
+        anchors.left: grid.left
+        anchors.top: grid.bottom
+        width: 100;
+        height: 80
+
+        Component {
+            id: khComp
+            Row {
+                Text {
+                    id: ip_address
+                    text: ip
+                }
+
+                Text {
+                    id: ver
+                    text: version
+                }
+
+                Text {
+                    id: api
+                    text: apiversion
+                }
+            }
+        }
+
+        delegate: khComp
+        model: zmsearch
+    }
+
+
     Button {
         id: startScanning
         text: "Scan..."
@@ -376,6 +409,23 @@ ApplicationWindow {
         onClicked: {
             console.log("start scanning")
             zmsearch.search(netmon.getSelected())
+        }
+    }
+
+    Button {
+        id: cancelNetworkScan
+        anchors {
+            left: startScanning.right
+            top: startScanning.top
+            margins: base_margins
+        }
+
+        enabled: zmsearch.inProgress
+
+        text: "cancel scan"
+        onClicked: {
+            console.log("cancel scan")
+            zmsearch.cancel()
         }
     }
 }
