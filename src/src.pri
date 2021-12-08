@@ -8,6 +8,7 @@ HEADERS +=  $$PWD/rbuffer.h\
             $$PWD/camcontroller.h \
             $$PWD/camvideoproducer.h\
             $$PWD/scenebuilder.h \
+            $$PWD/tilemodel.h \
             $$PWD/zmdata.h \
             $$PWD/zmsearch.h \
             $$PWD/zmsqapplication.h\
@@ -26,6 +27,7 @@ SOURCES +=  $$PWD/rbuffer.cpp\
             $$PWD/camcontroller.cpp \
             $$PWD/camvideoproducer.cpp\
             $$PWD/scenebuilder.cpp \
+            $$PWD/tilemodel.cpp \
             $$PWD/zmdata.cpp \
             $$PWD/zmsearch.cpp \
             $$PWD/zmsqapplication.cpp\

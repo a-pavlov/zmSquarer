@@ -15,6 +15,7 @@
 #include "scenebuilder.h"
 #include "networksmodel.h"
 #include "zmsearch.h"
+#include "tilemodel.h"
 
 #ifdef Q_OS_WIN
 
@@ -64,6 +65,7 @@ int main(int argc, char *argv[]) {
     SceneBuilder::registerQmlType();
     NetworksModel::registerQmlType();
     ZMSearch::registerQmlType();
+    TileModel::registerQmlType();
 
 
     ZMSQApplication app(argc, argv);

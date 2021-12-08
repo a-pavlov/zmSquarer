@@ -6,6 +6,7 @@ import CamVideoProducer 0.1
 import QtQuick.Controls 2.12
 import NetworksModel 0.1
 import ZMSearch 0.1
+import TileModel 0.1
 
 ApplicationWindow {
     id: wnd
@@ -18,10 +19,13 @@ ApplicationWindow {
 
     NetworksModel {
         id: netmon
-
         onSelectedChanged: {
            console.log("selected " + count)
         }
+    }
+
+    TileModel {
+        id: tilemodel
     }
 
     ZMSearch {
@@ -205,18 +209,18 @@ ApplicationWindow {
                 Column {
                     //anchors.fill: parent
                     Text { text: name; anchors.horizontalCenter: parent.horizontalCenter }
-                    Text { text: num; anchors.horizontalCenter: parent.horizontalCenter; }
+                    Text { text: select; anchors.horizontalCenter: parent.horizontalCenter; }
                     Text { text: GridView.isCurrentItem ? "curr" : "nc"; anchors.horizontalCenter: parent.horizontalCenter}
                 }
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        if (grid.currentIndex == (num - 1)) {
-                            console.log("start cam")
+                        if (grid.currentIndex == pos) {
+                            upd = "test"
                         } else {
-                            console.log("clicked " + model.num + " current item " + grid.currentIndex)
-                            grid.currentIndex = model.num - 1;
+                            console.log("clicked " + model.pos + " current item " + grid.currentIndex)
+                            grid.currentIndex = model.pos;
                         }
                     }
 
@@ -232,88 +236,7 @@ ApplicationWindow {
             id: grid
             anchors.fill: parent
             cellWidth: 80; cellHeight: 80
-
-            model: ListModel {
-                ListElement {
-                    name: "Jim Williams"
-                    num: 1
-                }
-
-                ListElement {
-                    name: "John Brown"
-                    num: 2
-                }
-
-                ListElement {
-                    name: "Bill Smyth"
-                    num: 3
-                }
-
-                ListElement {
-                    name: "Sam Wise"
-                    num: 4
-                }
-
-                ListElement {
-                    name: "Jim Williams"
-                    num: 5
-                }
-
-                ListElement {
-                    name: "John Brown"
-                    num: 6
-                }
-
-                ListElement {
-                    name: "Bill Smyth"
-                    num: 7
-                }
-
-                ListElement {
-                    name: "Sam Wise"
-                    num: 8
-                }
-
-                ListElement {
-                    name: "Jim Williams"
-                    num: 9
-                }
-
-                ListElement {
-                    name: "John Brown"
-                    num: 10
-                }
-
-                ListElement {
-                    name: "Bill Smyth"
-                    num: 11
-                }
-
-                ListElement {
-                    name: "Sam Wise"
-                    num: 12
-                }
-
-                ListElement {
-                    name: "Jim Williams"
-                    num: 13
-                }
-
-                ListElement {
-                    name: "John Brown"
-                    num: 14
-                }
-
-                ListElement {
-                    name: "Bill Smyth"
-                    num: 15
-                }
-
-                ListElement {
-                    name: "Sam Wise"
-                    num: 16
-                }
-            }
+            model: tilemodel
 
             delegate: contactDelegate
             highlight: Rectangle {
@@ -337,7 +260,7 @@ ApplicationWindow {
 
             Component.onCompleted: {
                                       console.log("started")
-                                  }
+                                }
         }
     }
 
