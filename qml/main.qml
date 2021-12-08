@@ -300,20 +300,12 @@ ApplicationWindow {
 
         Component {
             id: khComp
-            Row {
-                Text {
-                    id: ip_address
-                    text: ip
-                }
-
-                Text {
-                    id: ver
-                    text: version
-                }
-
-                Text {
-                    id: api
-                    text: apiversion
+            CheckBox {
+                id: ip_address
+                checked: check
+                text: ip
+                onClicked: {
+                    upd = "xx"
                 }
             }
         }

@@ -31,6 +31,7 @@ struct ZMMonitor {
 struct ZMVersion {
     QString version;
     QString apiversion;
+    ZMVersion(const QString& ver, const QString& aver);
     ZMVersion() = default;
     ZMVersion(const ZMVersion&) = default;
     ZMVersion& operator=(const ZMVersion&) = default;

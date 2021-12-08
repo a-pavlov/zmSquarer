@@ -21,7 +21,13 @@ void ZMSearch::registerQmlType() {
 ZMSearch::ZMSearch(QObject* parent) :
     QAbstractListModel(parent)
     , requestsInProgress(0)
-    , cancelRequested(false) {
+    , cancelRequested(false)
+    , checkedHostIndex(-1) {
+    // test hosts
+    hosts.append(qMakePair(QString("192.168.11.22"), ZMVersion("1.2", "1.2")));
+    hosts.append(qMakePair(QString("192.168.11.23"), ZMVersion("1.1", "1.2")));
+    hosts.append(qMakePair(QString("192.168.1.12"), ZMVersion("1.0", "1.2")));
+    hosts.append(qMakePair(QString("192.168.1.26"), ZMVersion("1.4", "1.2")));
 }
 
 int ZMSearch::getTotalRequests() const {
@@ -145,6 +151,8 @@ QHash<int, QByteArray> ZMSearch::roleNames() const {
     roles[AddressRole]      = "ip";
     roles[VersionRole]      = "version";
     roles[ApiVersionRole]   = "apiversion";
+    roles[CheckRole]        = "check";
+    roles[UpdRole]          = "upd";
     return roles;
 }
 
@@ -161,11 +169,39 @@ QVariant ZMSearch::data(const QModelIndex & index, int role) const {
         case AddressRole:       return zh.first;
         case VersionRole:       return zh.second.version;
         case ApiVersionRole:    return zh.second.apiversion;
+        case CheckRole:         return index.row() == checkedHostIndex;
     default:
         break;
     }
 
     return QVariant();
+}
+
+bool ZMSearch::setData(const QModelIndex& index, const QVariant &value, int role /*= Qt::EditRole*/) {
+    Q_UNUSED(value)
+    if (index.isValid() && (index.row() >= 0 && index.row() < rowCount() && index.column() >= 0)) {
+        if (role == UpdRole) {
+            qDebug() << "zmsearch update requested " ;
+            if (checkedHostIndex == index.row()) {
+                checkedHostIndex = -1;
+                emit dataChanged(index, index);
+                return true;
+            }
+
+            int prevCheckedIndex = checkedHostIndex;
+            checkedHostIndex = index.row();
+
+            if (prevCheckedIndex!= -1) {
+                emit dataChanged(createIndex(prevCheckedIndex, 0), createIndex(prevCheckedIndex, 0));
+            }
+
+            emit dataChanged(createIndex(index.row(), 0), createIndex(index.row(), 0));
+            return true;
+        }
+    }
+
+    return false;
+
 }
 
 bool ZMSearch::getInProgress() const {

@@ -19,11 +19,14 @@ private:
     quint32 seachListSize;
     void addHost(const QString& ip, const ZMVersion&);
     bool cancelRequested;
+    int checkedHostIndex;
 public:
     enum ServerRoles {
         AddressRole   = Qt::UserRole + 1,
         VersionRole,
-        ApiVersionRole
+        ApiVersionRole,
+        CheckRole,
+        UpdRole
     };
 
     static int MAX_SEARCH_REQ;
@@ -33,6 +36,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     Q_INVOKABLE int rowCount(const QModelIndex & parent = QModelIndex()) const override;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
+    bool setData(const QModelIndex& index, const QVariant &value, int role = Qt::EditRole) override;
     Q_INVOKABLE void search(const QList<QString>& interfaces);
     Q_INVOKABLE void cancel();
     int getTotalRequests() const;
