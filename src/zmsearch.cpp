@@ -201,7 +201,6 @@ bool ZMSearch::setData(const QModelIndex& index, const QVariant &value, int role
     }
 
     return false;
-
 }
 
 bool ZMSearch::getInProgress() const {

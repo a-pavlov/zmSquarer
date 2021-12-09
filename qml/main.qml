@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.3
 import QtQuick.Window 2.1
 import QtMultimedia 5.0
 import QtQuick.Layouts 1.11
@@ -7,21 +7,37 @@ import QtQuick.Controls 2.12
 import NetworksModel 0.1
 import ZMSearch 0.1
 import TileModel 0.1
+import ZMClient 0.1
+import ZMSQPreferences 0.1
 
 ApplicationWindow {
     id: wnd
     visible: true
-    width: 640
-    height: 480
-    property var newObject: ""
-    property var base_margins: 4
+    width: 1024
+    height: 768
+    visibility: cbFullScreen.checked ? Qt.WindowFullScreen : Qt.WindowMinimized
+    flags: cbFullScreen.checked ? (Qt.FramelessWindowHint | Qt.Window) : Qt.Window
+    property var comp: ""
+    property int cell_width: 160
+    property int cell_height: 160
+    property int delegate_width: 152
+    property int delegate_heigth: 152
+    property int base_radius: 4
+    property int base_margins: 4
+    property var camsView: ""
+    property string hiResUrl: ""
 
+    property var newObject: ""
 
     NetworksModel {
         id: netmon
         onSelectedChanged: {
            console.log("selected " + count)
         }
+    }
+
+    ZMSQPreferences {
+        id: prefs
     }
 
     TileModel {
@@ -32,170 +48,180 @@ ApplicationWindow {
         id: zmsearch
     }
 
-    Button {
-        id: test
-        anchors {
-            left: parent.left
-            top: parent.top
-            margins: base_margins
+    ZMClient {
+        id: zmc
+        url: prefs.url
+        onMonitors: {
+            /*
+            monmod.clear()
+            monmod.addAll(mons)
+            monmod.addStopper()
+            btnUrl.text = qsTr("Connect")
+            btnUrl.enabled = true
+            btnUrl.checkMode = true
+            zmUrlProgress.visible = false
+            zmClientError.visible = false
+            // flush settings in case of successfull connection
+            prefs.url = url
+            prefs.flush()*/
         }
 
-        text: "Start"
-        //enabled: false
-        onClicked: {
-            console.log("start rectangle")
-            newObject = Qt.createQmlObject(
-                        'import QtQuick 2.0; Rectangle { color: "red"; anchors.fill: parent; MouseArea {  anchors.fill: parent;  onClicked: { console.log(\"xxx\"); } } Keys.onPressed: {console.log(\"Dync key pressed\");} }',
-                        wnd, "dynamicSnippet1")
-            newObject.focus=true
-        }
-    }
-
-    Button {
-        id: load
-        anchors {
-            left: test.right
-            top: parent.top
-            margins: base_margins
-        }
-
-        text: "load"
-        onClicked: {
-            loader.sourceComponent = c1
-            loader.focus=true
+        onError: {
+            /*
+            monmod.clean()
+            btnUrl.text = qsTr("Connect")
+            btnUrl.enabled = true
+            btnUrl.checkMode = true
+            zmUrlProgress.visible = false
+            zmClientError.text = qsTr(
+                        "<font color=\"#FF0000\">Error: %1</font> ").arg(msg)
+            zmClientError.visible = true
+            */
         }
     }
 
-    Button {
-        id: refreshNetworks
-        anchors {
-            left: load.right
-            top: parent.top
-            margins: base_margins
-        }
-
-        text: "refresh networks"
-        onClicked: {
-            netmon.refresh()
-        }
-    }
-
-
-    Loader {
-        id: loader
-        active: true
-        anchors.fill: parent
+    GroupBox {
+        id: setup
         focus: true
-
-        Keys.onPressed: {
-            console.log("loader key pressed")
+        anchors {
+            top: parent.top
+            horizontalCenter: parent.horizontalCenter
         }
 
-        onLoaded: {
-            console.log("component loaded");
-        }
-    }
+        title: qsTr("Setup connection")
 
-    Component {
+        ColumnLayout {
+            Label {
+                id: lb
+                text: qsTr("Enter ZM url with scheme. ") + (zmc.supportsSsl?qsTr("<font color=\"green\">SSL supported</font>"):qsTr("<font color=\"yellow\">SSL not supported</font>"))
+            }
 
-        id: c1
+            RowLayout {
+                id: r
 
-        /*FocusScope {
-            focus: true
-            x: rect.x
-            y: rect.y
-            width: rect.width
-            height: rect.height
-*/
-            Rectangle {
-                id: rect
-                focus: false
-                color: "red"
-                anchors {
-                    //left: parent.left
-                    //top: del.bottom
-                    margins: base_margins
-                }
-
-                width: 100
-                height: 100
-
-                Keys.onPressed: {
-                    if (event.key === Qt.Key_Escape) {
-                        console.log("Escape pressed")
+                TextField {
+                    id: zmUrl
+                    placeholderText: qsTr("http://")
+                    text: prefs.url
+                    onTextChanged: {
+                        zmc.url = text
+                        console.log("text changed " + text)
                     }
-
-                    console.log("key pressed")
-                    event.accepted = true
                 }
 
-                MouseArea {
-                    anchors.fill: parent
+                Button {
+                    id: btnUrl
+                    property bool checkMode: true
+                    enabled: zmUrl.text.length > 0
+                    anchors.margins: base_margins
+                    text: qsTr("Connect")
                     onClicked: {
-                        console.log("onclic")
-                        focus = true
+                        //if (checkMode) {
+                        text = qsTr("Connecting...")
+                        zmc.getMonitors()
+
+                        //} else {
+                        //    text = qsTr("Check")
+                        //}
+                        console.log("check " + checkMode)
+                        zmClientError.visible = false
+                        zmUrl.enabled = checkMode
+                        zmUrlProgress.visible = checkMode
+                        //checkMode = !checkMode
+                        btnUrl.enabled = false
                     }
                 }
 
-                Rectangle {
-                    id: out1
-                    width: 40
-                    height: 40
-                    anchors.left: parent.left
-                    anchors.top: parent.top
+                Button {
+                    id: btnStartView
                     anchors.margins: base_margins
-                    focus: true
-                    color: "black"
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            console.log("vout 1click")
-                            focus = true
-                        }
-                    }
-
-                    Keys.onPressed: {
-                        console.log("VO 1 key pressed")
-                        event.accepted = true
+                    enabled: monmod.monitorsCount > 0
+                    text: qsTr("Start")
+                    onClicked: {
+                        zmClientError.visible = false
+                        setVisualIndexes()
+                        sceneBuilder.buildScene(zmc, monmod)
                     }
                 }
 
-                Rectangle {
-                    id: out2
-                    width: 40
-                    height: 40
-                    anchors.centerIn: parent
-                    focus: true
-                    color: "green"
+                Button {
+                    id: btnExit
                     anchors.margins: base_margins
-
-                    anchors.left: out1.right
-                    anchors.top: parent.top
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            console.log("vout 2 click")
-                            focus = true
-                        }
+                    enabled: monmod.monitorsCount > 0
+                    text: qsTr("Quit")
+                    onClicked: {
+                        prefs.fullScreen = cbFullScreen.checked
+                        prefs.flush()
+                        Qt.quit()
                     }
+                }
 
-                    Keys.onPressed: {
-                        console.log("VO 2 key pressed")
-                        event.accepted = true
+                Button {
+                    id: refreshNetworks
+                    text: "Search"
+                    onClicked: {
+                        netmon.refresh()
+                        //netScanLoader.active = true
+                        selNet.visible = true
                     }
                 }
             }
-        //}
-    }
 
+            CheckBox {
+                id: cbFullScreen
+                text: qsTr("Full screen mode")
+                checked: prefs.fullScreen
+                onCheckedChanged: {
+
+                }
+            }
+
+            ProgressBar {
+                id: zmUrlProgress
+                visible: false
+                width: parent.width
+                indeterminate: true
+            }
+
+            Label {
+                id: zmClientError
+                text: qsTr("<font color=\"#FF0000\">Error:</font> ")
+                visible: false
+            }
+
+            /*Loader {
+                id: netScanLoader
+                // Explicitly set the size of the
+                // Loader to the parent item's size
+                anchors.fill: parent
+                sourceComponent: rect
+                active: false
+                focus: true
+            }
+
+            Component {
+              id: rect
+              Rectangle {
+                width: 50
+                height: 50
+                color: "red"
+                }
+            }*/
+        }
+
+        Keys.onPressed: {
+            if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
+                event.accepted = true
+                Qt.quit()
+            }
+        }
+    }
 
     Rectangle {
         id: slots
         anchors {
-            top: load.bottom
-            left: load.left
+            top: setup.bottom
+            left: setup.left
         }
 
         width: 320; height: 320
@@ -264,84 +290,110 @@ ApplicationWindow {
         }
     }
 
+    Dialog {
+        id: selNet
+        visible: false
+        anchors.centerIn: parent
+        title: qsTr("Search ZM dialog")
 
-    ListView {
-        id: networks
-        anchors.left: slots.right
-        anchors.top: slots.top
-        width: 120;
-        height: 80
+        onAccepted: {
+            console.log("Accept ")
+        }
 
-        Component {
-            id: comp
-            Row {
-                CheckBox {
-                    id: nm
-                    checked: selected
-                    text: address
-                    onCheckedChanged: {
-                        console.log("check " + checked)
-                        selected = checked
+        onRejected: {
+            console.log("Rejected")
+        }
+
+        standardButtons: StandardButton.Ok
+
+        contentItem: Rectangle {
+            ColumnLayout {
+                Text {
+                    id: name
+                    text: qsTr("Networks:")
+                }
+
+                ListView {
+                    id: networks
+                    implicitHeight: 100
+
+                    Component {
+                        id: comp
+                        Row {
+                            CheckBox {
+                                id: nm
+                                checked: selected
+                                text: address
+                                onCheckedChanged: {
+                                    console.log("check " + checked)
+                                    selected = checked
+                                }
+                            }
+                        }
+                    }
+
+                    delegate: comp
+                    model: netmon
+                }
+
+                RowLayout {
+                    Button {
+                        id: startScanning
+                        text: "Scan..."
+                        enabled: netmon.selectedCount > 0
+                        onClicked: {
+                            console.log("start scanning")
+                            zmsearch.search(netmon.getSelected())
+
+                        }
+                    }
+
+                    Button {
+                        id: cancelNetworkScan
+                        enabled: zmsearch.inProgress
+
+                        text: "Cancel scan"
+                        onClicked: {
+                            console.log("cancel scan")
+                            zmsearch.cancel()
+                        }
                     }
                 }
-            }
-        }
 
-        delegate: comp
-        model: netmon
-    }
+                Text {
+                    id: name2
+                    text: qsTr("ZM hosts")
+                }
 
-    ListView {
-        id: knownHosts
-        anchors.left: slots.left
-        anchors.top: slots.bottom
-        width: 100;
-        height: 80
+                ListView {
+                    id: knownHosts
+                    implicitHeight: 100
 
-        Component {
-            id: khComp
-            CheckBox {
-                id: ip_address
-                checked: check
-                text: ip
-                onClicked: {
-                    upd = "xx"
+                    Component {
+                        id: khComp
+                        CheckBox {
+                            id: ip_address
+                            checked: check
+                            text: ip
+                            onClicked: {
+                                upd = "xx"
+                                if (checked) {
+                                    zmUrl.text = ip
+                                } else {
+                                    zmUrl.text = ""
+                                }
+                            }
+                        }
+                    }
+
+                    delegate: khComp
+                    model: zmsearch
                 }
             }
-        }
 
-        delegate: khComp
-        model: zmsearch
-    }
-
-
-    Button {
-        id: startScanning
-        text: "Scan..."
-        anchors.top: networks.bottom
-        anchors.left: networks.left
-        enabled: netmon.selectedCount > 0
-        onClicked: {
-            console.log("start scanning")
-            zmsearch.search(netmon.getSelected())
-        }
-    }
-
-    Button {
-        id: cancelNetworkScan
-
-        anchors {
-            left: startScanning.right
-            top: startScanning.top
-            margins: base_margins
-        }
-
-        enabled: zmsearch.inProgress
-
-        text: "cancel scan"
-        onClicked: {
-            console.log("cancel scan")
-            zmsearch.cancel()
+            color: "white"
+            implicitWidth: 400
+            implicitHeight: 300
         }
     }
 }
