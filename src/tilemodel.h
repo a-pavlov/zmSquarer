@@ -6,7 +6,7 @@
 
 class TileModel : public QAbstractListModel {
     Q_OBJECT
-    QList<qint32> tiles;
+    QList<QPair<qint32, qint32> > tiles;
     QList<ZMMonitor> availableMons;
 
     bool isValidMonIndex(qint32 indx) const {
@@ -19,8 +19,11 @@ public:
         SelectorRole   = Qt::UserRole + 1,
         PosIndexRole,
         NameRole,
+        HRNameRole,
         HaveMonRole,
-        UpdateRole
+        HaveHRRole,
+        UpdateRole,
+        UpdateHiResRole
     };
 
     static void registerQmlType();

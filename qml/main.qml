@@ -52,10 +52,12 @@ ApplicationWindow {
         id: zmc
         url: prefs.url
         onMonitors: {
-            /*
-            monmod.clear()
-            monmod.addAll(mons)
-            monmod.addStopper()
+            tilemodel.setAvailableMons(mons)
+
+
+            //monmod.clear()
+            //monmod.addAll(mons)
+            //monmod.addStopper()
             btnUrl.text = qsTr("Connect")
             btnUrl.enabled = true
             btnUrl.checkMode = true
@@ -63,11 +65,10 @@ ApplicationWindow {
             zmClientError.visible = false
             // flush settings in case of successfull connection
             prefs.url = url
-            prefs.flush()*/
+            prefs.flush()
         }
 
         onError: {
-            /*
             monmod.clean()
             btnUrl.text = qsTr("Connect")
             btnUrl.enabled = true
@@ -76,7 +77,6 @@ ApplicationWindow {
             zmClientError.text = qsTr(
                         "<font color=\"#FF0000\">Error: %1</font> ").arg(msg)
             zmClientError.visible = true
-            */
         }
     }
 
@@ -232,30 +232,66 @@ ApplicationWindow {
                 width: grid.cellWidth;
                 height: grid.cellHeight
 
-                Column {
-                    //anchors.fill: parent
-                    Text { text: name; anchors.horizontalCenter: parent.horizontalCenter }
-                    Text { text: select; anchors.horizontalCenter: parent.horizontalCenter; }
-                    Text { text: GridView.isCurrentItem ? "curr" : "nc"; anchors.horizontalCenter: parent.horizontalCenter}
-                }
+                Rectangle {
+                    id: mainView
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.margins: 4
+                    radius: 4
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        if (grid.currentIndex == pos) {
-                            upd = "test"
-                        } else {
-                            console.log("clicked " + model.pos + " current item " + grid.currentIndex)
-                            grid.currentIndex = model.pos;
-                        }
+                    color: havemon?"lightgreen":"yellow"
+                    Text {
+                        text: name
+                        anchors.centerIn: parent
                     }
 
-                    onDoubleClicked: {
-                        console.log("dbl clk")
+                    width: parent.width - 8
+                    height: parent.height/3
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (grid.currentIndex == pos) {
+                                upd = "test"
+                            } else {
+                                console.log("clicked " + model.pos + " current item " + grid.currentIndex)
+                                grid.currentIndex = model.pos;
+                            }
+                        }
+
+                        onDoubleClicked: {
+                            console.log("dbl clk")
+                        }
+                    }
+                }
+
+                Rectangle {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: mainView.bottom
+                    radius: 4
+                    anchors.margins: 4
+
+                    color: havehr?"lightgreen":"yellow"
+                    Text {
+                        text: hrname
+                        anchors.centerIn: parent
+                    }
+
+                    width: parent.width - 8
+                    height: parent.height/3
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (grid.currentIndex == pos) {
+                                updhr = "test"
+                            } else {
+                                console.log("hr clicked " + model.pos + " current item " + grid.currentIndex)
+                                grid.currentIndex = model.pos;
+                            }
+                        }
                     }
                 }
             }
-
         }
 
         GridView {
@@ -265,28 +301,24 @@ ApplicationWindow {
             model: tilemodel
 
             delegate: contactDelegate
-            highlight: Rectangle {
-                width: grid.cellWidth; height: grid.cellHeight
-                        color: "lightsteelblue"; radius: 5
-                        x: grid.currentItem.x
-                        y: grid.currentItem.y
-                        Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
-                        Behavior on y { SpringAnimation { spring: 3; damping: 0.2 } }
 
-                //color: "lightsteelblue";
-                //radius: 5
-                //Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
-                //Behavior on y { SpringAnimation { spring: 3; damping: 0.2 } }
+            highlight: Rectangle {
+                width: grid.cellWidth
+                height: grid.cellHeight
+                color: "lightsteelblue"
+                radius: 5
+                x: grid.currentItem.x
+                y: grid.currentItem.y
+                Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
+                Behavior on y { SpringAnimation { spring: 3; damping: 0.2 } }
             }
 
             highlightFollowsCurrentItem: true
-            //keyNavigationEnabled : true
             focus: true
-            //onCurrentItemChanged: console.log(model.get(list.currentIndex).name + ' selected')
 
             Component.onCompleted: {
-                                      console.log("started")
-                                }
+                console.log("started")
+            }
         }
     }
 
@@ -344,7 +376,6 @@ ApplicationWindow {
                         onClicked: {
                             console.log("start scanning")
                             zmsearch.search(netmon.getSelected())
-
                         }
                     }
 
