@@ -32,9 +32,6 @@ ApplicationWindow {
 
     NetworksModel {
         id: netmon
-        onSelectedChanged: {
-           console.log("selected " + count)
-        }
     }
 
     ZMSQPreferences {
@@ -80,7 +77,6 @@ ApplicationWindow {
         onSuccess: {
             camsView = Qt.createQmlObject(code, wnd, "scene1")
             camsView.focus = true
-            console.log(code)
             setup.visible = false
             slots.visible = false
         }
@@ -148,7 +144,6 @@ ApplicationWindow {
                     text: prefs.url
                     onTextChanged: {
                         zmc.url = text
-                        console.log("text changed " + text)
                     }
                 }
 
@@ -159,14 +154,8 @@ ApplicationWindow {
                     anchors.margins: base_margins
                     text: qsTr("Connect")
                     onClicked: {
-                        //if (checkMode) {
                         text = qsTr("Connecting...")
                         zmc.getMonitors()
-
-                        //} else {
-                        //    text = qsTr("Check")
-                        //}
-                        console.log("check " + checkMode)
                         zmClientError.visible = false
                         zmUrl.enabled = checkMode
                         zmUrlProgress.visible = checkMode
@@ -188,7 +177,6 @@ ApplicationWindow {
                 Button {
                     id: btnExit
                     anchors.margins: base_margins
-                    //enabled: monmod.monitorsCount > 0
                     text: qsTr("Quit")
                     onClicked: {
                         prefs.fullScreen = cbFullScreen.checked
@@ -280,7 +268,6 @@ ApplicationWindow {
                             if (grid.currentIndex == pos) {
                                 upd = "test"
                             } else {
-                                console.log("clicked " + model.pos + " current item " + grid.currentIndex)
                                 grid.currentIndex = model.pos;
                             }
                         }
@@ -308,7 +295,6 @@ ApplicationWindow {
                             if (grid.currentIndex == pos) {
                                 updhr = "test"
                             } else {
-                                console.log("hr clicked " + model.pos + " current item " + grid.currentIndex)
                                 grid.currentIndex = model.pos;
                             }
                         }
@@ -386,7 +372,6 @@ ApplicationWindow {
                                     checked: selected
                                     text: address
                                     onCheckedChanged: {
-                                        console.log("check " + checked)
                                         selected = checked
                                     }
                                 }

@@ -39,28 +39,12 @@ int ZMSearch::getTotalRequests() const {
 
 void ZMSearch::startRequest(const QHostAddress& address) {
     QString url = (httpsEnabled?"https://":"http://") + address.toString() + "/zm/api/host/getVersion.json";
-    qDebug() << "start request " << url;
     QNetworkRequest request(url);
     QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
 
     QObject::connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), [this](QNetworkReply::NetworkError code) {
         Q_UNUSED(this)
-        qDebug() << "network error occurred " << code;
-        /*switch (code) {
-            case QNetworkReply::NetworkError::ConnectionRefusedError:       emit error(QString("Connection refused")); break;
-            case QNetworkReply::NetworkError::RemoteHostClosedError:        emit error(QString("Remote host closed")); break;
-            case QNetworkReply::NetworkError::HostNotFoundError:            emit error(QString("Host not found")); break;
-            case QNetworkReply::NetworkError::TimeoutError:                 emit error(QString("Timeout")); break;
-            case QNetworkReply::NetworkError::OperationCanceledError:       emit error(QString("Operation canceled")); break;
-            case QNetworkReply::NetworkError::SslHandshakeFailedError:      emit error(QString("Ssl handshake failed")); break;
-            case QNetworkReply::NetworkError::TemporaryNetworkFailureError: emit error(QString("Temporary network failure")); break;
-            case QNetworkReply::NetworkError::NetworkSessionFailedError:    emit error(QString("Network session failed")); break;
-            case QNetworkReply::NetworkError::BackgroundRequestNotAllowedError: emit error(QString("Background request not allowed")); break;
-            case QNetworkReply::NetworkError::TooManyRedirectsError:        emit error(QString("Too many redirects")); break;
-            case QNetworkReply::NetworkError::InsecureRedirectError:        emit error(QString("Insecure redirect")); break;
-            default:
-                emit error(QString::number(code));
-        }*/
+        Q_UNUSED(code)
     });
 
     QObject::connect(reply, &QNetworkReply::sslErrors, [reply](const QList<QSslError> &errors) {
@@ -78,11 +62,8 @@ void ZMSearch::startRequest(const QHostAddress& address) {
             QByteArray buffer = reply->readAll();
             ZMVersion version = ZMVersion::fromJson(QJsonDocument::fromJson(buffer));
             if (!version.isEmpty()) {
-                qDebug() << "version " << version.version;
-                emit found(reply->request().url().toString());
-                //hosts.append(qMakePair(reply->request().url().toString(), version));
-                qDebug() << "found host " << reply->request().url();
-                this->addHost(reply->url().host(), version);
+                emit found(reply->url().scheme() + "://" + reply->request().url().toString());
+                this->addHost(reply->url().scheme() + "://" + reply->url().host(), version);
             }
         }
 
@@ -189,7 +170,6 @@ bool ZMSearch::setData(const QModelIndex& index, const QVariant &value, int role
     Q_UNUSED(value)
     if (index.isValid() && (index.row() >= 0 && index.row() < rowCount() && index.column() >= 0)) {
         if (role == UpdRole) {
-            qDebug() << "zmsearch update requested " ;
             if (checkedHostIndex == index.row()) {
                 checkedHostIndex = -1;
                 emit dataChanged(index, index);
