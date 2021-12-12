@@ -237,26 +237,31 @@ ApplicationWindow {
 
         anchors.margins: base_margins
 
-        width: 320
-        height: 320
+        width: 500
+        height: 500
 
         Component {
             id: contactDelegate
             Item {
                 width: grid.cellWidth;
                 height: grid.cellHeight
-                anchors.margins: base_margins
+                //anchors.margins: base_margins
+                //Rectangle {
+                //    anchors.fill: parent
+                //    border.color: "black"
 
                 Rectangle {
                     id: mainView
+                    anchors.top: parent.top
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.margins: base_margins
                     radius: base_radius
 
-                    color: havemon?"lightgreen":"yellow"
+                    color: havemon?"lightgreen":"lightgray"
                     Text {
-                        text: name
+                        text: qsTr("Low: %1").arg(name)
                         anchors.centerIn: parent
+                        wrapMode: Text.Wrap
                     }
 
                     width: parent.width - base_margins*2
@@ -280,10 +285,11 @@ ApplicationWindow {
                     radius: base_radius
                     anchors.margins: base_margins
 
-                    color: havehr?"lightgreen":"yellow"
+                    color: havehr?"lightgreen":"lightgray"
                     Text {
-                        text: hrname
+                        text: qsTr("Hi: %1").arg(hrname)
                         anchors.centerIn: parent
+                        wrapMode: Text.Wrap
                     }
 
                     width: parent.width - base_margins*2
@@ -300,13 +306,14 @@ ApplicationWindow {
                         }
                     }
                 }
+               // }
             }
         }
 
         GridView {
             id: grid
             anchors.fill: parent
-            cellWidth: 80; cellHeight: 80
+            cellWidth: 120; cellHeight: 120
             model: tilemodel
 
             delegate: contactDelegate
@@ -415,7 +422,6 @@ ApplicationWindow {
                         width: parent.width
                         indeterminate: false
                         value: zmsearch.progress
-
                     }
 
                     Text {
