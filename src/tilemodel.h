@@ -6,14 +6,18 @@
 
 class TileModel : public QAbstractListModel {
     Q_OBJECT
-    QList<QPair<qint32, qint32> > tiles;
+public:
+    typedef QPair<qint32, qint32> TILE;
+    typedef QPair<qint32, TILE> TILE_NUM;
+private:
+    QList<TILE> tiles;
     QList<ZMMonitor> availableMons;
 
     bool isValidMonIndex(qint32 indx) const {
         return (indx != -1 && indx < availableMons.size());
     }
 public:
-    static const quint32 CAM_LINE = 4;
+    static const qint32 CAM_LINE = 4;
 
     enum TileRoles {
         SelectorRole   = Qt::UserRole + 1,
@@ -33,6 +37,13 @@ public:
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex& index, const QVariant &value, int role = Qt::EditRole) override;
     Q_INVOKABLE void setAvailableMons(const QList<ZMMonitor>& am);
+    Q_PROPERTY(qint32 numeratedTilesCount READ getNumeratedTilesCount NOTIFY numeratedTilesChanged)
+    Q_INVOKABLE QList<QList<TILE_NUM> > getNumeratedTiles() const;
+    qint32 getNumeratedTilesCount() const;
+    Q_INVOKABLE void load();
+    Q_INVOKABLE void save() const;
+signals:
+    void numeratedTilesChanged();
 };
 
 #endif // TILEMODEL_H

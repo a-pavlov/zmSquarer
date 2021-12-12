@@ -147,3 +147,72 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
     emit success(buffer);
     return buffer;
 }
+
+QString SceneBuilder::buildScene(ZMClient* zmc, TileModel* tilemodel) const {
+    auto tiles = tilemodel->getNumeratedTiles();
+    QString camVideoProducer = readFile(":/text/camvideoproducer.txt");
+    QString camVideoOutput = readFile(":/text/videooutput.txt");
+    QString camViewHeader = readFile(":/text/header.txt");
+
+    int height = tiles.size();
+#ifdef TOFILE
+    QFile resFile("c:/dev/test.qml");
+    bool resOpened = resFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream resStream(&resFile);
+    resStream << camViewHeader << "\n";
+#endif
+
+    QString buffer;
+    QTextStream bufferStream(&buffer);
+    bufferStream << camViewHeader << "\n";
+    QString topAnchor("parent.top");
+
+    for(auto m: tiles) {
+        QStringList videoProducer;
+        std::transform(m.begin(), m.end(), std::back_inserter(videoProducer), [&](const TileModel::TILE_NUM& mon) ->
+                       QString {
+            return camVideoProducer
+                    .arg(mon.first) // index in screen
+                    .arg(zmc->getMonitorUrl(mon.second.first))  // real mon id
+                    .arg(zmc->getMonitorUrl(mon.second.second != -1?mon.second.second:mon.second.first));   // hi res mon if present
+        });
+
+        QString leftAnchor("parent.left");
+        QString output("output_%1.right");
+
+        QStringList videoOutput;
+        std::transform(m.begin(), m.end(), std::back_inserter(videoOutput), [&](const TileModel::TILE_NUM& mon) ->
+                       QString {
+            QString res = camVideoOutput
+                        .arg(mon.first)
+                        .arg(leftAnchor)
+                        .arg(topAnchor)
+                        .arg(m.size())
+                        .arg(height);
+
+            leftAnchor = QString("output_%1.right").arg(mon.first);
+            return res;
+        });
+
+        topAnchor = QString("output_%1.bottom").arg(m.begin()->first);
+
+        bufferStream << videoProducer.join("\n") << "\n\n" << videoOutput.join("\n") << "\n";
+#ifdef TOFILE
+        resStream << videoProducer.join("\n") << "\n\n" << videoOutput.join("\n") << "\n";
+#endif
+    }
+
+    bufferStream << "}\n";
+
+#ifdef TOFILE
+    resStream << "}\n";
+    if (resFile.isOpen()) resFile.close();
+    qDebug() << "buffer size " << buffer.size();
+    qDebug() << "template " << readFile(":/text/template.txt");
+    qDebug() << "video provider " << readFile(":/text/camvideoproducer.txt");
+    qDebug() << "video output " << readFile(":/text/videooutput.txt");
+#endif
+
+    emit success(buffer);
+    return buffer;
+}

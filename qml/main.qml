@@ -9,6 +9,7 @@ import ZMSearch 0.1
 import TileModel 0.1
 import ZMClient 0.1
 import ZMSQPreferences 0.1
+import SceneBuilder 0.1
 
 ApplicationWindow {
     id: wnd
@@ -53,17 +54,11 @@ ApplicationWindow {
         url: prefs.url
         onMonitors: {
             tilemodel.setAvailableMons(mons)
-
-
-            //monmod.clear()
-            //monmod.addAll(mons)
-            //monmod.addStopper()
             btnUrl.text = qsTr("Connect")
             btnUrl.enabled = true
             btnUrl.checkMode = true
             zmUrlProgress.visible = false
             zmClientError.visible = false
-            // flush settings in case of successfull connection
             prefs.url = url
             prefs.flush()
         }
@@ -80,9 +75,57 @@ ApplicationWindow {
         }
     }
 
+    SceneBuilder {
+        id: sceneBuilder
+        onSuccess: {
+            camsView = Qt.createQmlObject(code, wnd, "scene1")
+            camsView.focus = true
+            console.log(code)
+            setup.visible = false
+            slots.visible = false
+        }
+
+        onFail: {
+            zmClientError.text = qsTr(
+                        "<font color=\"#FF0000\">Error: %1</font> ").arg(code)
+            zmClientError.visible = true
+        }
+    }
+
+    function runHiRes() {
+        hiResLoader.active = true
+        camsView.visible = false
+        hiResLoader.focus = true
+        hiResLoader.forceActiveFocus()
+    }
+
+    function showStartScreen() {
+        camsView.destroy()
+        setup.visible = true
+        slots.visible = true
+        btnStartView.forceActiveFocus()
+    }
+
+    function saveParameters() {
+        tilemodel.save()
+        prefs.fullScreen = cbFullScreen.checked
+        prefs.url = zmUrl.text
+        prefs.flush()
+    }
+
+    onClosing: {
+        saveParameters()
+    }
+
+    Component.onCompleted: {
+        tilemodel.load()
+    }
+
+
     GroupBox {
         id: setup
         focus: true
+        anchors.margins: base_margins
         anchors {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
@@ -127,7 +170,6 @@ ApplicationWindow {
                         zmClientError.visible = false
                         zmUrl.enabled = checkMode
                         zmUrlProgress.visible = checkMode
-                        //checkMode = !checkMode
                         btnUrl.enabled = false
                     }
                 }
@@ -135,24 +177,24 @@ ApplicationWindow {
                 Button {
                     id: btnStartView
                     anchors.margins: base_margins
-                    enabled: monmod.monitorsCount > 0
+                    enabled: tilemodel.numeratedTilesCount > 0
                     text: qsTr("Start")
                     onClicked: {
                         zmClientError.visible = false
-                        setVisualIndexes()
-                        sceneBuilder.buildScene(zmc, monmod)
+                        sceneBuilder.buildScene(zmc, tilemodel)
                     }
                 }
 
                 Button {
                     id: btnExit
                     anchors.margins: base_margins
-                    enabled: monmod.monitorsCount > 0
+                    //enabled: monmod.monitorsCount > 0
                     text: qsTr("Quit")
                     onClicked: {
                         prefs.fullScreen = cbFullScreen.checked
                         prefs.flush()
-                        Qt.quit()
+                        wnd.close()
+                        //Qt.quit()
                     }
                 }
 
@@ -161,8 +203,8 @@ ApplicationWindow {
                     text: "Search"
                     onClicked: {
                         netmon.refresh()
-                        //netScanLoader.active = true
-                        selNet.visible = true
+                        netScan.active = true
+                        netScan.visible = true
                     }
                 }
             }
@@ -188,25 +230,6 @@ ApplicationWindow {
                 text: qsTr("<font color=\"#FF0000\">Error:</font> ")
                 visible: false
             }
-
-            /*Loader {
-                id: netScanLoader
-                // Explicitly set the size of the
-                // Loader to the parent item's size
-                anchors.fill: parent
-                sourceComponent: rect
-                active: false
-                focus: true
-            }
-
-            Component {
-              id: rect
-              Rectangle {
-                width: 50
-                height: 50
-                color: "red"
-                }
-            }*/
         }
 
         Keys.onPressed: {
@@ -224,19 +247,23 @@ ApplicationWindow {
             left: setup.left
         }
 
-        width: 320; height: 320
+        anchors.margins: base_margins
+
+        width: 320
+        height: 320
 
         Component {
             id: contactDelegate
             Item {
                 width: grid.cellWidth;
                 height: grid.cellHeight
+                anchors.margins: base_margins
 
                 Rectangle {
                     id: mainView
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.margins: 4
-                    radius: 4
+                    anchors.margins: base_margins
+                    radius: base_radius
 
                     color: havemon?"lightgreen":"yellow"
                     Text {
@@ -244,8 +271,8 @@ ApplicationWindow {
                         anchors.centerIn: parent
                     }
 
-                    width: parent.width - 8
-                    height: parent.height/3
+                    width: parent.width - base_margins*2
+                    height: parent.height/2 - base_margins*2
 
                     MouseArea {
                         anchors.fill: parent
@@ -257,18 +284,14 @@ ApplicationWindow {
                                 grid.currentIndex = model.pos;
                             }
                         }
-
-                        onDoubleClicked: {
-                            console.log("dbl clk")
-                        }
                     }
                 }
 
                 Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: mainView.bottom
-                    radius: 4
-                    anchors.margins: 4
+                    radius: base_radius
+                    anchors.margins: base_margins
 
                     color: havehr?"lightgreen":"yellow"
                     Text {
@@ -276,8 +299,8 @@ ApplicationWindow {
                         anchors.centerIn: parent
                     }
 
-                    width: parent.width - 8
-                    height: parent.height/3
+                    width: parent.width - base_margins*2
+                    height: parent.height/2 - base_margins*2
 
                     MouseArea {
                         anchors.fill: parent
@@ -322,109 +345,180 @@ ApplicationWindow {
         }
     }
 
-    Dialog {
-        id: selNet
-        visible: false
-        anchors.centerIn: parent
-        title: qsTr("Search ZM dialog")
-
-        onAccepted: {
-            console.log("Accept ")
+    Loader {
+        id: netScan
+        active: false
+        anchors {
+            centerIn: parent
+            fill: parent
         }
 
-        onRejected: {
-            console.log("Rejected")
-        }
+        sourceComponent: ns
+        focus: true
+    }
 
-        standardButtons: StandardButton.Ok
+    Component {
+        id: ns
+        Rectangle {
+            GroupBox {
+                id: selNet
+                visible: true
+                anchors.centerIn: parent
+                title: qsTr("Search ZM")
+                height: 500
 
-        contentItem: Rectangle {
-            ColumnLayout {
-                Text {
-                    id: name
-                    text: qsTr("Networks:")
-                }
+                ColumnLayout {
+                    Text {
+                        id: name
+                        text: qsTr("Networks:")
+                    }
 
-                ListView {
-                    id: networks
-                    implicitHeight: 100
+                    ListView {
+                        id: networks
+                        implicitHeight: 100
 
-                    Component {
-                        id: comp
-                        Row {
-                            CheckBox {
-                                id: nm
-                                checked: selected
-                                text: address
-                                onCheckedChanged: {
-                                    console.log("check " + checked)
-                                    selected = checked
+                        Component {
+                            id: comp
+                            Row {
+                                CheckBox {
+                                    id: nm
+                                    checked: selected
+                                    text: address
+                                    onCheckedChanged: {
+                                        console.log("check " + checked)
+                                        selected = checked
+                                    }
                                 }
                             }
                         }
+
+                        delegate: comp
+                        model: netmon
                     }
 
-                    delegate: comp
-                    model: netmon
-                }
-
-                RowLayout {
-                    Button {
-                        id: startScanning
-                        text: "Scan..."
-                        enabled: netmon.selectedCount > 0
-                        onClicked: {
-                            console.log("start scanning")
-                            zmsearch.search(netmon.getSelected())
-                        }
-                    }
-
-                    Button {
-                        id: cancelNetworkScan
-                        enabled: zmsearch.inProgress
-
-                        text: "Cancel scan"
-                        onClicked: {
-                            console.log("cancel scan")
-                            zmsearch.cancel()
-                        }
-                    }
-                }
-
-                Text {
-                    id: name2
-                    text: qsTr("ZM hosts")
-                }
-
-                ListView {
-                    id: knownHosts
-                    implicitHeight: 100
-
-                    Component {
-                        id: khComp
-                        CheckBox {
-                            id: ip_address
-                            checked: check
-                            text: ip
+                    RowLayout {
+                        Button {
+                            id: startScanning
+                            text: "Scan..."
+                            enabled: netmon.selectedCount > 0
                             onClicked: {
-                                upd = "xx"
-                                if (checked) {
-                                    zmUrl.text = ip
-                                } else {
-                                    zmUrl.text = ""
-                                }
+                                console.log("start scanning")
+                                zmsearch.search(netmon.getSelected())
+                            }
+                        }
+
+                        Button {
+                            id: cancelNetworkScan
+                            enabled: zmsearch.inProgress
+
+                            text: "Cancel scan"
+                            onClicked: {
+                                console.log("cancel scan")
+                                zmsearch.cancel()
                             }
                         }
                     }
 
-                    delegate: khComp
-                    model: zmsearch
+                    Text {
+                        id: name2
+                        text: qsTr("ZM hosts")
+                    }
+
+                    ListView {
+                        id: knownHosts
+                        implicitHeight: 100
+
+                        Component {
+                            id: khComp
+                            CheckBox {
+                                id: ip_address
+                                checked: check
+                                text: ip
+                                onClicked: {
+                                    upd = "xx"
+                                    if (checked) {
+                                        zmUrl.text = ip
+                                    } else {
+                                        zmUrl.text = ""
+                                    }
+                                }
+                            }
+                        }
+
+                        delegate: khComp
+                        model: zmsearch
+                    }
+
+                }
+
+                Button {
+                    id: closeNetScan
+                    text: "Ok"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    onClicked: {
+                        netScan.active = false
+                    }
+                }
+
+                implicitWidth: 400
+                implicitHeight: 300
+            }
+        }
+    }
+
+    Loader {
+        id: hiResLoader
+        active: false
+        anchors.fill: parent
+        sourceComponent: hiResView
+        focus: true
+    }
+
+    Component {
+        id: hiResView
+        Rectangle {
+            id: hiResRect
+            focus: true
+
+            CamVideoProducer {
+                id: videoProducer_1
+                url: hiResUrl
+            }
+
+            VideoOutput {
+                id: output1
+                anchors.fill: parent
+                source: videoProducer_1
+
+                ImageButton {
+                    id: backBtn
+                    width: 32
+                    height: 32
+                    anchors {
+                        margins: base_margins*2
+                        right: parent.right
+                        top: parent.top
+                    }
+
+                    image:  "qrc:/images/Goback.png"
+
+                    onClicked: {
+                        hiResLoader.active = false
+                        camsView.visible = true
+                        camsView.focus = true
+                    }
                 }
             }
 
-            color: "white"
-            implicitWidth: 400
-            implicitHeight: 300
+            Keys.onPressed: {
+                if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
+                    event.accepted = true
+                    hiResLoader.active = false
+                    camsView.visible = true
+                    camsView.focus = true
+                }
+            }
         }
     }
 }
