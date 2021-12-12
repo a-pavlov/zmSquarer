@@ -53,7 +53,7 @@ ApplicationWindow {
         id: zmc
         url: prefs.url
         onMonitors: {
-            tilemodel.setAvailableMons(mons)
+            tilemodel.setAvailableMons(mons, zmUrl.text)
             btnUrl.text = qsTr("Connect")
             btnUrl.enabled = true
             btnUrl.checkMode = true
@@ -181,7 +181,7 @@ ApplicationWindow {
                     text: qsTr("Start")
                     onClicked: {
                         zmClientError.visible = false
-                        sceneBuilder.buildScene(zmc, tilemodel)
+                        sceneBuilder.buildScene(tilemodel)
                     }
                 }
 
@@ -365,7 +365,8 @@ ApplicationWindow {
                 visible: true
                 anchors.centerIn: parent
                 title: qsTr("Search ZM")
-                height: 500
+                width: 250
+                height: 450
 
                 ColumnLayout {
                     Text {
@@ -396,14 +397,19 @@ ApplicationWindow {
                         model: netmon
                     }
 
+                    CheckBox {
+                        id: httpsEnabled
+                        text: qsTr("Search for HTTPS")
+                        checked: false
+                    }
+
                     RowLayout {
                         Button {
                             id: startScanning
-                            text: "Scan..."
+                            text: qsTr("Start search")
                             enabled: netmon.selectedCount > 0
                             onClicked: {
-                                console.log("start scanning")
-                                zmsearch.search(netmon.getSelected())
+                                zmsearch.search(netmon.getSelected(), httpsEnabled.checked)
                             }
                         }
 
@@ -411,12 +417,20 @@ ApplicationWindow {
                             id: cancelNetworkScan
                             enabled: zmsearch.inProgress
 
-                            text: "Cancel scan"
+                            text: qsTr("Stop search")
                             onClicked: {
-                                console.log("cancel scan")
                                 zmsearch.cancel()
                             }
                         }
+                    }
+
+                    ProgressBar {
+                        id: netScanProgress
+                        visible: true
+                        width: parent.width
+                        indeterminate: false
+                        value: zmsearch.progress
+
                     }
 
                     Text {
@@ -426,20 +440,23 @@ ApplicationWindow {
 
                     ListView {
                         id: knownHosts
-                        implicitHeight: 100
+                        height: 100
 
                         Component {
                             id: khComp
-                            CheckBox {
-                                id: ip_address
-                                checked: check
-                                text: ip
-                                onClicked: {
-                                    upd = "xx"
-                                    if (checked) {
-                                        zmUrl.text = ip
-                                    } else {
-                                        zmUrl.text = ""
+                            Item {
+                                height: 40
+                                CheckBox {
+                                    id: ip_address
+                                    checked: check
+                                    text: ip
+                                    onClicked: {
+                                        upd = "xx"
+                                        if (checked) {
+                                            zmUrl.text = ip
+                                        } else {
+                                            zmUrl.text = ""
+                                        }
                                     }
                                 }
                             }
@@ -448,21 +465,17 @@ ApplicationWindow {
                         delegate: khComp
                         model: zmsearch
                     }
-
                 }
 
                 Button {
                     id: closeNetScan
-                    text: "Ok"
+                    text: qsTr("Ok")
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
                     onClicked: {
                         netScan.active = false
                     }
                 }
-
-                implicitWidth: 400
-                implicitHeight: 300
             }
         }
     }

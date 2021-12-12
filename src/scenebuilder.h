@@ -13,7 +13,7 @@ public:
     static QString readFile(const QString&);
     SceneBuilder();
     Q_INVOKABLE QString buildScene(ZMClient* zmc, MonitorModel* monmod) const;
-    Q_INVOKABLE QString buildScene(ZMClient* zmc, TileModel* tilemodel) const;
+    Q_INVOKABLE QString buildScene(TileModel* tilemodel) const;
 signals:
     void success(const QString& code) const;
     void fail(const QString& code) const;

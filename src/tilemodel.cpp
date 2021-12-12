@@ -81,8 +81,9 @@ bool TileModel::setData(const QModelIndex& index, const QVariant& value, int rol
     return false;
 }
 
-void TileModel::setAvailableMons(const QList<ZMMonitor> &am) {
+void TileModel::setAvailableMons(const QList<ZMMonitor> &am, const QString url) {
     beginResetModel();
+    zmBaseUrl = url;
     for(qint32 i = 0; i < tiles.size(); ++i) {
         if (tiles[i].first >= am.size()) tiles[i].first = -1;
         if (tiles[i].second >= am.size()) tiles[i].second = -1;
@@ -139,6 +140,7 @@ void TileModel::load() {
     }
 
     pref.endArray();
+    zmBaseUrl = pref.value("Common/TileModelBaseUrl").toString();
 
     count = pref.beginReadArray("Common/TileModel");
     if (count != tiles.size()) return;
@@ -171,6 +173,8 @@ void TileModel::save() const {
     }
 
     pref.endArray();
+
+    pref.setValue("Common/TileModelBaseUrl", zmBaseUrl);
 
     pref.beginWriteArray("Common/TileModel");
     for(int index = 0; index < tiles.size(); ++index) {

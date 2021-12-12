@@ -100,4 +100,8 @@ QString ZMClient::getMonitorUrl(int monId) const {
     return baseUrl + "/zm/cgi-bin/nph-zms?mode=jpeg&monitor=" + QString::number(monId) + "&scale=100&maxfps=30&buffer=1000&user=admin&pass=root";
 }
 
+QString ZMClient::getMonitorUrl(const QString& url, int monId) {
+    return url + "/zm/cgi-bin/nph-zms?mode=jpeg&monitor=" + QString::number(monId) + "&scale=100&maxfps=30&buffer=1000&user=admin&pass=root";
+}
+
 

@@ -11,8 +11,11 @@ class ZMSearch : public QAbstractListModel {
 private:
     typedef QPair<QString, ZMVersion> ZMHost;
     void continueSearch();
-    int requestsInProgress;
-    quint32 totalRequests;
+
+    qint32 requestsInProgress;
+    qint32 maxRequests;
+    qint32 completedRequests;
+
     QList<QHostAddress> pendingRequests;
     QList<ZMHost> hosts;
     void startRequest(const QHostAddress&);
@@ -20,6 +23,7 @@ private:
     void addHost(const QString& ip, const ZMVersion&);
     bool cancelRequested;
     int checkedHostIndex;
+    bool httpsEnabled;
 public:
     enum ServerRoles {
         AddressRole   = Qt::UserRole + 1,
@@ -37,17 +41,19 @@ public:
     Q_INVOKABLE int rowCount(const QModelIndex & parent = QModelIndex()) const override;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex& index, const QVariant &value, int role = Qt::EditRole) override;
-    Q_INVOKABLE void search(const QList<QString>& interfaces);
+    Q_INVOKABLE void search(const QList<QString>& interfaces, bool https);
     Q_INVOKABLE void cancel();
     int getTotalRequests() const;
-    int getCompletedRequests() const;
 
     Q_PROPERTY(bool inProgress READ getInProgress NOTIFY inProgressChanged)
+    Q_PROPERTY(qreal progress READ getProgress NOTIFY progressChanged)
 
     bool getInProgress() const;
+    qreal getProgress() const;
 signals:
     void found(QString);
     void inProgressChanged(bool);
+    void progressChanged(qreal);
 };
 
 #endif // ZMSEARCH_H

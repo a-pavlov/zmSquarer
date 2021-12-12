@@ -32,6 +32,7 @@ public:
     Q_PROPERTY(bool supportsSsl READ supportsSsl NOTIFY supportsSslChanged)
     Q_INVOKABLE QString getMonitors();
     Q_INVOKABLE QString getMonitorUrl(int monId) const;
+    static QString getMonitorUrl(const QString& url, int monId);
 signals:
     void monitors(const QList<ZMMonitor>& mons);
     void error(const QString& msg);

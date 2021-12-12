@@ -148,7 +148,7 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
     return buffer;
 }
 
-QString SceneBuilder::buildScene(ZMClient* zmc, TileModel* tilemodel) const {
+QString SceneBuilder::buildScene(TileModel* tilemodel) const {
     auto tiles = tilemodel->getNumeratedTiles();
     QString camVideoProducer = readFile(":/text/camvideoproducer.txt");
     QString camVideoOutput = readFile(":/text/videooutput.txt");
@@ -173,8 +173,8 @@ QString SceneBuilder::buildScene(ZMClient* zmc, TileModel* tilemodel) const {
                        QString {
             return camVideoProducer
                     .arg(mon.first) // index in screen
-                    .arg(zmc->getMonitorUrl(mon.second.first))  // real mon id
-                    .arg(zmc->getMonitorUrl(mon.second.second != -1?mon.second.second:mon.second.first));   // hi res mon if present
+                    .arg(ZMClient::getMonitorUrl(tilemodel->baseUrl(), mon.second.first))  // real mon id
+                    .arg(ZMClient::getMonitorUrl(tilemodel->baseUrl(), mon.second.second != -1?mon.second.second:mon.second.first));   // hi res mon if present
         });
 
         QString leftAnchor("parent.left");

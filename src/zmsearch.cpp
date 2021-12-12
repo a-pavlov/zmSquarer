@@ -21,8 +21,11 @@ void ZMSearch::registerQmlType() {
 ZMSearch::ZMSearch(QObject* parent) :
     QAbstractListModel(parent)
     , requestsInProgress(0)
+    , maxRequests(0)
+    , completedRequests(0)
     , cancelRequested(false)
-    , checkedHostIndex(-1) {
+    , checkedHostIndex(-1)
+    , httpsEnabled(false) {
     // test hosts
     hosts.append(qMakePair(QString("192.168.11.22"), ZMVersion("1.2", "1.2")));
     hosts.append(qMakePair(QString("192.168.11.23"), ZMVersion("1.1", "1.2")));
@@ -34,12 +37,8 @@ int ZMSearch::getTotalRequests() const {
     return pendingRequests.size() + requestsInProgress;
 }
 
-int ZMSearch::getCompletedRequests() const {
-    return totalRequests;
-}
-
 void ZMSearch::startRequest(const QHostAddress& address) {
-    QString url = "https://" + address.toString() + "/zm/api/host/getVersion.json";
+    QString url = (httpsEnabled?"https://":"http://") + address.toString() + "/zm/api/host/getVersion.json";
     qDebug() << "start request " << url;
     QNetworkRequest request(url);
     QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
@@ -88,6 +87,8 @@ void ZMSearch::startRequest(const QHostAddress& address) {
         }
 
         this->requestsInProgress--;
+        this->completedRequests++;
+        emit progressChanged(getProgress());
         reply->deleteLater();
         continueSearch();
     });
@@ -114,9 +115,14 @@ void ZMSearch::continueSearch() {
     }
 }
 
-void ZMSearch::search(const QList<QString>& addresses) {
+void ZMSearch::search(const QList<QString>& addresses, bool https) {
     pendingRequests = ZMUtils::genTestHosts(addresses);
-    totalRequests = pendingRequests.size();
+    maxRequests = pendingRequests.size();
+    requestsInProgress = 0;
+    completedRequests = 0;
+    httpsEnabled = https;
+    emit progressChanged(getProgress());
+
     if (!hosts.isEmpty()) {
         beginRemoveRows(QModelIndex(), 0, hosts.size() - 1);
         hosts.clear();
@@ -128,15 +134,17 @@ void ZMSearch::search(const QList<QString>& addresses) {
     if (requestsInProgress != 0) {
         // continue
         emit inProgressChanged(true);
-        qDebug() << "in progress true";
     }
+
     continueSearch();
 }
 
 void ZMSearch::cancel() {
     cancelRequested = true;
     emit inProgressChanged(false);
+    emit progressChanged(getProgress());
     pendingRequests.clear();
+    maxRequests = 0;
 }
 
 void ZMSearch::addHost(const QString& ip, const ZMVersion& zmv) {
@@ -205,7 +213,10 @@ bool ZMSearch::setData(const QModelIndex& index, const QVariant &value, int role
 
 bool ZMSearch::getInProgress() const {
     bool res = !cancelRequested && requestsInProgress > 0;
-    qDebug() << "get in progress " << res;
     return res;
+}
+
+qreal ZMSearch::getProgress() const {
+    return maxRequests!=0?1.0*completedRequests/maxRequests:0.0;
 }
 
