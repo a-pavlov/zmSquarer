@@ -1,4 +1,4 @@
-import QtQuick 2.3
+import QtQuick 2.12
 import QtQuick.Window 2.1
 import QtMultimedia 5.0
 import QtQuick.Layouts 1.11
@@ -120,8 +120,9 @@ ApplicationWindow {
 
     GroupBox {
         id: setup
-        focus: true
         anchors.margins: base_margins
+        visible: true
+        enabled: true
         anchors {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
@@ -145,6 +146,13 @@ ApplicationWindow {
                     onTextChanged: {
                         zmc.url = text
                     }
+
+                    Keys.onPressed: {
+                        if (event.key == Qt.Key_Down) {
+                            console.log("to grid")
+                            grid.focus = true
+                        }
+                    }
                 }
 
                 Button {
@@ -160,6 +168,13 @@ ApplicationWindow {
                         zmUrl.enabled = checkMode
                         zmUrlProgress.visible = checkMode
                         btnUrl.enabled = false
+                    }
+
+                    Keys.onPressed: {
+                        if (event.key == Qt.Key_Right) {
+                            console.log("focus to start")
+                            btnStartView.focus = true
+                        }
                     }
                 }
 
@@ -225,6 +240,8 @@ ApplicationWindow {
                 event.accepted = true
                 Qt.quit()
             }
+
+            console.log("key pressed")
         }
     }
 
@@ -241,82 +258,99 @@ ApplicationWindow {
         height: 500
 
         Component {
-            id: contactDelegate
+            id: contactDelegate            
+
             Item {
                 width: grid.cellWidth;
                 height: grid.cellHeight
-                //anchors.margins: base_margins
+                property bool isCurrent: grid.currentIndex === index
+                anchors.margins: base_margins
                 //Rectangle {
                 //    anchors.fill: parent
                 //    border.color: "black"
+                //Rectangle {
+                //    width: grid.cellWidth;
+                //    height: grid.cellHeight
+                //
+                //    color: isCurrent?'yellow':'green'
 
-                Rectangle {
-                    id: mainView
-                    anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.margins: base_margins
-                    radius: base_radius
+                //    Keys.onPressed: {
+                //        console.log("key item pressed")
+                //    }
 
-                    color: havemon?"lightgreen":"lightgray"
-                    Text {
-                        text: qsTr("Low: %1").arg(name)
-                        anchors.centerIn: parent
-                        wrapMode: Text.Wrap
-                    }
 
-                    width: parent.width - base_margins*2
-                    height: parent.height/2 - base_margins*2
+                    Rectangle {
+                        id: mainView
+                        anchors.top: parent.top
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.margins: base_margins
+                        radius: base_radius
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            if (grid.currentIndex == pos) {
-                                upd = "test"
-                            } else {
-                                grid.currentIndex = model.pos;
+                        color: haveMon?"lightgreen":"lightgray"
+                        Text {
+                            text: qsTr("Low: %1").arg(name)
+                            anchors.centerIn: parent
+                            wrapMode: Text.Wrap
+                        }
+
+                        width: parent.width - base_margins*2
+                        height: parent.height/2 - base_margins*2
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (grid.currentIndex == index) {
+                                    upd = "test"
+                                } else {
+                                    grid.currentIndex = index; //model.pos;
+                                }
                             }
                         }
                     }
-                }
 
-                Rectangle {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: mainView.bottom
-                    radius: base_radius
-                    anchors.margins: base_margins
+                    Rectangle {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: mainView.bottom
+                        radius: base_radius
+                        anchors.margins: base_margins
 
-                    color: havehr?"lightgreen":"lightgray"
-                    Text {
-                        text: qsTr("Hi: %1").arg(hrname)
-                        anchors.centerIn: parent
-                        wrapMode: Text.Wrap
-                    }
+                        color: havehr?"lightgreen":"lightgray"
+                        Text {
+                            text: qsTr("Hi: %1").arg(hrname)
+                            anchors.centerIn: parent
+                            wrapMode: Text.Wrap
+                        }
 
-                    width: parent.width - base_margins*2
-                    height: parent.height/2 - base_margins*2
+                        width: parent.width - base_margins*2
+                        height: parent.height/2 - base_margins*2
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            if (grid.currentIndex == pos) {
-                                updhr = "test"
-                            } else {
-                                grid.currentIndex = model.pos;
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                if (grid.currentIndex == index) {
+                                    updhr = "test"
+                                } else {
+                                    grid.currentIndex = index; //model.pos;
+                                }
                             }
                         }
                     }
-                }
+                //}
+
                // }
             }
         }
+
 
         GridView {
             id: grid
             anchors.fill: parent
             cellWidth: 120; cellHeight: 120
             model: tilemodel
-
+            keyNavigationEnabled: true
+            focus: true
             delegate: contactDelegate
+            //KeyNavigation.up: setup
 
             highlight: Rectangle {
                 width: grid.cellWidth
@@ -330,12 +364,21 @@ ApplicationWindow {
             }
 
             highlightFollowsCurrentItem: true
-            focus: true
 
             Component.onCompleted: {
                 console.log("started")
             }
-        }
+
+            Keys.onPressed: {
+                if (event.key == Qt.Key_Escape) {
+                    console.log("back from grid")
+                    //grid.focus = false
+                    zmUrl.focus = true
+                    //btnUrl.focus = true
+                    zmUrl.forceActiveFocus()
+                }
+            }
+        }        
     }
 
     Loader {
@@ -521,7 +564,10 @@ ApplicationWindow {
                     hiResLoader.active = false
                     camsView.visible = true
                     camsView.focus = true
+                    console.log("key pressed handled")
                 }
+
+                console.log("key pressed next")
             }
         }
     }
