@@ -378,7 +378,7 @@ ApplicationWindow {
                     zmUrl.forceActiveFocus()
                 }
             }
-        }        
+        }
     }
 
     Loader {

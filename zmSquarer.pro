@@ -4,7 +4,7 @@ QT += qml quick multimedia widgets network
 
 SOURCES += main.cpp
 
-RESOURCES += qml.qrc images.qrc text.qrc
+RESOURCES += qml.qrc images.qrc text.qrc zmsq.qrc
 
 CONFIG(debug, debug|release): message(Project is built in DEBUG mode.)
 CONFIG(release, debug|release): message(Project is built in RELEASE mode.)

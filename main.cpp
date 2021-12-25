@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 
     ZMSQApplication app(argc, argv);
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:///qml/zmsq.qml")));
     //engine.load(QUrl(QStringLiteral("qrc:///zmSquarer2.qml")));
     return app.exec();
 }
