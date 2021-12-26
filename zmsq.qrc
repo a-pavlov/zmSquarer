@@ -5,8 +5,7 @@
         <file>qml/zmsq/SearchView.qml</file>
         <file>qml/zmsq/images/arrow.png</file>
         <file>qml/zmsq/images/qt-logo.png</file>
-        <file>qml/zmsq/ListMenu.qml</file>
-        <file>qml/zmsq/ListViewDelegate.qml</file>
+        <file>qml/zmsq/ZMViewDelegate.qml</file>
         <file>qml/zmsq/SetupView.qml</file>
         <file>qml/zmsq/ButtonDefault.qml</file>
         <file>qml/zmsq/TextContent.qml</file>

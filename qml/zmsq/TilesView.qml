@@ -73,7 +73,7 @@ FocusScope {
         Item{
             id: itemRoot
             width: parent.width
-            height: content.implicitHeight + StyleHelperItem.item_padding * 2
+            height: content_txt.implicitHeight + StyleHelperItem.item_padding * 2
             property var style: StyleHelperItem.parseItemClass("stable")
 
             Rectangle{
@@ -85,7 +85,7 @@ FocusScope {
                 radius: StyleHelperItem.card_border_radius
 
                 Text {
-                    id: content
+                    id: content_txt
                     text: "TEST message"
                     color: itemRoot.style.text
                     font.pixelSize: StyleHelperItem.item_font_size
@@ -193,8 +193,7 @@ FocusScope {
                 }
             }
 
-            KeyNavigation.up: searchView
-            KeyNavigation.down: listMenu
+            KeyNavigation.up: searchView            
 
             delegate: Item {
                 id: container
@@ -230,9 +229,6 @@ FocusScope {
                         id: xx
                         text: resolution
                     }
-
-                    //Image { source: "images/qt-logo.png"; anchors.centerIn: parent }
-
                 }
 
                 MouseArea {

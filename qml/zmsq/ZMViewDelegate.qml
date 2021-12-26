@@ -70,7 +70,8 @@ Item {
     Text {
         id: label
         anchors.centerIn: content
-        text: (model.selected ? FontAwesome.icons.fa_check : FontAwesome.icons.fa_times) + " " + model.network
+        text: (model.selected ? FontAwesome.icons.fa_check : FontAwesome.icons.fa_times) + " " + model.network + "\n" +
+              model.version + "/" + model.apiVersion
         color: "#193441"
         font.pixelSize: 14
     }

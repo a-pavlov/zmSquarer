@@ -17,7 +17,7 @@ Window {
     width: 800
     height: 640
     visible: true
-    property int setupViewHeight: 160
+    property int setupViewHeight: 200
     property int searchViewHeight: 200
     property int tilesViewHeight: 320
     property int listMenuHeight: 320
@@ -80,13 +80,13 @@ Window {
                 activeFocusOnTab: true
             }
 
-            ListMenu {
+            /*ListMenu {
                 id: listMenu
                 y: startingY + setupViewHeight + searchViewHeight + tilesViewHeight
                 width: parent.width;
                 height: listMenuHeight
                 activeFocusOnTab: true
-            }
+            }*/
 
             Rectangle {
                 id: shade
@@ -101,7 +101,7 @@ Window {
                     PropertyChanges { target: setupView; y:  startingY }
                     PropertyChanges { target: searchView; y: startingY + setupViewHeight }
                     PropertyChanges { target: tilesView; y: startingY + setupViewHeight + searchViewHeight }
-                    PropertyChanges { target: listMenu; y: startingY + setupViewHeight + searchViewHeight + tilesViewHeight }
+                    //PropertyChanges { target: listMenu; y: startingY + setupViewHeight + searchViewHeight + tilesViewHeight }
                 },
 
                 State {
@@ -109,24 +109,24 @@ Window {
                     PropertyChanges { target: setupView; y:  startingY - setupViewHeight }
                     PropertyChanges { target: searchView; y: startingY }
                     PropertyChanges { target: tilesView; y: startingY + searchViewHeight }
-                    PropertyChanges { target: listMenu; y: startingY + searchViewHeight + tilesViewHeight }
+                    //PropertyChanges { target: listMenu; y: startingY + searchViewHeight + tilesViewHeight }
                 },
 
                 State {
-                    name: "showTilesView"                    
+                    name: "showTilesView"
                     PropertyChanges { target: setupView; y:  -setupViewHeight }
                     PropertyChanges { target: searchView; y: 0 }
                     PropertyChanges { target: tilesView; y: searchViewHeight }
-                    PropertyChanges { target: listMenu; y: searchViewHeight + tilesViewHeight }
-                },
+                    //PropertyChanges { target: listMenu; y: searchViewHeight + tilesViewHeight }
+                }
 
-                State {
+                /*State {
                     name: "showListViews"
                     PropertyChanges { target: setupView; y: -setupViewHeight - searchViewHeight }
                     PropertyChanges { target: searchView; y: -searchViewHeight }
                     PropertyChanges { target: tilesView; y: 0 }
                     PropertyChanges { target: listMenu; y: tilesViewHeight }
-                }
+                }*/
             ]
 
             transitions: Transition {

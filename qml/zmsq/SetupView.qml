@@ -68,34 +68,6 @@ FocusScope {
         KeyNavigation.down: searchView
         Column {
             spacing: 10
-/*
-            Item{
-                id: test1
-                width: parent.width
-                height: content.implicitHeight + StyleHelperItem.item_padding * 2
-                property var style: StyleHelperItem.parseItemClass("positive")
-
-                Rectangle{
-                    anchors.fill: parent
-                    anchors.margins: - StyleHelperItem.item_border_width
-                    color: test1.style.bg
-                    border.width: StyleHelperItem.item_border_width
-                    border.color: test1.style.border
-                    radius: StyleHelperItem.card_border_radius
-
-                    Text {
-                        id: content
-                        text: "Test text"
-                        color: test1.style.text
-                        font.pixelSize: StyleHelperItem.item_font_size
-                        anchors.fill: parent
-                        anchors.margins: StyleHelperItem.item_padding
-                        verticalAlignment: Text.AlignVCenter
-                        wrapMode: Text.WordWrap
-                    }
-                }
-            }*/
-
             Item{
                 id: itemRoot
                 width: parent.width
@@ -122,37 +94,6 @@ FocusScope {
                     }
                 }
             }
-            /*
-           Item {
-                id: root
-                width: parent.width
-                height: sectionText.implicitHeight + StyleHelperItem.item_padding
-                property string text: "Start work here"
-
-                Rectangle{
-                    anchors.fill: parent
-                    anchors.margins: - StyleHelperItem.item_border_width
-                    color: StyleHelperItem.list_header_bg
-                    border.width: StyleHelperItem.item_border_width
-                    border.color: StyleHelperItem.itemStyles.default.border
-
-                    Text{
-                        id: sectionText
-                        text: root.text
-                        font.bold: true
-                        color: StyleHelperItem.item_divider_color
-                        font.pixelSize: StyleHelperItem.item_font_size
-                        anchors.fill: parent
-                        anchors.topMargin: StyleHelperItem.item_padding / 2
-                        anchors.leftMargin: StyleHelperItem.item_padding
-                        anchors.rightMargin: StyleHelperItem.item_padding
-                        anchors.bottomMargin: StyleHelperItem.item_padding / 2
-                        verticalAlignment: Text.AlignVCenter
-                        elide: Text.ElideRight
-                    }
-                }
-            }
-*/
 
             Row {
                 id: r
@@ -170,7 +111,7 @@ FocusScope {
 
                 ButtonDefault {
                     id: btnUrl
-                    property bool checkMode: true                    
+                    property bool checkMode: true
 
                     text: "Connect"
                     KeyNavigation.right: btnStartView
@@ -217,6 +158,7 @@ FocusScope {
             ButtonDefault {
                 id: cbFullScreen
                 anchors.margins: 10
+                x: 10
                 checkable: true
                 text: qsTr("Full screen mode")
                 checked: false
@@ -227,9 +169,10 @@ FocusScope {
 
             ProgressBar {
                 id: zmUrlProgress
-                visible: false
+                visible: true
                 width: parent.width
-                indeterminate: true
+                height: 8
+                indeterminate: true               
             }
 
             Label {
