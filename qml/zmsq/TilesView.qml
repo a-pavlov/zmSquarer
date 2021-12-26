@@ -65,15 +65,16 @@ FocusScope {
     Rectangle {
         anchors.fill: parent
         clip: true
+
         /*gradient: Gradient {
             GradientStop { position: 0.0; color: "#193441" }
             GradientStop { position: 1.0; color: Qt.darker("#193441") }
         }*/
 
-        Item{
+        Item {
             id: itemRoot
             width: parent.width
-            height: content_txt.implicitHeight + StyleHelperItem.item_padding * 2
+            height: content_txt.implicitHeight + StyleHelperItem.item_padding
             property var style: StyleHelperItem.parseItemClass("stable")
 
             Rectangle{
@@ -86,7 +87,7 @@ FocusScope {
 
                 Text {
                     id: content_txt
-                    text: "TEST message"
+                    text: "Click to choose the low res camera:"
                     color: itemRoot.style.text
                     font.pixelSize: StyleHelperItem.item_font_size
                     anchors.fill: parent
@@ -99,16 +100,22 @@ FocusScope {
 
         GridView {
             id: gridView
-            y: 60
+            y: itemRoot.height
             width: parent.width
-            height: parent.height - 40
+            height: parent.height - itemRoot.height
             anchors.leftMargin: 20;
             anchors.rightMargin: 20
             cellWidth: 152; cellHeight: 152
             focus: true
+            KeyNavigation.up: searchView
+            KeyNavigation.down: tilesViewHR
+            snapMode: ListView.SnapToItem
+            clip: true
+
             model: ListModel {
                 id: cm
                 ListElement {
+                    cam_id: "1"
                     cam_name: "Camera 1 House"
                     active: true
                     resolution: "1920x1080"
@@ -116,6 +123,7 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "2"
                     cam_name: "Camera 2 House"
                     active: true
                     resolution: "1920x1080"
@@ -123,6 +131,7 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "3"
                     cam_name: "Not assigned"
                     active: false
                     resolution: "N/a"
@@ -130,6 +139,7 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "4"
                     cam_name: "Not assigned"
                     active: false
                     resolution: "N/a"
@@ -137,6 +147,7 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "5"
                     cam_name: "Not assigned"
                     active: false
                     resolution: "N/a"
@@ -144,6 +155,7 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "6"
                     cam_name: "Back yard camera"
                     active: false
                     resolution: "800x600"
@@ -151,6 +163,7 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "7"
                     cam_name: "Not assigned"
                     active: false
                     resolution: "N/a"
@@ -158,6 +171,7 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "18"
                     cam_name: "Not assigned"
                     active: false
                     resolution: "N/a"
@@ -165,6 +179,7 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "9"
                     cam_name: "Not assigned"
                     active: false
                     resolution: "N/a"
@@ -172,6 +187,7 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "14"
                     cam_name: "Super puper camera view"
                     active: true
                     resolution: "320x240"
@@ -179,6 +195,7 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "21"
                     cam_name: "Super puper camera view 2"
                     active: false
                     resolution: "1024x768"
@@ -186,24 +203,57 @@ FocusScope {
                 }
 
                 ListElement {
+                    cam_id: "11"
                     cam_name: "Super puper camera view 3"
                     active: true
                     resolution: "1024x768"
                     cam: true
                 }
-            }
 
-            KeyNavigation.up: searchView            
+                ListElement {
+                    cam_id: "10"
+                    cam_name: "Not assigned"
+                    active: false
+                    resolution: "N/a"
+                    cam: false
+                }
+
+                ListElement {
+                    cam_id: "31"
+                    cam_name: "Super puper camera view"
+                    active: true
+                    resolution: "320x240"
+                    cam: true
+                }
+
+                ListElement {
+                    cam_id: "14"
+                    cam_name: "Super puper camera view 2"
+                    active: false
+                    resolution: "1024x768"
+                    cam: true
+                }
+
+                ListElement {
+                    cam_id: "81"
+                    cam_name: "Super puper camera view 3"
+                    active: true
+                    resolution: "1024x768"
+                    cam: true
+                }
+            }            
 
             delegate: Item {
                 id: container
                 width: GridView.view.cellWidth; height: GridView.view.cellHeight
 
+
                 Rectangle {
                     id: content
                     color: "transparent"
                     antialiasing: true
-                    anchors.fill: parent; anchors.margins: 20; radius: 10
+                    anchors.fill: parent;
+                    anchors.margins: 5; radius: 10
 
                     Rectangle {
                         color: cam ? (active ? ColorsHelper.color.balanced :  ColorsHelper.color.assertive) : ColorsHelper.color.energized
@@ -219,14 +269,14 @@ FocusScope {
                         anchors.left: parent.left
                         anchors.margins: 10
                         width: parent.width - 20
-                        text: FontAwesome.icons.fa_video_camera + "\n" +  cam_name
+                        text: FontAwesome.icons.fa_video_camera + " " + cam_id + "\n" +  cam_name
                         wrapMode: Text.WordWrap
                     }
 
                     TextContent {
                         anchors.top: name.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
-                        id: xx
+                        id: res
                         text: resolution
                     }
                 }
@@ -252,7 +302,9 @@ FocusScope {
                 }
 
                 Keys.onPressed: {
-                    console.log("key pressed")
+                    if (event.key === Qt.Key_Space) {
+                        console.log("choose camera clicked")
+                    }
                 }
             }
         }

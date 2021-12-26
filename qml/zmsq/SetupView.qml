@@ -71,7 +71,7 @@ FocusScope {
             Item{
                 id: itemRoot
                 width: parent.width
-                height: content.implicitHeight + StyleHelperItem.item_padding * 2
+                height: content.implicitHeight + StyleHelperItem.item_padding
                 property var style: StyleHelperItem.parseItemClass("stable")
 
                 Rectangle{
@@ -84,7 +84,7 @@ FocusScope {
 
                     Text {
                         id: content
-                        text: "TEST message"
+                        text: "Start using ZM:"
                         color: itemRoot.style.text
                         font.pixelSize: StyleHelperItem.item_font_size
                         anchors.fill: parent
@@ -106,7 +106,11 @@ FocusScope {
                     height: btnUrl.height
                     placeholderText: qsTr("http://")
                     KeyNavigation.right: btnUrl
-                    KeyNavigation.down: cbFullScreen
+                    KeyNavigation.down: searchView
+                    ToolTip.delay: 1000
+                    ToolTip.timeout: 5000
+                    ToolTip.visible: activeFocus
+                    ToolTip.text: qsTr("This tool tip is shown after hovering the button for a second.")
                 }
 
                 ButtonDefault {
@@ -115,10 +119,8 @@ FocusScope {
 
                     text: "Connect"
                     KeyNavigation.right: btnStartView
-                    KeyNavigation.down: cbFullScreen
-
+                    KeyNavigation.down: searchView
                     icon: FontAwesome.icons.fa_external_link_square
-                    iconRight: true
                     class_name: "positive medium"
                 }
 
@@ -127,44 +129,36 @@ FocusScope {
                     checkable: false
                     enabled: false
                     text: qsTr("Start")
-                    icon: FontAwesome.icons.fa_camera
+                    icon: FontAwesome.icons.fa_play
                     class_name: "balanced medium"
+                    KeyNavigation.right: btnFullScreen
+                    KeyNavigation.down: searchView
+                }
+
+                ButtonDefault {
+                    id: btnFullScreen
+                    anchors.margins: 10
+                    x: 10
+                    checkable: true
+                    text: qsTr("Screen")
+                    checked: false
+                    class_name: "balanced medium"
+                    icon: FontAwesome.icons.fa_expand
                     KeyNavigation.right: btnExit
-                    KeyNavigation.down: cbFullScreen
+                    KeyNavigation.down: searchView
+                    ToolTip.delay: 1000
+                    ToolTip.timeout: 5000
+                    ToolTip.visible: activeFocus
+                    ToolTip.text: qsTr("This tool tip is shown after hovering the button for a second.")
                 }
 
                 ButtonDefault {
                     id: btnExit
                     text: qsTr("Quit")
-                    class_name: "balanced medium"
-                    icon: FontAwesome.icons.fa_sign_out
-                    KeyNavigation.right: refreshNetworks
-                    KeyNavigation.down: cbFullScreen
+                    class_name: "assertive medium"
+                    icon: FontAwesome.icons.fa_sign_out                    
+                    KeyNavigation.down: searchView
                 }
-
-                ButtonDefault {
-                    id: refreshNetworks
-                    text: "Search"
-                    class_name: "balanced medium"
-                    KeyNavigation.down: cbFullScreen
-                    icon: FontAwesome.icons.fa_search
-                    onClicked: {
-                        console.log("search clicked")
-                        netmon.refresh()
-                    }
-                }
-            }
-
-            ButtonDefault {
-                id: cbFullScreen
-                anchors.margins: 10
-                x: 10
-                checkable: true
-                text: qsTr("Full screen mode")
-                checked: false
-                class_name: "balanced medium"
-                icon: FontAwesome.icons.fa_check
-                KeyNavigation.down: searchView
             }
 
             ProgressBar {

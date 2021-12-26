@@ -17,12 +17,11 @@ Window {
     width: 800
     height: 640
     visible: true
-    property int setupViewHeight: 200
+    property int setupViewHeight: 140
     property int searchViewHeight: 200
-    property int tilesViewHeight: 320
-    property int listMenuHeight: 320
-    property int startingY: 160
-
+    property int tilesViewHeight: 420
+    property int tilesViewHRHeight: 420
+    property int startingY: 80
 
     FontLoader{ source: "qrc:/qml/fonts/fontawesome-webfont.ttf"}
 /*
@@ -80,13 +79,13 @@ Window {
                 activeFocusOnTab: true
             }
 
-            /*ListMenu {
-                id: listMenu
+            TilesViewHR {
+                id: tilesViewHR
                 y: startingY + setupViewHeight + searchViewHeight + tilesViewHeight
-                width: parent.width;
-                height: listMenuHeight
+                width: cellWidth*4 + 100
+                height: tilesViewHeight
                 activeFocusOnTab: true
-            }*/
+            }
 
             Rectangle {
                 id: shade
@@ -101,7 +100,7 @@ Window {
                     PropertyChanges { target: setupView; y:  startingY }
                     PropertyChanges { target: searchView; y: startingY + setupViewHeight }
                     PropertyChanges { target: tilesView; y: startingY + setupViewHeight + searchViewHeight }
-                    //PropertyChanges { target: listMenu; y: startingY + setupViewHeight + searchViewHeight + tilesViewHeight }
+                    PropertyChanges { target: tilesViewHR; y: startingY + setupViewHeight + searchViewHeight + tilesViewHeight }
                 },
 
                 State {
@@ -109,24 +108,24 @@ Window {
                     PropertyChanges { target: setupView; y:  startingY - setupViewHeight }
                     PropertyChanges { target: searchView; y: startingY }
                     PropertyChanges { target: tilesView; y: startingY + searchViewHeight }
-                    //PropertyChanges { target: listMenu; y: startingY + searchViewHeight + tilesViewHeight }
+                    PropertyChanges { target: tilesViewHR; y: startingY + searchViewHeight + tilesViewHeight }
                 },
 
                 State {
                     name: "showTilesView"
-                    PropertyChanges { target: setupView; y:  -setupViewHeight }
-                    PropertyChanges { target: searchView; y: 0 }
-                    PropertyChanges { target: tilesView; y: searchViewHeight }
-                    //PropertyChanges { target: listMenu; y: searchViewHeight + tilesViewHeight }
-                }
+                    PropertyChanges { target: setupView; y:  -setupViewHeight - searchViewHeight - 100 }
+                    PropertyChanges { target: searchView; y: -searchViewHeight - 100 }
+                    PropertyChanges { target: tilesView; y: startingY }
+                    PropertyChanges { target: tilesViewHR; y: startingY + tilesViewHeight }
+                },
 
-                /*State {
-                    name: "showListViews"
-                    PropertyChanges { target: setupView; y: -setupViewHeight - searchViewHeight }
-                    PropertyChanges { target: searchView; y: -searchViewHeight }
-                    PropertyChanges { target: tilesView; y: 0 }
-                    PropertyChanges { target: listMenu; y: tilesViewHeight }
-                }*/
+                State {
+                    name: "showTilesViewsHR"
+                    PropertyChanges { target: setupView; y: -setupViewHeight - searchViewHeight - tilesViewHeight }
+                    PropertyChanges { target: searchView; y: -searchViewHeight - tilesViewHeight }
+                    PropertyChanges { target: tilesView; y: -tilesViewHeight }
+                    PropertyChanges { target: tilesViewHR; y: startingY }
+                }
             ]
 
             transitions: Transition {

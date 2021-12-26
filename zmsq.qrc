@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>qml/zmsq.qml</file>
         <file>qml/zmsq/TilesView.qml</file>
+        <file>qml/zmsq/TilesViewHR.qml</file>
         <file>qml/zmsq/SearchView.qml</file>
         <file>qml/zmsq/images/arrow.png</file>
         <file>qml/zmsq/images/qt-logo.png</file>
