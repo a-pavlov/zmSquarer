@@ -70,8 +70,8 @@ Item {
     Text {
         id: label
         anchors.centerIn: content
-        text: (model.selected ? FontAwesome.icons.fa_check : FontAwesome.icons.fa_times) + " " + model.network + "\n" +
-              model.version + "/" + model.apiVersion
+        text: (model.check ? FontAwesome.icons.fa_check : FontAwesome.icons.fa_times) + " " + model.ip + "\n" +
+              model.version + "/" + model.apiversion
         color: "#193441"
         font.pixelSize: 14
     }
@@ -90,7 +90,15 @@ Item {
     Keys.onPressed: {
         if (event.key === Qt.Key_Space) {
             console.log("space clicked")
-            model.selected = !model.selected
+            model.upd = "xx";
+            if (model.check) {
+                console.log("select " + model.ip)
+                prefs.url = model.ip
+            } else {
+                console.log("select nothing");
+            }
+
+            //model.selected = !model.selected
         }
     }
 

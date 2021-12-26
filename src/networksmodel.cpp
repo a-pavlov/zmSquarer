@@ -56,18 +56,20 @@ void NetworksModel::refresh() {
     for(QList<QHostAddress>::iterator itr = ifaces.begin(); itr != ifaces.end(); ++itr) {
         if (itr->protocol() ==  QAbstractSocket::IPv4Protocol && !itr->isLoopback()) {
             beginInsertRows(QModelIndex(), addresses.size(), addresses.size());
-            addresses.append(qMakePair(false, itr->toString()));
+            addresses.append(qMakePair(true, itr->toString()));
             endInsertRows();
         }
     }
+
+    emit selectedChanged(getSelectedCount());
 }
 
 bool NetworksModel::setData(const QModelIndex& index, const QVariant &value, int role/* = Qt::EditRole*/) {
-    qDebug() << "set data " << value;
     if (index.isValid() && (index.row() >= 0 && index.row() < rowCount() && index.column() >= 0)) {
         if (role == SelectedMode) {
             addresses[index.row()].first = value.toBool();
             emit selectedChanged(getSelectedCount());
+            dataChanged(index, index);
             return true;
         }
     }

@@ -2,14 +2,14 @@ import QtQuick 2.12
 import QtQuick.Window 2.1
 import QtQuick.Layouts 1.11
 import QtQuick.Controls 2.12
-/*
+
 import NetworksModel 0.1
 import ZMSearch 0.1
 import TileModel 0.1
 import ZMClient 0.1
 import ZMSQPreferences 0.1
 import SceneBuilder 0.1
-*/
+
 import "zmsq"
 
 Window {
@@ -23,8 +23,17 @@ Window {
     property int tilesViewHRHeight: 520
     property int startingY: 80
 
+    visibility: setupView.fullScreen ? Qt.WindowFullScreen : Qt.WindowMinimized
+    flags: setupView.fullScreen ? (Qt.FramelessWindowHint | Qt.Window) : Qt.Window
+
+    Component.onCompleted: {
+        console.log("wnd completed full screen: " + setupView.fullScreen)
+        netmon.refresh()
+        console.log("netmon refreshed")
+    }
+
     FontLoader{ source: "qrc:/qml/fonts/fontawesome-webfont.ttf"}
-/*
+
     NetworksModel {
         id: netmon
     }
@@ -40,7 +49,7 @@ Window {
     ZMSearch {
         id: zmsearch
     }
-*/
+
     Rectangle {
         id: window
         width: 700
@@ -125,6 +134,14 @@ Window {
                     PropertyChanges { target: searchView; y: -searchViewHeight - tilesViewHeight }
                     PropertyChanges { target: tilesView; y: -tilesViewHeight }
                     PropertyChanges { target: tilesViewHR; y: startingY }
+                },
+
+                State {
+                    name: "showCameras"
+                    PropertyChanges { target: setupView; y: -setupViewHeight - searchViewHeight - tilesViewHeight - tilesViewHRHeight }
+                    PropertyChanges { target: searchView; y: -searchViewHeight - tilesViewHeight - tilesViewHRHeight }
+                    PropertyChanges { target: tilesView; y: -tilesViewHeight - tilesViewHRHeight }
+                    PropertyChanges { target: tilesViewHR; y: -tilesViewHRHeight }
                 }
             ]
 

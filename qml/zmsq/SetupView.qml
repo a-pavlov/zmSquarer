@@ -64,6 +64,8 @@ FocusScope {
             mainView.state = "showSetupView"
     }
 
+    property bool fullScreen: btnFullScreen.checked
+
     Rectangle {
         anchors.fill: parent
         clip: true
@@ -102,7 +104,7 @@ FocusScope {
                 spacing: 10
 
                 TextField {
-                    id: zmUrl                    
+                    id: zmUrl
                     focus: true
                     anchors.margins: 10
                     height: btnUrl.height
@@ -113,13 +115,14 @@ FocusScope {
                     ToolTip.timeout: 5000
                     ToolTip.visible: activeFocus
                     ToolTip.text: qsTr("This tool tip is shown after hovering the button for a second.")
+                    text: prefs.url
                 }
 
                 ButtonDefault {
                     id: btnUrl
                     property bool checkMode: true
-
-                    text: "Connect"
+                    enabled: zmUrl.text.length > 0
+                    text: qsTr("Connect")
                     KeyNavigation.right: btnStartView
                     KeyNavigation.down: searchView
                     icon: FontAwesome.icons.fa_external_link_square
@@ -142,24 +145,36 @@ FocusScope {
                     anchors.margins: 10
                     x: 10
                     checkable: true
+                    checked: prefs.fullScreen
                     text: qsTr("Screen")
-                    checked: false
                     class_name: "balanced medium"
                     icon: FontAwesome.icons.fa_expand
                     KeyNavigation.right: btnExit
                     KeyNavigation.down: searchView
+                    /*
                     ToolTip.delay: 1000
                     ToolTip.timeout: 5000
                     ToolTip.visible: activeFocus
                     ToolTip.text: qsTr("This tool tip is shown after hovering the button for a second.")
+*/
+                    onClicked: {
+                        //wnd.visibility = checked ? Qt.WindowFullScreen : Qt.WindowMinimized
+                        //wnd.flags = checked ? (Qt.FramelessWindowHint | Qt.Window) : Qt.Window
+                    }
                 }
 
                 ButtonDefault {
                     id: btnExit
                     text: qsTr("Quit")
                     class_name: "assertive medium"
-                    icon: FontAwesome.icons.fa_sign_out                    
+                    icon: FontAwesome.icons.fa_sign_out
                     KeyNavigation.down: searchView
+
+                    onClicked: {
+                        prefs.fullScreen = btnFullScreen.checked
+                        prefs.flush()
+                        wnd.close()
+                    }
                 }
             }
 

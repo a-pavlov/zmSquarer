@@ -25,9 +25,10 @@ FocusScope {
 
     ButtonDefault {
         id: networkScan
-        y: parseInt(parent.height / 3)        
+        y: parseInt(parent.height / 3)
+        enabled: netmon.selectedCount > 0
         property bool startMode: true
-        text: startMode ? "Start search" : "Stop search"
+        text: startMode ? qsTr("Start search") : qsTr("Stop search")
         KeyNavigation.right: list2
         KeyNavigation.down: tilesView
         icon: startMode ? FontAwesome.icons.fa_search : FontAwesome.icons.fa_stop
@@ -50,22 +51,6 @@ FocusScope {
         height: 10
         palette.dark: ColorsHelper.color.positive
     }
-/*
-    ButtonDefault {
-        property bool btnChecked: false
-        id: btnStopNetworkScan
-        y: parseInt(2 * parent.height / 3)
-        checkable: false
-        enabled: true
-        text: qsTr("Stop scan")
-        icon: btnChecked? FontAwesome.icons.fa_check : FontAwesome.icons.fa_times;
-        class_name: "balanced medium"
-        KeyNavigation.right: list2
-        KeyNavigation.down: tilesView
-        onClicked: {
-            btnChecked = !btnChecked
-        }
-    }*/
 
     ListView {
         id: list2
@@ -73,7 +58,8 @@ FocusScope {
         x: parseInt(parent.width / 3); width: parent.width / 3; height: parent.height - 20
         KeyNavigation.down: tilesView;
         KeyNavigation.right : list3
-        model: ListModel {
+        model: netmon
+            /*ListModel {
             ListElement {
                 network: "192.168.100.1"
                 selected: false
@@ -88,7 +74,7 @@ FocusScope {
                 network: "192.168.1.1"
                 selected: false
             }
-        }
+        }*/
 
         cacheBuffer: 200
         delegate: Item {
@@ -108,7 +94,7 @@ FocusScope {
             Text {
                 id: label
                 anchors.centerIn: content
-                text: (model.selected ? FontAwesome.icons.fa_check : FontAwesome.icons.fa_times) + " " + model.network
+                text: (model.selected ? FontAwesome.icons.fa_check : FontAwesome.icons.fa_times) + " " + model.address
                 color: "#193441"
                 font.pixelSize: 14
             }
@@ -152,7 +138,7 @@ FocusScope {
         y: activeFocus ? 10 : 40; x: parseInt(2 * parent.width / 3); width: parent.width / 3; height: parent.height - 20
         KeyNavigation.down: tilesView;
         KeyNavigation.left: list2
-        model: ListModel {
+        model: zmsearch /*ListModel {
             ListElement {
                 network: "192.168.100.1"
                 version: "1.22"
@@ -166,7 +152,7 @@ FocusScope {
                 apiVersion: "2.33"
                 selected: false
             }
-       }
+       }*/
 
         cacheBuffer: 200
         delegate: ZMViewDelegate {}
