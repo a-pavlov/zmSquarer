@@ -19,8 +19,8 @@ Window {
     visible: true
     property int setupViewHeight: 140
     property int searchViewHeight: 200
-    property int tilesViewHeight: 420
-    property int tilesViewHRHeight: 420
+    property int tilesViewHeight: 520
+    property int tilesViewHRHeight: 520
     property int startingY: 80
 
     FontLoader{ source: "qrc:/qml/fonts/fontawesome-webfont.ttf"}
