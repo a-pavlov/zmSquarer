@@ -47,6 +47,8 @@ FocusScope {
         visible: true
         indeterminate: false
         value: 0.4
+        height: 10
+        palette.dark: ColorsHelper.color.positive
     }
 /*
     ButtonDefault {

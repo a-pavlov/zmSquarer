@@ -55,6 +55,8 @@ import QtQuick.Layouts 1.1
 import "variables/fontawesome.js" as FontAwesome
 import "variables/buttons.js" as StyleHelper
 import "variables/items.js" as StyleHelperItem
+import "variables/colors.js" as ColorsHelper
+
 
 FocusScope {
     onActiveFocusChanged: {
@@ -166,7 +168,16 @@ FocusScope {
                 visible: true
                 width: parent.width
                 height: 8
-                indeterminate: true               
+                indeterminate: true
+
+                background: Rectangle {
+                    implicitWidth: parent.width
+                    implicitHeight: 8
+                    color: "#e6e6e6"
+                    radius: 3
+                }
+
+                palette.dark: ColorsHelper.color.positive
             }
 
             Label {

@@ -87,7 +87,7 @@ FocusScope {
 
                 Text {
                     id: content_txt
-                    text: "Click to choose the corresponding hi res camera:"
+                    text: "Place hi res cameras to corresponding low res tiles"
                     color: itemRoot.style.text
                     font.pixelSize: StyleHelperItem.item_font_size
                     anchors.fill: parent
