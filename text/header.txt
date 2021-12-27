@@ -3,14 +3,23 @@ import QtQuick.Controls 2.12
 import QtMultimedia 5.0
 import CamVideoProducer 0.1
 
+import "qrc:/qml/zmsq/variables/fontawesome.js" as FontAwesome
+
+import "zmsq"
+
+
+FocusScope {
+    id: scope
+    anchors.fill: parent
+
 Item {
     id: main
     anchors.fill: parent
-    focus: true
 
     Keys.onPressed: {
         if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
             event.accepted = true
             wnd.showStartScreen();
+            mainView.state = "showTilesView"
         }
-    }
+    }    

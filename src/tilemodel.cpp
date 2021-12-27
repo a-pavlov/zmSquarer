@@ -20,6 +20,9 @@ QHash<int, QByteArray> TileModel::roleNames() const {
     roles[SelectorRole]     = "select";
     roles[PosIndexRole]     = "pos";
     roles[NameRole]         = "name";
+    roles[IdRole]           = "id";
+    roles[StatusRole]       = "status";
+    roles[ResolutionRole]   = "resolution";
     roles[HRNameRole]       = "hrname";
     roles[HaveMonRole]      = "havemon";
     roles[HaveHRRole]       = "havehr";
@@ -37,9 +40,12 @@ QVariant TileModel::data(const QModelIndex & index, int role /* = Qt::DisplayRol
     Q_ASSERT(index.row() < tiles.size());
     auto tIndex = tiles.at(index.row());
     switch(role) {
-        case Qt::DisplayRole:   return (isValidMonIndex(tIndex.first)?availableMons.at(tIndex.first).name:tr("Off"));
-        case NameRole:          return (isValidMonIndex(tIndex.first)?availableMons.at(tIndex.first).name:tr("Off"));
-        case HRNameRole:        return (isValidMonIndex(tIndex.second)?availableMons.at(tIndex.second).name:tr("Off"));
+        case Qt::DisplayRole:   return (isValidMonIndex(tIndex.first)?availableMons.at(tIndex.first).name:QString());
+        case NameRole:          return (isValidMonIndex(tIndex.first)?availableMons.at(tIndex.first).name:QString());
+        case IdRole:            return (isValidMonIndex(tIndex.first)?availableMons.at(tIndex.first).id:QString());
+        case StatusRole:        return (isValidMonIndex(tIndex.first)?availableMons.at(tIndex.first).status:QString());
+        case ResolutionRole:    return (isValidMonIndex(tIndex.first)?(QString::number(availableMons.at(tIndex.first).size.height()) + "x" + QString::number(availableMons.at(tIndex.first).size.width())):QString());
+        case HRNameRole:        return (isValidMonIndex(tIndex.second)?availableMons.at(tIndex.second).name:tr("Off"));        
         case HaveMonRole:       return isValidMonIndex(tIndex.first);
         case HaveHRRole:        return isValidMonIndex(tIndex.second);
         case SelectorRole:      return tIndex.first;

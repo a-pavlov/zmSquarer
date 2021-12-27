@@ -112,141 +112,11 @@ FocusScope {
             snapMode: ListView.SnapToItem
             clip: true
 
-            model: ListModel {
-                id: cm
-                ListElement {
-                    cam_id: "1"
-                    cam_name: "Camera 1 House"
-                    active: true
-                    resolution: "1920x1080"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "2"
-                    cam_name: "Camera 2 House"
-                    active: true
-                    resolution: "1920x1080"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "3"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "4"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "5"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "6"
-                    cam_name: "Back yard camera"
-                    active: false
-                    resolution: "800x600"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "7"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "18"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "9"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "14"
-                    cam_name: "Super puper camera view"
-                    active: true
-                    resolution: "320x240"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "21"
-                    cam_name: "Super puper camera view 2"
-                    active: false
-                    resolution: "1024x768"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "11"
-                    cam_name: "Super puper camera view 3"
-                    active: true
-                    resolution: "1024x768"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "10"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "31"
-                    cam_name: "Super puper camera view"
-                    active: true
-                    resolution: "320x240"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "14"
-                    cam_name: "Super puper camera view 2"
-                    active: false
-                    resolution: "1024x768"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "81"
-                    cam_name: "Super puper camera view 3"
-                    active: true
-                    resolution: "1024x768"
-                    cam: true
-                }
-            }            
+            model: tilemodel
 
             delegate: Item {
                 id: container
                 width: GridView.view.cellWidth; height: GridView.view.cellHeight
-
 
                 Rectangle {
                     id: content
@@ -256,7 +126,7 @@ FocusScope {
                     anchors.margins: 5; radius: 10
 
                     Rectangle {
-                        color: cam ? (active ? ColorsHelper.color.balanced :  ColorsHelper.color.assertive) : ColorsHelper.color.energized
+                        color: havemon ? ((model.status == "Connected") ? ColorsHelper.color.balanced :  ColorsHelper.color.assertive) : ColorsHelper.color.energized
                         anchors.fill: parent;
                         anchors.margins: 3;
                         radius: 8;
@@ -269,7 +139,8 @@ FocusScope {
                         anchors.left: parent.left
                         anchors.margins: 10
                         width: parent.width - 20
-                        text: FontAwesome.icons.fa_video_camera + " " + cam_id + "\n" +  cam_name
+                        text: FontAwesome.icons.fa_video_camera + " " + model.id + "\n" +
+                              (havemon ? model.name : qsTr("place camera here"))
                         wrapMode: Text.WordWrap
                     }
 
@@ -277,7 +148,7 @@ FocusScope {
                         anchors.top: name.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
                         id: res
-                        text: resolution
+                        text: model.resolution
                     }
                 }
 
@@ -304,6 +175,7 @@ FocusScope {
                 Keys.onPressed: {
                     if (event.key === Qt.Key_Space) {
                         console.log("choose camera clicked")
+                        upd = "test"
                     }
                 }
             }

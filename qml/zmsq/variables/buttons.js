@@ -127,6 +127,14 @@ var buttonStyles = {
         active_bg               : Qt.darker(color.dark, 1.18),
         active_border           : Qt.darker(color.dark, 1.18)
     },
+    transparent: {
+        bg                      : color.transparent,
+        bg_disabled             : "lightgray",
+        text                    : "#fff",
+        border                  : Qt.darker(color.dark, 1.18),
+        active_bg               : Qt.darker(color.dark, 1.18),
+        active_border           : Qt.darker(color.dark, 1.18)
+    },
     default: {
         bg                      : color.stable,
         bg_disabled             : "lightgray",

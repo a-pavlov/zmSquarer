@@ -4,7 +4,7 @@
 #include <QFile>
 #include <algorithm>
 
-//#define TOFILE 1
+#define TOFILE 1
 
 void SceneBuilder::registerQmlType() {
     qmlRegisterType<SceneBuilder>(
@@ -133,7 +133,7 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
 #endif
     }
 
-    bufferStream << "}\n";
+    bufferStream << "}}\n";
 
 #ifdef TOFILE
     resStream << "}\n";
@@ -156,7 +156,11 @@ QString SceneBuilder::buildScene(TileModel* tilemodel) const {
 
     int height = tiles.size();
 #ifdef TOFILE
+#ifdef Q_OS_LINUX
+    QFile resFile("/tmp/test.qml");
+#else
     QFile resFile("c:/dev/test.qml");
+#endif
     bool resOpened = resFile.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream resStream(&resFile);
     resStream << camViewHeader << "\n";
@@ -181,6 +185,7 @@ QString SceneBuilder::buildScene(TileModel* tilemodel) const {
         QString output("output_%1.right");
 
         QStringList videoOutput;
+        QString focus = "true";
         std::transform(m.begin(), m.end(), std::back_inserter(videoOutput), [&](const TileModel::TILE_NUM& mon) ->
                        QString {
             QString res = camVideoOutput
@@ -188,8 +193,9 @@ QString SceneBuilder::buildScene(TileModel* tilemodel) const {
                         .arg(leftAnchor)
                         .arg(topAnchor)
                         .arg(m.size())
-                        .arg(height);
-
+                        .arg(height)
+                        .arg(focus);
+            focus = "false";
             leftAnchor = QString("output_%1.right").arg(mon.first);
             return res;
         });
@@ -202,10 +208,10 @@ QString SceneBuilder::buildScene(TileModel* tilemodel) const {
 #endif
     }
 
-    bufferStream << "}\n";
+    bufferStream << "} }\n";
 
 #ifdef TOFILE
-    resStream << "}\n";
+    resStream << "} }\n";
     if (resFile.isOpen()) resFile.close();
     qDebug() << "buffer size " << buffer.size();
     qDebug() << "template " << readFile(":/text/template.txt");

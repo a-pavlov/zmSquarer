@@ -9,9 +9,14 @@ import TileModel 0.1
 import ZMSQPreferences 0.1
 import SceneBuilder 0.1
 
+import QtMultimedia 5.0
+import CamVideoProducer 0.1
+
+import "qrc:/qml/zmsq/variables/fontawesome.js" as FontAwesome
+
 import "zmsq"
 
-Window {
+ApplicationWindow {
     id: wnd
     width: 800
     height: 640
@@ -22,14 +27,14 @@ Window {
     property int tilesViewHRHeight: 520
     property int startingY: 80
 
+    property int base_radius: 4
+    property int base_margins: 4
+
+    property var camsView: ""
+    property string hiResUrl: ""
+
     visibility: setupView.fullScreen ? Qt.WindowFullScreen : Qt.WindowMinimized
     flags: setupView.fullScreen ? (Qt.FramelessWindowHint | Qt.Window) : Qt.Window
-
-    Component.onCompleted: {
-        console.log("wnd completed full screen: " + setupView.fullScreen)
-        netmon.refresh()
-        console.log("netmon refreshed")
-    }
 
     FontLoader{ source: "qrc:/qml/fonts/fontawesome-webfont.ttf"}
 
@@ -47,7 +52,49 @@ Window {
 
     ZMSearch {
         id: zmsearch
-    }       
+    }
+
+    SceneBuilder {
+        id: sceneBuilder
+        onSuccess: {
+            mainView.state = "showCameras"
+            camsView = Qt.createQmlObject(code, wnd, "scene1")
+            camsView.focus = true
+            //setup.visible = false
+            //slots.visible = false
+        }
+
+        onFail: {
+            zmClientError.text = qsTr(
+                        "<font color=\"#FF0000\">Error: %1</font> ").arg(code)
+            zmClientError.visible = true
+        }
+    }
+
+    onClosing: {
+        tilemodel.save()
+        prefs.url = zmUrl.text
+        prefs.flush()
+    }
+
+    Component.onCompleted: {
+        console.log("wnd completed full screen: " + setupView.fullScreen)
+        netmon.refresh()
+        tilemodel.load()
+        console.log("netmon refreshed")
+    }
+
+    function showStartScreen() {
+        camsView.destroy()
+        tilesView.forceActiveFocus()
+    }
+
+    function runHiRes() {
+        hiResLoader.active = true
+        camsView.visible = false
+        hiResLoader.focus = true
+        hiResLoader.forceActiveFocus()
+    }
 
     Rectangle {
         id: window
@@ -151,6 +198,74 @@ Window {
 
         transitions: Transition {
             NumberAnimation { properties: "x,opacity"; duration: 600; easing.type: Easing.OutQuint }
+        }
+    }
+
+    // HI resolution view
+
+    Loader {
+        id: hiResLoader
+        active: false
+        anchors.fill: parent
+        sourceComponent: hiResView
+        focus: true
+    }
+
+    FocusScope {
+        id: hiResScope
+        anchors.fill: parent
+
+        Component {
+            id: hiResView
+            Rectangle {
+                id: hiResRect
+
+                CamVideoProducer {
+                    id: videoProducer_1
+                    url: hiResUrl
+                }
+
+                VideoOutput {
+                    id: output1
+                    anchors.fill: parent
+                    source: videoProducer_1
+
+                    ButtonDefault {
+                        id: backBtn
+                        focus: true
+
+                        anchors {
+                            margins: base_margins*2
+                            right: parent.right
+                            top: parent.top
+                        }
+
+                        class_name: "outline small"
+                        icon: FontAwesome.icons.fa_arrow_left
+
+
+                        Keys.onPressed: {
+                            if (event.key === Qt.Key_Space) {
+                                hiResLoader.active = false
+                                camsView.visible = true
+                                camsView.focus = true
+                            }
+                        }
+                    }
+                }
+
+                Keys.onPressed: {
+                    if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
+                        event.accepted = true
+                        hiResLoader.active = false
+                        camsView.visible = true
+                        camsView.focus = true
+                        console.log("key pressed handled")
+                    }
+
+                    console.log("key pressed next")
+                }
+            }
         }
     }
 }

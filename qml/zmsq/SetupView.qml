@@ -116,7 +116,7 @@ FocusScope {
 
                     Text {
                         id: content
-                        text: "Start using ZM: " + (ZMClient.supportsSsl ? "SSL supported" : "SSL not found")
+                        text: qsTr("Setup squarer for ZM: ") + (zmc.supportsSsl?qsTr("<font color=\"green\">SSL supported</font>"):qsTr("<font color=\"yellow\">SSL not supported</font>"))
                         color: itemRoot.style.text
                         font.pixelSize: StyleHelperItem.item_font_size
                         anchors.fill: parent
@@ -170,12 +170,19 @@ FocusScope {
                 ButtonDefault {
                     id: btnStartView
                     checkable: false
-                    enabled: false
+                    enabled: tilemodel.numeratedTilesCount > 0
                     text: qsTr("Start")
                     icon: FontAwesome.icons.fa_play
                     class_name: "balanced medium"
                     KeyNavigation.right: btnFullScreen
                     KeyNavigation.down: searchView
+
+                    Keys.onPressed: {
+                        if (event.key === Qt.Key_Space) {
+                            console.log("build scene")
+                            sceneBuilder.buildScene(tilemodel)
+                        }
+                    }
                 }
 
                 ButtonDefault {

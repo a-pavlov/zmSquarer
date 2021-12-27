@@ -9,6 +9,7 @@
         <file>qml/zmsq/ButtonDefault.qml</file>
         <file>qml/zmsq/TextContent.qml</file>
         <file>qml/zmsq/Card.qml</file>
+        <file>qml/zmsq/TestModels.qml</file>
         <file>qml/zmsq/styles/AvatarListViewStyle.qml</file>
         <file>qml/zmsq/styles/CardStyle.qml</file>
         <file>qml/zmsq/styles/DefaulListViewStyle.qml</file>
