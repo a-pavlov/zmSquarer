@@ -67,7 +67,6 @@ int main(int argc, char *argv[]) {
     ZMSearch::registerQmlType();
     TileModel::registerQmlType();
 
-
     ZMSQApplication app(argc, argv);
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:///qml/zmsq.qml")));

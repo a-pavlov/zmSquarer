@@ -57,11 +57,39 @@ import "variables/buttons.js" as StyleHelper
 import "variables/items.js" as StyleHelperItem
 import "variables/colors.js" as ColorsHelper
 
+import ZMClient 0.1
 
 FocusScope {
     onActiveFocusChanged: {
         if (activeFocus)
             mainView.state = "showSetupView"
+    }
+
+
+    ZMClient {
+        id: zmc
+        url: prefs.url
+
+        onMonitors: {
+            tilemodel.setAvailableMons(mons, zmUrl.text)
+            btnUrl.text = qsTr("Connect")
+            btnUrl.enabled = true
+            btnUrl.checkMode = true
+            zmUrlProgress.visible = false
+            zmClientError.visible = false
+            prefs.url = url
+            prefs.flush()
+        }
+
+        onError: {
+            btnUrl.text = qsTr("Connect")
+            btnUrl.enabled = true
+            btnUrl.checkMode = true
+            zmUrlProgress.visible = false
+            zmClientError.text = qsTr(
+                        "<font color=\"#FF0000\">Error: %1</font> ").arg(msg)
+            zmClientError.visible = true
+        }
     }
 
     property bool fullScreen: btnFullScreen.checked
@@ -88,7 +116,7 @@ FocusScope {
 
                     Text {
                         id: content
-                        text: "Start using ZM:"
+                        text: "Start using ZM: " + (ZMClient.supportsSsl ? "SSL supported" : "SSL not found")
                         color: itemRoot.style.text
                         font.pixelSize: StyleHelperItem.item_font_size
                         anchors.fill: parent
@@ -100,7 +128,6 @@ FocusScope {
             }
 
             Row {
-                id: r
                 spacing: 10
 
                 TextField {
@@ -127,6 +154,17 @@ FocusScope {
                     KeyNavigation.down: searchView
                     icon: FontAwesome.icons.fa_external_link_square
                     class_name: "positive medium"
+                    Keys.onPressed: {
+                        if (event.key === Qt.Key_Space) {
+                            zmUrl.focus = true
+                            text = qsTr("Connecting...")
+                            zmc.getMonitors()
+                            zmClientError.visible = false
+                            zmUrl.enabled = checkMode
+                            zmUrlProgress.visible = checkMode
+                            btnUrl.enabled = false
+                        }
+                    }
                 }
 
                 ButtonDefault {
@@ -180,7 +218,7 @@ FocusScope {
 
             ProgressBar {
                 id: zmUrlProgress
-                visible: true
+                visible: false
                 width: parent.width
                 height: 8
                 indeterminate: true

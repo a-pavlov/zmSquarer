@@ -6,7 +6,6 @@ import QtQuick.Controls 2.12
 import NetworksModel 0.1
 import ZMSearch 0.1
 import TileModel 0.1
-import ZMClient 0.1
 import ZMSQPreferences 0.1
 import SceneBuilder 0.1
 
@@ -48,7 +47,7 @@ Window {
 
     ZMSearch {
         id: zmsearch
-    }
+    }       
 
     Rectangle {
         id: window
