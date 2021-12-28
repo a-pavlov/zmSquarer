@@ -6,6 +6,7 @@
 const QString pathUrl = "Network/Url";
 const QString pathMons = "Common/Monitors";
 const QString pathFullScreen = "Common/FullScreen";
+const QString pathHttpsEnabled = "Common/HttpsEnabled";
 
 
 void Preferences::registerQmlType() {
@@ -66,4 +67,12 @@ bool Preferences::fullScreen() const {
 void Preferences::setFullScreen(bool b) {
     setValue(pathFullScreen, b);
     emit fullScreenChanged(b);
+}
+
+void Preferences::setHttpsEnabled(bool value) {
+    setValue(pathHttpsEnabled, value);
+    emit httpsEnabledChanged(value);
+}
+bool Preferences::httpsEnabled() const {
+    return value(pathHttpsEnabled, false).toBool();
 }

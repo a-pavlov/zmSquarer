@@ -27,10 +27,10 @@ ZMSearch::ZMSearch(QObject* parent) :
     , checkedHostIndex(-1)
     , httpsEnabled(false) {
     // test hosts
-    hosts.append(qMakePair(QString("192.168.11.22"), ZMVersion("1.2", "1.2")));
-    hosts.append(qMakePair(QString("192.168.11.23"), ZMVersion("1.1", "1.2")));
-    hosts.append(qMakePair(QString("192.168.1.12"), ZMVersion("1.0", "1.2")));
-    hosts.append(qMakePair(QString("192.168.1.26"), ZMVersion("1.4", "1.2")));
+    //hosts.append(qMakePair(QString("192.168.11.22"), ZMVersion("1.2", "1.2")));
+    //hosts.append(qMakePair(QString("192.168.11.23"), ZMVersion("1.1", "1.2")));
+    //hosts.append(qMakePair(QString("192.168.1.12"), ZMVersion("1.0", "1.2")));
+    //hosts.append(qMakePair(QString("192.168.1.26"), ZMVersion("1.4", "1.2")));
 }
 
 int ZMSearch::getTotalRequests() const {

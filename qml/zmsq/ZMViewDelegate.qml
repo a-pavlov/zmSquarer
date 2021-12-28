@@ -70,8 +70,7 @@ Item {
     Text {
         id: label
         anchors.centerIn: content
-        text: (model.check ? FontAwesome.icons.fa_check : FontAwesome.icons.fa_times) + " " + model.ip + "\n" +
-              model.version + "/" + model.apiversion
+        text: (model.check ? FontAwesome.icons.fa_check : FontAwesome.icons.fa_times) + qsTr("%1\nver: %2 api: %3 ").arg(model.ip).arg(model.version).arg(model.apiversion)
         color: "#193441"
         font.pixelSize: 14
     }

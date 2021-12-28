@@ -138,6 +138,7 @@ FocusScope {
                     placeholderText: qsTr("http://")
                     KeyNavigation.right: btnUrl
                     KeyNavigation.down: searchView
+                    font.pixelSize: 14
                     ToolTip.delay: 1000
                     ToolTip.timeout: 5000
                     ToolTip.visible: activeFocus
@@ -216,8 +217,6 @@ FocusScope {
                     KeyNavigation.down: searchView
 
                     onClicked: {
-                        prefs.fullScreen = btnFullScreen.checked
-                        prefs.flush()
                         wnd.close()
                     }
                 }

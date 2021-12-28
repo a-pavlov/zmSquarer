@@ -41,6 +41,7 @@ class Preferences : public QIniSettings {
     Q_PROPERTY(QString url READ url WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(bool fullScreen READ fullScreen WRITE setFullScreen NOTIFY fullScreenChanged)
     Q_PROPERTY(int checkedMons READ checkedMonsCount)
+    Q_PROPERTY(bool httpsEnabled READ httpsEnabled WRITE setHttpsEnabled NOTIFY httpsEnabledChanged)
 public:
     static void registerQmlType();
     Preferences();
@@ -55,11 +56,14 @@ public:
     int checkedMonsCount() const;
     bool fullScreen() const;
     void setFullScreen(bool);
+    void setHttpsEnabled(bool);
+    bool httpsEnabled() const;
 private:
     QStringList checkedMons;
 signals:
      void urlChanged(QString);
      void fullScreenChanged(bool);
+     void httpsEnabledChanged(bool);
 };
 
 #endif // PREFERENCES_H

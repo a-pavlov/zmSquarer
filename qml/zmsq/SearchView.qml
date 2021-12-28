@@ -11,11 +11,14 @@ FocusScope {
             mainView.state = "showSearchView"
     }
 
+    property bool httpsEnabled: btnHttpsEnabled.checked
+
     ButtonDefault {
         y: 10
-        id: httpsEnabled
+        id: btnHttpsEnabled
         checkable: true
         focus: true
+        checked: prefs.httpsEnabled
         text: qsTr("Https enabled")
         class_name: "balanced medium"
         icon: FontAwesome.icons.fa_check
@@ -36,6 +39,12 @@ FocusScope {
 
         Keys.onPressed: {
             if (event.key === Qt.Key_Space) {
+                if (startMode) {
+                    zmsearch.search(netmon.getSelected(), btnHttpsEnabled.checked)
+                } else {
+                    zmsearch.cancel()
+                }
+
                 startMode = !startMode
             }
         }
@@ -47,19 +56,41 @@ FocusScope {
         y: parseInt(2 * parent.height / 3)
         visible: true
         indeterminate: false
-        value: 0.4
+        value: zmsearch.progress
         height: 10
         palette.dark: ColorsHelper.color.positive
     }
 
     ListView {
         id: list2
-        y: activeFocus ? 10 : 40;
         x: parseInt(parent.width / 3); width: parent.width / 3; height: parent.height - 20
         KeyNavigation.down: tilesView;
         KeyNavigation.right : list3
         model: netmon
         cacheBuffer: 200
+        header: Item {
+            id: header_networks
+            width: ListView.view.width; height: 60; anchors.leftMargin: 10; anchors.rightMargin: 10
+
+            Rectangle {
+                id: h_content
+                anchors.centerIn: parent; width: header_networks.width - 40; height: header_networks.height - 10
+                color: "transparent"
+                antialiasing: true
+                radius: 10
+                Rectangle { anchors.fill: parent; anchors.margins: 3; color: ColorsHelper.color.energized; antialiasing: true; radius: 8 }
+            }
+
+            Text {
+                id: h_label
+                anchors.centerIn: h_content
+                text: qsTr("Available networks")
+                color: "#193441"
+                font.pixelSize: 14
+                font.bold: true
+            }
+        }
+
         delegate: Item {
             id: container
             width: ListView.view.width; height: 60; anchors.leftMargin: 10; anchors.rightMargin: 10
@@ -95,7 +126,6 @@ FocusScope {
 
             Keys.onPressed: {
                 if (event.key === Qt.Key_Space) {
-                    console.log("space clicked")
                     model.selected = !model.selected
                 }
             }
@@ -118,11 +148,36 @@ FocusScope {
 
     ListView {
         id: list3
-        y: activeFocus ? 10 : 40; x: parseInt(2 * parent.width / 3); width: parent.width / 3; height: parent.height - 20
+        x: parseInt(2 * parent.width / 3); width: parent.width / 3; height: parent.height - 20
         KeyNavigation.down: tilesView;
         KeyNavigation.left: list2
         model: zmsearch
         cacheBuffer: 200
+
+        header: Item {
+            id: zm_hosts_header
+            width: ListView.view.width; height: 60; anchors.leftMargin: 10; anchors.rightMargin: 10
+
+            Rectangle {
+                id: zm_hosts_content
+                anchors.centerIn: parent; width: zm_hosts_header.width - 40; height: zm_hosts_header.height - 10
+                color: "transparent"
+                antialiasing: true
+                radius: 10
+
+                Rectangle { anchors.fill: parent; anchors.margins: 3; color: ColorsHelper.color.energized; antialiasing: true; radius: 8 }
+            }
+
+            Text {
+                id: zm_hosts_label
+                anchors.centerIn: zm_hosts_content
+                text: qsTr("Found ZM hosts")
+                color: "#193441"
+                font.pixelSize: 14
+                font.bold: true
+            }
+        }
+
         delegate: ZMViewDelegate {}
 
         Behavior on y {

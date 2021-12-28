@@ -73,7 +73,10 @@ ApplicationWindow {
 
     onClosing: {
         tilemodel.save()
+        prefs.fullScreen = setupView.fullScreen
+        prefs.httpsEnabled = searchView.httpsEnabled
         prefs.flush()
+        console.log("wnd on close: flush")
     }
 
     Component.onCompleted: {
