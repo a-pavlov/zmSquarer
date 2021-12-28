@@ -66,11 +66,6 @@ FocusScope {
         anchors.fill: parent
         clip: true
 
-        /*gradient: Gradient {
-            GradientStop { position: 0.0; color: "#193441" }
-            GradientStop { position: 1.0; color: Qt.darker("#193441") }
-        }*/
-
         Item {
             id: itemRoot
             width: parent.width
@@ -111,136 +106,7 @@ FocusScope {
             snapMode: ListView.SnapToItem
             clip: true
 
-            model: ListModel {
-                id: cm
-                ListElement {
-                    cam_id: "1"
-                    cam_name: "Camera 1 House"
-                    active: true
-                    resolution: "1920x1080"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "2"
-                    cam_name: "Camera 2 House"
-                    active: true
-                    resolution: "1920x1080"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "3"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "4"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "5"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "6"
-                    cam_name: "Back yard camera"
-                    active: false
-                    resolution: "800x600"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "7"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "18"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "9"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "14"
-                    cam_name: "Super puper camera view"
-                    active: true
-                    resolution: "320x240"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "21"
-                    cam_name: "Super puper camera view 2"
-                    active: false
-                    resolution: "1024x768"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "11"
-                    cam_name: "Super puper camera view 3"
-                    active: true
-                    resolution: "1024x768"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "10"
-                    cam_name: "Not assigned"
-                    active: false
-                    resolution: "N/a"
-                    cam: false
-                }
-
-                ListElement {
-                    cam_id: "31"
-                    cam_name: "Super puper camera view"
-                    active: true
-                    resolution: "320x240"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "14"
-                    cam_name: "Super puper camera view 2"
-                    active: false
-                    resolution: "1024x768"
-                    cam: true
-                }
-
-                ListElement {
-                    cam_id: "81"
-                    cam_name: "Super puper camera view 3"
-                    active: true
-                    resolution: "1024x768"
-                    cam: true
-                }
-            }            
+            model: tilemodel
 
             delegate: Item {
                 id: container
@@ -255,7 +121,7 @@ FocusScope {
                     anchors.margins: 5; radius: 10
 
                     Rectangle {
-                        color: cam ? (active ? ColorsHelper.color.balanced :  ColorsHelper.color.assertive) : ColorsHelper.color.energized
+                        color: havemon_hr ? ((model.status_hr === "Connected") ? ColorsHelper.color.balanced :  ColorsHelper.color.assertive) : ColorsHelper.color.energized
                         anchors.fill: parent;
                         anchors.margins: 3;
                         radius: 8;
@@ -263,20 +129,42 @@ FocusScope {
                     }
 
                     TextContent {
-                        id: name
+                        id: low_name
                         anchors.top: parent.top
                         anchors.left: parent.left
                         anchors.margins: 10
                         width: parent.width - 20
-                        text: FontAwesome.icons.fa_video_camera + " " + cam_id + "\n" +  cam_name
+                        text: FontAwesome.icons.fa_video_camera + " " + model.id + " " +
+                              (havemon ? model.name : qsTr("No mon"))
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Rectangle {
+                        id: separator
+                        anchors.top: low_name.bottom
+                        anchors.left: parent.left
+                        anchors.margins: 10
+                        width: parent.width - 20
+                        height: 2
+                        color: "black"
+                    }
+
+                    TextContent {
+                        id: name
+                        anchors.top: separator.bottom
+                        anchors.left: parent.left
+                        anchors.margins: 10
+                        width: parent.width - 20
+                        text: FontAwesome.icons.fa_video_camera + " " + model.id_hr + " " +
+                              (havemon ? (havemon_hr ? model.name_hr : qsTr("Choose HI res mon")) : qsTr("No mon, can't use this slot"))
                         wrapMode: Text.WordWrap
                     }
 
                     TextContent {
+                        id: res
                         anchors.top: name.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
-                        id: res
-                        text: resolution
+                        text: resolution_hr
                     }
                 }
 
@@ -286,8 +174,14 @@ FocusScope {
                     hoverEnabled: true
 
                     onClicked: {
-                        container.GridView.view.currentIndex = index
-                        container.forceActiveFocus()
+                        if (container.GridView.view.currentIndex !== index) {
+                            container.GridView.view.currentIndex = index
+                            container.forceActiveFocus()
+                        } else {
+                            if (havemon) {
+                                updhr = "next"
+                            }
+                        }
                     }
                 }
 
@@ -302,7 +196,10 @@ FocusScope {
 
                 Keys.onPressed: {
                     if (event.key === Qt.Key_Space) {
-                        console.log("choose camera clicked")
+                        if (havemon) {
+                            updhr = "next"
+                            console.log("set hi res camera")
+                        }
                     }
                 }
             }

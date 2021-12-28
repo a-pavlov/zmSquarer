@@ -62,15 +62,16 @@ Button {
             size: type.size
         }
     }
-
+/*
     MouseArea {
         anchors.fill: parent
+        propagateComposedEvents: true
         onClicked: {
             root.focus = true
             root.checked = !root.checked
         }
     }
-
+*/
     states: [
         State {
             name: "active"
@@ -81,6 +82,10 @@ Button {
             }
         }
     ]
+
+    onClicked: {
+        focus=true
+    }
 
     onActiveFocusChanged: {
         if (activeFocus) {

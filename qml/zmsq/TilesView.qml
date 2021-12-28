@@ -126,7 +126,7 @@ FocusScope {
                     anchors.margins: 5; radius: 10
 
                     Rectangle {
-                        color: havemon ? ((model.status == "Connected") ? ColorsHelper.color.balanced :  ColorsHelper.color.assertive) : ColorsHelper.color.energized
+                        color: havemon ? ((model.status === "Connected") ? ColorsHelper.color.balanced :  ColorsHelper.color.assertive) : ColorsHelper.color.energized
                         anchors.fill: parent;
                         anchors.margins: 3;
                         radius: 8;

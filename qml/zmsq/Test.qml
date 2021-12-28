@@ -10,15 +10,40 @@ Window {
 
     FontLoader{ source: "/home/inkpot/dev/zmSquarer/qml/zmsq/fontawesome-webfont.ttf"}
 
-    ButtonDefault {
-        id: test
-        y: 20
-        x: 20
-        
-        
-        text: "back"        
-        icon: FontAwesome.icons.fa_search
-        class_name: "outline small"
+    Row {
+
+        ButtonDefault {
+            id: test
+            text: "test1"
+            focus: true
+            icon: FontAwesome.icons.fa_search
+            class_name: "outline small"
+            KeyNavigation.right: test2
+            onClicked: {
+                console.log("test 1 clicked")
+            }
+        }
+
+        ButtonDefault {
+            id: test2
+            text: "test2"
+            icon: FontAwesome.icons.fa_search
+            class_name: "outline small"
+            KeyNavigation.right: test3
+            onClicked: {
+                console.log("test 2 clicked")
+            }
+        }
+
+        ButtonDefault {
+            id: test3
+            text: "test3"
+            icon: FontAwesome.icons.fa_search
+            class_name: "outline small"
+            onClicked: {
+                console.log("test 3 clicked")
+            }
+        }
     }
 
     Component.onCompleted: {

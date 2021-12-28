@@ -27,9 +27,12 @@ public:
         IdRole,
         StatusRole,
         ResolutionRole,
-        HRNameRole,
+        NameRoleHR,
+        IdRoleHR,
+        StatusRoleHR,
+        ResolutionRoleHR,
         HaveMonRole,
-        HaveHRRole,
+        HaveMonRoleHR,
         UpdateRole,
         UpdateHiResRole
     };

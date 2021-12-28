@@ -73,7 +73,6 @@ ApplicationWindow {
 
     onClosing: {
         tilemodel.save()
-        prefs.url = zmUrl.text
         prefs.flush()
     }
 

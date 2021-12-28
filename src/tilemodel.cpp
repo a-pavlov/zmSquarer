@@ -23,9 +23,12 @@ QHash<int, QByteArray> TileModel::roleNames() const {
     roles[IdRole]           = "id";
     roles[StatusRole]       = "status";
     roles[ResolutionRole]   = "resolution";
-    roles[HRNameRole]       = "hrname";
+    roles[NameRoleHR]       = "name_hr";
+    roles[IdRoleHR]         = "id_hr";
+    roles[StatusRoleHR]     = "status_hr";
+    roles[ResolutionRoleHR] = "resolution_hr";
     roles[HaveMonRole]      = "havemon";
-    roles[HaveHRRole]       = "havehr";
+    roles[HaveMonRoleHR]    = "havemon_hr";
     roles[UpdateRole]       = "upd";
     roles[UpdateHiResRole]  = "updhr";
     return roles;
@@ -45,9 +48,12 @@ QVariant TileModel::data(const QModelIndex & index, int role /* = Qt::DisplayRol
         case IdRole:            return (isValidMonIndex(tIndex.first)?availableMons.at(tIndex.first).id:QString());
         case StatusRole:        return (isValidMonIndex(tIndex.first)?availableMons.at(tIndex.first).status:QString());
         case ResolutionRole:    return (isValidMonIndex(tIndex.first)?(QString::number(availableMons.at(tIndex.first).size.height()) + "x" + QString::number(availableMons.at(tIndex.first).size.width())):QString());
-        case HRNameRole:        return (isValidMonIndex(tIndex.second)?availableMons.at(tIndex.second).name:tr("Off"));        
+        case NameRoleHR:        return (isValidMonIndex(tIndex.second)?availableMons.at(tIndex.second).name:QString());
+        case IdRoleHR:          return (isValidMonIndex(tIndex.second)?availableMons.at(tIndex.second).id:QString());
+        case StatusRoleHR:      return (isValidMonIndex(tIndex.second)?availableMons.at(tIndex.second).status:QString());
+        case ResolutionRoleHR:  return (isValidMonIndex(tIndex.second)?(QString::number(availableMons.at(tIndex.second).size.height()) + "x" + QString::number(availableMons.at(tIndex.second).size.width())):QString());
         case HaveMonRole:       return isValidMonIndex(tIndex.first);
-        case HaveHRRole:        return isValidMonIndex(tIndex.second);
+        case HaveMonRoleHR:     return isValidMonIndex(tIndex.second);
         case SelectorRole:      return tIndex.first;
         case PosIndexRole:      return index.row();
     default:
