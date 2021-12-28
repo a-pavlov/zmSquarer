@@ -88,16 +88,10 @@ Item {
 
     Keys.onPressed: {
         if (event.key === Qt.Key_Space) {
-            console.log("space clicked")
             model.upd = "xx";
             if (model.check) {
-                console.log("select " + model.ip)
                 prefs.url = model.ip
-            } else {
-                console.log("select nothing");
             }
-
-            //model.selected = !model.selected
         }
     }
 

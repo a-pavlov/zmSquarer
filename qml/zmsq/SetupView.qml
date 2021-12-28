@@ -138,7 +138,7 @@ FocusScope {
                     placeholderText: qsTr("http://")
                     KeyNavigation.right: btnUrl
                     KeyNavigation.down: searchView
-                    font.pixelSize: 14
+                    font.pixelSize: StyleHelperItem.item_font_size
                     ToolTip.delay: 1000
                     ToolTip.timeout: 5000
                     ToolTip.visible: activeFocus

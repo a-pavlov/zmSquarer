@@ -44,7 +44,17 @@ FocusScope {
                 } else {
                     zmsearch.cancel()
                 }
+                startMode = !startMode
+            }
+        }
 
+        onClicked: {
+            if (event.key === Qt.Key_Space) {
+                if (startMode) {
+                    zmsearch.search(netmon.getSelected(), btnHttpsEnabled.checked)
+                } else {
+                    zmsearch.cancel()
+                }
                 startMode = !startMode
             }
         }
