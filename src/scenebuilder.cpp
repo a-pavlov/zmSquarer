@@ -171,7 +171,8 @@ QString SceneBuilder::buildScene(TileModel* tilemodel) const {
     bufferStream << camViewHeader << "\n";
     QString topAnchor("parent.top");
 
-    for(auto m: tiles) {
+    for(int i = 0; i < tiles.size(); ++i) {
+        auto m = tiles[i];
         QStringList videoProducer;
         std::transform(m.begin(), m.end(), std::back_inserter(videoProducer), [&](const TileModel::TILE_NUM& mon) ->
                        QString {
@@ -186,23 +187,48 @@ QString SceneBuilder::buildScene(TileModel* tilemodel) const {
 
         QStringList videoOutput;
         QString focus = "true";
-        std::transform(m.begin(), m.end(), std::back_inserter(videoOutput), [&](const TileModel::TILE_NUM& mon) ->
-                       QString {
-            QString res = camVideoOutput
-                        .arg(mon.first)
-                        .arg(leftAnchor)
-                        .arg(topAnchor)
-                        .arg(m.size())
-                        .arg(height)
-                        .arg(focus);
+        for(int j = 0; j < m.size(); ++j) {
+            auto mon = m[j];
+            // navigation keys
+            QString backBtn_right_key = (j == (m.size() - 1)) ? "" : QString("KeyNavigation.right: backBtn_%1").arg(m[j+1].first);
+            QString zoomBtn_right_key = (j == (m.size() - 1)) ? "" : QString("KeyNavigation.right: zoomBtn_%1").arg(m[j+1].first);
+            QString exitBtn_right_key = (j == (m.size() - 1)) ? "" : QString("KeyNavigation.right: exitBtn_%1").arg(m[j+1].first);
+            QString exitBtn_down_key = (i == (tiles.size() - 1)) ? "" : QString("KeyNavigation.down: backBtn_%1").arg(tiles[i + 1][qMin(j, (tiles[i + 1].size() - 1))].first);
+
+            videoOutput.push_back(camVideoOutput
+                    .arg(mon.first)
+                    .arg(leftAnchor)
+                    .arg(topAnchor)
+                    .arg(m.size())
+                    .arg(height)
+                    .arg(focus)
+                    .arg(backBtn_right_key)
+                    .arg(zoomBtn_right_key)
+                    .arg(exitBtn_right_key)
+                    .arg(exitBtn_down_key));
+
             focus = "false";
             leftAnchor = QString("output_%1.right").arg(mon.first);
-            return res;
-        });
+
+            // obsolete code
+            /*std::transform(m.begin(), m.end(), std::back_inserter(videoOutput), [&](const TileModel::TILE_NUM& mon) ->
+                           QString {
+                QString res = camVideoOutput
+                            .arg(mon.first)
+                            .arg(leftAnchor)
+                            .arg(topAnchor)
+                            .arg(m.size())
+                            .arg(height)
+                            .arg(focus);
+                focus = "false";
+                leftAnchor = QString("output_%1.right").arg(mon.first);
+                return res;
+            });*/
+        }
 
         topAnchor = QString("output_%1.bottom").arg(m.begin()->first);
-
         bufferStream << videoProducer.join("\n") << "\n\n" << videoOutput.join("\n") << "\n";
+
 #ifdef TOFILE
         resStream << videoProducer.join("\n") << "\n\n" << videoOutput.join("\n") << "\n";
 #endif

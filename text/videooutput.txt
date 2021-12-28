@@ -19,6 +19,7 @@ VideoOutput {
         class_name: "outline small"
         icon: FontAwesome.icons.fa_arrow_left
         KeyNavigation.down: zoomBtn_%1
+        %7
 
         onClicked: {
             wnd.showStartScreen();
@@ -35,9 +36,10 @@ VideoOutput {
             top: backBtn_%1.bottom
         }
 
-        KeyNavigation.down: exitBtn_%1
         class_name: "outline small"
         icon: FontAwesome.icons.fa_search
+        KeyNavigation.down: exitBtn_%1
+        %8
 
         onClicked: {
             wnd.hiResUrl = videoProducer_%1.hiResUrl
@@ -55,6 +57,8 @@ VideoOutput {
 
         class_name: "outline small"
         icon: FontAwesome.icons.fa_sign_out
+        %9
+        %10
 
         onClicked: {
             Qt.quit()

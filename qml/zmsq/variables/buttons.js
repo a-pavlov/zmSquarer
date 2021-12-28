@@ -26,6 +26,7 @@ var button_block_margin         = 10;
 var button_clear_padding        = 6;
 var button_border_radius        = 2;
 var button_border_width         = 1;
+var button_border_width_outline = 2;
 
 var buttonSizes = {
     "default": {

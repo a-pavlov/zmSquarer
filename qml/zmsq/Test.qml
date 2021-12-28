@@ -18,7 +18,7 @@ Window {
             focus: true
             icon: FontAwesome.icons.fa_search
             class_name: "outline small"
-            KeyNavigation.right: test2
+            //KeyNavigation.left: test
             onClicked: {
                 console.log("test 1 clicked")
             }
@@ -29,7 +29,7 @@ Window {
             text: "test2"
             icon: FontAwesome.icons.fa_search
             class_name: "outline small"
-            KeyNavigation.right: test3
+            KeyNavigation.left: test
             onClicked: {
                 console.log("test 2 clicked")
             }
@@ -39,6 +39,7 @@ Window {
             id: test3
             text: "test3"
             icon: FontAwesome.icons.fa_search
+            KeyNavigation.left: test2
             class_name: "outline small"
             onClicked: {
                 console.log("test 3 clicked")

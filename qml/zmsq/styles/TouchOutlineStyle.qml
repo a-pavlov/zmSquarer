@@ -15,7 +15,7 @@ ButtonStyle {
             anchors.centerIn: parent
             color: (control.pressed || control.selected) ? root.style.border : "transparent"
             border.color: style.active_border
-            border.width: StyleHelper.button_border_width
+            border.width: StyleHelper.hasClass('outline', control.class_name) ? StyleHelper.button_border_width_outline : StyleHelper.button_border_width;
             radius: StyleHelper.hasClass('full', control.class_name) ? 0 : StyleHelper.button_border_radius
             smooth: true
         }
