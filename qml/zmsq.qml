@@ -232,12 +232,15 @@ ApplicationWindow {
                     ButtonDefault {
                         id: backBtn
                         focus: true
+                        x: output1.contentRect.x + output1.contentRect.width - width - base_margins*2
+                        y: output1.contentRect.y + height + base_margins
 
-                        anchors {
-                            margins: base_margins*2
-                            right: parent.right
-                            top: parent.top
-                        }
+
+                        //anchors {
+                        //    margins: base_margins*2
+                        //    right: parent.right
+                        //    top: parent.top
+                        //}
 
                         class_name: "outline small"
                         icon: FontAwesome.icons.fa_arrow_left
