@@ -1,4 +1,4 @@
-Qt.include("bars.js");
+Qt.include("qrc:/qml/zmsq/variables/bars.js");
 
 function parseItemClass (className) {
     var type = itemStyles.default

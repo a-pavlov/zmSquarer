@@ -1,4 +1,4 @@
-Qt.include("buttons.js");
+Qt.include("qrc:/qml/zmsq/variables/buttons.js");
 
 var bar_height                      = 44;
 var bar_title_font_size             = 17;

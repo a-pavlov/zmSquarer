@@ -52,10 +52,10 @@ import QtQuick 2.1
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.1
 
-import "variables/fontawesome.js" as FontAwesome
-import "variables/buttons.js" as StyleHelper
-import "variables/items.js" as StyleHelperItem
-import "variables/colors.js" as ColorsHelper
+import "qrc:/qml/zmsq/variables/fontawesome.js" as FontAwesome
+import "qrc:/qml/zmsq/variables/buttons.js" as StyleHelper
+import "qrc:/qml/zmsq/variables/items.js" as StyleHelperItem
+import "qrc:/qml/zmsq/variables/colors.js" as ColorsHelper
 
 import ZMClient 0.1
 

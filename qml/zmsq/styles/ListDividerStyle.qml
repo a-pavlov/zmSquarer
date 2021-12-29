@@ -1,5 +1,5 @@
 import QtQuick 2.3
-import "../variables/items.js" as StyleHelper
+import "qrc:/qml/zmsq/variables/items.js" as StyleHelper
 Item{
     id: root
     width: ListView.view.width

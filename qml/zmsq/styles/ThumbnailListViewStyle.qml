@@ -1,10 +1,11 @@
 import QtQuick 2.3
 import QtQuick.Layouts 1.1
 import QtGraphicalEffects 1.0
-import "../lists"
-import "../variables/badges.js" as StyleHelper
-import "../variables/fontawesome.js" as FontAwesome
-import "../content"
+
+import "qrc:/qml/zmsq/variables/badges.js" as StyleHelper
+import "qrc:/qml/zmsq/variables/fontawesome.js" as FontAwesome
+import ".."
+
 
 Item{
     id: itemRoot

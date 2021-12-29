@@ -1,4 +1,4 @@
-Qt.include("base.js");
+Qt.include("qrc:/qml/zmsq/variables/base.js");
 
 function parseButtonClass (className) {
     var type = {

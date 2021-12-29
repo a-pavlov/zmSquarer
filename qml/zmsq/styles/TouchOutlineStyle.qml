@@ -1,7 +1,7 @@
 import QtQuick 2.3
 import QtQuick.Controls.Styles 1.2
 import QtQuick.Layouts 1.1
-import "../variables/buttons.js" as StyleHelper
+import "qrc:/qml/zmsq/variables/buttons.js" as StyleHelper
 
 ButtonStyle {
     id: root

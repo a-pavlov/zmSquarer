@@ -1,4 +1,4 @@
-Qt.include("colors.js");
+Qt.include("qrc:/qml/zmsq/variables/colors.js");
 
 var font_family_sans_serif         = "Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif";
 var font_family_light_sans_serif   = "Helvetica Neue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif";
