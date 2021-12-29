@@ -30,22 +30,22 @@ ButtonStyle {
 
         Text {
             visible: control.icon !== ""
-            horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
             text: control.icon
             font.family: "FontAwesome"
             font.pixelSize: control.iconSize
             color: (control.pressed || control.selected) ? "#fff" : root.style.border
-            Layout.alignment: Qt.AlignVCenter
+            Layout.alignment: Qt.AlignLeft
         }
         Text {
             visible: control.text !== ""
-            horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
             text: control.text
             font.pixelSize: control.fontSize
             color: (control.pressed || control.selected) ? "#fff" : root.style.border
-            Layout.alignment: Qt.AlignCenter
+            Layout.alignment: Qt.AlignLeft
         }
     }
 }
