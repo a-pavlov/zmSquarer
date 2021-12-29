@@ -156,7 +156,8 @@ FocusScope {
                     icon: FontAwesome.icons.fa_external_link_square
                     class_name: "positive medium"
                     Keys.onPressed: {
-                        if (event.key === Qt.Key_Space) {
+                        if (event.key === Qt.Key_Space || event.key === Qt.Key_Enter) {
+                            prefs.url = zmUrl.text
                             zmUrl.focus = true
                             text = qsTr("Connecting...")
                             zmc.getMonitors()
@@ -165,6 +166,17 @@ FocusScope {
                             zmUrlProgress.visible = checkMode
                             btnUrl.enabled = false
                         }
+                    }
+
+                    onClicked: {
+                        prefs.url = zmUrl.text
+                        zmUrl.focus = true
+                        text = qsTr("Connecting...")
+                        zmc.getMonitors()
+                        zmClientError.visible = false
+                        zmUrl.enabled = checkMode
+                        zmUrlProgress.visible = checkMode
+                        btnUrl.enabled = false
                     }
                 }
 
