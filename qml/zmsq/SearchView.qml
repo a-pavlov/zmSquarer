@@ -36,7 +36,7 @@ FocusScope {
         KeyNavigation.down: tilesView
         icon: startMode ? FontAwesome.icons.fa_search : FontAwesome.icons.fa_stop
         class_name: "positive medium"
-
+/*
         Keys.onPressed: {
             if (event.key === Qt.Key_Space) {
                 if (startMode) {
@@ -47,7 +47,7 @@ FocusScope {
                 startMode = !startMode
             }
         }
-
+*/
         onClicked: {
             if (event.key === Qt.Key_Space) {
                 if (startMode) {
