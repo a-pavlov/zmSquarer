@@ -19,7 +19,8 @@ void ZMClient::registerQmlType() {
 }
 
 ZMClient::ZMClient(QObject *parent) :
-    QObject(parent) {
+    QObject(parent)
+  , current_reply(nullptr) {
 
 }
 
@@ -28,6 +29,8 @@ QString ZMClient::getMonitors() {
     QNetworkRequest request(baseUrl + "/zm/api/monitors.json");
     //request.setOriginatingObject(new ZMAPIRequest());
     QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
+    current_reply = reply;
+
 
     /*QObject::connect(reply, &QIODevice::readyRead, [reply]() {
         Q_UNUSED(reply);
@@ -73,10 +76,13 @@ QString ZMClient::getMonitors() {
             QByteArray buffer = reply->readAll();
             QList<ZMMonitor> mons = ZMMonitor::fromJson(QJsonDocument::fromJson(buffer));
             qDebug() << "monitors " << mons.size() << " data size bytes " << buffer.size();
-            emit monitors(mons);
+            emit monitors(mons, mons.size());
         }
 
+        // prevent cancel call on already stopped requst
+        current_reply = nullptr;
         reply->deleteLater();
+        qDebug() << "network request finished";
     });
 
     return QString();
@@ -98,6 +104,12 @@ QString ZMClient::getMonitorUrl(int monId) const {
     Q_ASSERT(monId > 0);
     Q_ASSERT(!baseUrl.isEmpty());
     return baseUrl + "/zm/cgi-bin/nph-zms?mode=jpeg&monitor=" + QString::number(monId) + "&scale=100&maxfps=30&buffer=1000&user=admin&pass=root";
+}
+
+void ZMClient::cancel() {
+    if (current_reply != nullptr) {
+        current_reply->abort();
+    }
 }
 
 QString ZMClient::getMonitorUrl(const QString& url, int monId) {

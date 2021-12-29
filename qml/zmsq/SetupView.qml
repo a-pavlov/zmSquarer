@@ -65,6 +65,7 @@ FocusScope {
             mainView.state = "showSetupView"
     }
 
+    property bool doConnect: true
 
     ZMClient {
         id: zmc
@@ -72,22 +73,20 @@ FocusScope {
 
         onMonitors: {
             tilemodel.setAvailableMons(mons, zmUrl.text)
-            btnUrl.text = qsTr("Connect")
-            btnUrl.enabled = true
-            btnUrl.checkMode = true
+            doConnect = true
             zmUrlProgress.visible = false
             zmClientError.visible = false
-            prefs.url = url
-            prefs.flush()
+            zmClientError.color = ColorsHelper.color.balanced
+            zmClientError.text = qsTr("Monitors found: %1").arg(mcount)
+            zmClientError.visible = true
         }
 
         onError: {
-            btnUrl.text = qsTr("Connect")
-            btnUrl.enabled = true
-            btnUrl.checkMode = true
+            console.log("error net")
+            doConnect = true
             zmUrlProgress.visible = false
-            zmClientError.text = qsTr(
-                        "<font color=\"#FF0000\">Error: %1</font> ").arg(msg)
+            zmClientError.color = ColorsHelper.color.assertive
+            zmClientError.text = qsTr("Error: %1").arg(msg)
             zmClientError.visible = true
         }
     }
@@ -100,6 +99,7 @@ FocusScope {
         KeyNavigation.down: searchView
         Column {
             spacing: 10
+
             Item{
                 id: itemRoot
                 width: parent.width
@@ -148,35 +148,22 @@ FocusScope {
 
                 ButtonDefault {
                     id: btnUrl
-                    property bool checkMode: true
                     enabled: zmUrl.text.length > 0
-                    text: qsTr("Connect")
+                    text: doConnect ? qsTr("Connect") : qsTr("Cancel");
                     KeyNavigation.right: btnStartView
                     KeyNavigation.down: searchView
                     icon: FontAwesome.icons.fa_external_link_square
                     class_name: "positive medium"
-                    Keys.onPressed: {
-                        if (event.key === Qt.Key_Space || event.key === Qt.Key_Enter) {
-                            prefs.url = zmUrl.text
-                            zmUrl.focus = true
-                            text = qsTr("Connecting...")
-                            zmc.getMonitors()
-                            zmClientError.visible = false
-                            zmUrl.enabled = checkMode
-                            zmUrlProgress.visible = checkMode
-                            btnUrl.enabled = false
-                        }
-                    }
 
                     onClicked: {
-                        prefs.url = zmUrl.text
-                        zmUrl.focus = true
-                        text = qsTr("Connecting...")
-                        zmc.getMonitors()
-                        zmClientError.visible = false
-                        zmUrl.enabled = checkMode
-                        zmUrlProgress.visible = checkMode
-                        btnUrl.enabled = false
+                        if (doConnect) {
+                            prefs.url = zmUrl.text
+                            zmc.getMonitors()
+                            zmClientError.visible = false
+                            doConnect = false
+                        } else {
+                            zmc.cancel()
+                        }
                     }
                 }
 
@@ -190,11 +177,8 @@ FocusScope {
                     KeyNavigation.right: btnFullScreen
                     KeyNavigation.down: searchView
 
-                    Keys.onPressed: {
-                        if (event.key === Qt.Key_Space) {
-                            console.log("build scene")
-                            sceneBuilder.buildScene(tilemodel)
-                        }
+                    onClicked: {
+                        sceneBuilder.buildScene(tilemodel)
                     }
                 }
 
@@ -236,7 +220,7 @@ FocusScope {
 
             ProgressBar {
                 id: zmUrlProgress
-                visible: false
+                visible: !doConnect
                 width: parent.width
                 height: 8
                 indeterminate: true
@@ -253,7 +237,8 @@ FocusScope {
 
             Label {
                 id: zmClientError
-                text: qsTr("<font color=\"#FF0000\">Error:</font> ")
+                font.pixelSize: StyleHelperItem.item_font_size
+                text: ""
                 visible: false
             }
         }
