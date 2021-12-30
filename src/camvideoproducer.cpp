@@ -218,6 +218,7 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
         }
     } else {
         int err = tjGetErrorCode(_jpegDecompressor);
+        Q_UNUSED(err)
         //qDebug() << "unable to decompress header " << err;
     }
 #else

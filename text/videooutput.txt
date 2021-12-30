@@ -53,7 +53,7 @@ VideoOutput {
         %10
 
         onClicked: {
-            Qt.quit()
+            wnd.close()
         }
     }
 

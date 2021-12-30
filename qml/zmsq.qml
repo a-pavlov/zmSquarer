@@ -60,8 +60,6 @@ ApplicationWindow {
             mainView.state = "showCameras"
             camsView = Qt.createQmlObject(code, wnd, "scene1")
             camsView.focus = true
-            //setup.visible = false
-            //slots.visible = false
         }
 
         onFail: {
@@ -76,14 +74,11 @@ ApplicationWindow {
         prefs.fullScreen = setupView.fullScreen
         prefs.httpsEnabled = searchView.httpsEnabled
         prefs.flush()
-        console.log("wnd on close: flush")
     }
 
     Component.onCompleted: {
-        console.log("wnd completed full screen: " + setupView.fullScreen)
         netmon.refresh()
         tilemodel.load()
-        console.log("netmon refreshed")
     }
 
     function showStartScreen() {
@@ -204,7 +199,6 @@ ApplicationWindow {
     }
 
     // HI resolution view
-
     Loader {
         id: hiResLoader
         active: false
@@ -238,7 +232,6 @@ ApplicationWindow {
                         x: output1.contentRect.x + output1.contentRect.width - width - base_margins*2
                         y: output1.contentRect.y + height + base_margins
 
-
                         //anchors {
                         //    margins: base_margins*2
                         //    right: parent.right
@@ -248,13 +241,10 @@ ApplicationWindow {
                         class_name: "outline small"
                         icon: FontAwesome.icons.fa_arrow_left
 
-
-                        Keys.onPressed: {
-                            if (event.key === Qt.Key_Space) {
-                                hiResLoader.active = false
-                                camsView.visible = true
-                                camsView.focus = true
-                            }
+                        onClicked: {
+                            hiResLoader.active = false
+                            camsView.visible = true
+                            camsView.focus = true
                         }
                     }
                 }
@@ -265,10 +255,7 @@ ApplicationWindow {
                         hiResLoader.active = false
                         camsView.visible = true
                         camsView.focus = true
-                        console.log("key pressed handled")
                     }
-
-                    console.log("key pressed next")
                 }
             }
         }

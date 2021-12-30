@@ -31,7 +31,6 @@ QString ZMClient::getMonitors() {
     QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
     current_reply = reply;
 
-
     /*QObject::connect(reply, &QIODevice::readyRead, [reply]() {
         Q_UNUSED(reply);
         //ZMAPIRequest* originator = dynamic_cast<ZMAPIRequest*>(reply->request().originatingObject());
@@ -41,7 +40,7 @@ QString ZMClient::getMonitors() {
     });*/
 
     QObject::connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), [this](QNetworkReply::NetworkError code) {
-        qDebug() << "network error occurred " << code;
+        //qDebug() << "network error occurred " << code;
         switch (code) {
             case QNetworkReply::NetworkError::ConnectionRefusedError:       emit error(QString("Connection refused")); break;
             case QNetworkReply::NetworkError::RemoteHostClosedError:        emit error(QString("Remote host closed")); break;
@@ -75,14 +74,13 @@ QString ZMClient::getMonitors() {
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray buffer = reply->readAll();
             QList<ZMMonitor> mons = ZMMonitor::fromJson(QJsonDocument::fromJson(buffer));
-            qDebug() << "monitors " << mons.size() << " data size bytes " << buffer.size();
+            //qDebug() << "monitors " << mons.size() << " data size bytes " << buffer.size();
             emit monitors(mons, mons.size());
         }
 
         // prevent cancel call on already stopped requst
         current_reply = nullptr;
         reply->deleteLater();
-        qDebug() << "network request finished";
     });
 
     return QString();

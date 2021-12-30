@@ -81,14 +81,12 @@ void ZMSearch::continueSearch() {
             break;
         }
 
-
         ++requestsInProgress;
         if (requestsInProgress == 1) {
             emit inProgressChanged(true);
         }
 
         startRequest(pendingRequests.takeFirst());
-
     }
 
     if (requestsInProgress == 0) {

@@ -7,7 +7,6 @@ import "qrc:/qml/zmsq/variables/fontawesome.js" as FontAwesome
 
 import "zmsq"
 
-
 FocusScope {
     id: scope
     anchors.fill: parent
@@ -22,4 +21,4 @@ Item {
             wnd.showStartScreen();
             mainView.state = "showTilesView"
         }
-    }    
+    }

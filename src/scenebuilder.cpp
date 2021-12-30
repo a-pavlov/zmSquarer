@@ -4,7 +4,7 @@
 #include <QFile>
 #include <algorithm>
 
-#define TOFILE 1
+//#define TOFILE 1
 
 void SceneBuilder::registerQmlType() {
     qmlRegisterType<SceneBuilder>(

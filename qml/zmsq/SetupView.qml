@@ -82,7 +82,6 @@ FocusScope {
         }
 
         onError: {
-            console.log("error net")
             doConnect = true
             zmUrlProgress.visible = false
             zmClientError.color = ColorsHelper.color.assertive

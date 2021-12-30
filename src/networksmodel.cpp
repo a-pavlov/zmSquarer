@@ -22,7 +22,7 @@ QHash<int, QByteArray> NetworksModel::roleNames() const {
     roles[AddressRole] = "address";
     roles[SelectedMode] = "selected";
     return roles;
-};
+}
 
 int NetworksModel::rowCount(const QModelIndex & parent) const {
     Q_UNUSED(parent)
@@ -69,7 +69,7 @@ bool NetworksModel::setData(const QModelIndex& index, const QVariant &value, int
         if (role == SelectedMode) {
             addresses[index.row()].first = value.toBool();
             emit selectedChanged(getSelectedCount());
-            dataChanged(index, index);
+            emit dataChanged(index, index);
             return true;
         }
     }

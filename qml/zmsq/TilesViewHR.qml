@@ -82,7 +82,7 @@ FocusScope {
 
                 Text {
                     id: content_txt
-                    text: "Place hi res cameras to corresponding low res tiles"
+                    text: qsTr("Place hi res cameras to corresponding low res tiles")
                     color: itemRoot.style.text
                     font.pixelSize: StyleHelperItem.item_font_size
                     anchors.fill: parent
@@ -198,7 +198,6 @@ FocusScope {
                     if (event.key === Qt.Key_Space) {
                         if (havemon) {
                             updhr = "next"
-                            console.log("set hi res camera")
                         }
                     }
                 }
