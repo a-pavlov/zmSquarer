@@ -31,23 +31,12 @@ FocusScope {
         y: parseInt(parent.height / 3)
         enabled: netmon.selectedCount > 0
         property bool startMode: true
-        text: startMode ? qsTr("Start search") : qsTr("Stop search")
+        text: startMode ? qsTr("Start search ZM") : qsTr("Stop search ZM")
         KeyNavigation.right: list2
         KeyNavigation.down: tilesView
         icon: startMode ? FontAwesome.icons.fa_search : FontAwesome.icons.fa_stop
         class_name: "positive medium"
-/*
-        Keys.onPressed: {
-            if (event.key === Qt.Key_Space) {
-                if (startMode) {
-                    zmsearch.search(netmon.getSelected(), btnHttpsEnabled.checked)
-                } else {
-                    zmsearch.cancel()
-                }
-                startMode = !startMode
-            }
-        }
-*/
+
         onClicked: {
             if (event.key === Qt.Key_Space) {
                 if (startMode) {
@@ -159,7 +148,7 @@ FocusScope {
     ListView {
         id: list3
         x: parseInt(2 * parent.width / 3); width: parent.width / 3; height: parent.height - 20
-        KeyNavigation.down: tilesView;
+        KeyNavigation.down: tilesView
         KeyNavigation.left: list2
         model: zmsearch
         cacheBuffer: 200
