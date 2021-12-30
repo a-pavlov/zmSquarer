@@ -66,11 +66,6 @@ FocusScope {
         anchors.fill: parent
         clip: true
 
-        /*gradient: Gradient {
-            GradientStop { position: 0.0; color: "#193441" }
-            GradientStop { position: 1.0; color: Qt.darker("#193441") }
-        }*/
-
         Item {
             id: itemRoot
             width: parent.width
@@ -87,7 +82,7 @@ FocusScope {
 
                 Text {
                     id: content_txt
-                    text: "Place low res cameras to square"
+                    text: qsTr("Place low res cameras to squares")
                     color: itemRoot.style.text
                     font.pixelSize: StyleHelperItem.item_font_size
                     anchors.fill: parent
@@ -103,8 +98,6 @@ FocusScope {
             y: itemRoot.height
             width: parent.width
             height: parent.height - itemRoot.height
-            anchors.leftMargin: 20;
-            anchors.rightMargin: 20
             cellWidth: 152; cellHeight: 152
             focus: true
             KeyNavigation.up: searchView

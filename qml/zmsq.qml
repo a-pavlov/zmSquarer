@@ -126,7 +126,7 @@ ApplicationWindow {
             TilesView {
                 id: tilesView
                 y: startingY + setupViewHeight + searchViewHeight
-                width: cellWidth*4 + 100
+                width: cellWidth*4
                 height: tilesViewHeight
                 activeFocusOnTab: true
             }
@@ -134,7 +134,7 @@ ApplicationWindow {
             TilesViewHR {
                 id: tilesViewHR
                 y: startingY + setupViewHeight + searchViewHeight + tilesViewHeight
-                width: cellWidth*4 + 100
+                width: cellWidth*4
                 height: tilesViewHeight
                 activeFocusOnTab: true
             }
