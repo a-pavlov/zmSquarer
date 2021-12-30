@@ -73,9 +73,16 @@ QString ZMClient::getMonitors() {
         //Q_ASSERT(originator != nullptr);
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray buffer = reply->readAll();
-            QList<ZMMonitor> mons = ZMMonitor::fromJson(QJsonDocument::fromJson(buffer));
-            //qDebug() << "monitors " << mons.size() << " data size bytes " << buffer.size();
-            emit monitors(mons, mons.size());
+            QJsonParseError jsonParseError;
+            QList<ZMMonitor> mons = ZMMonitor::fromJson(QJsonDocument::fromJson(buffer, &jsonParseError));
+            if (jsonParseError.error == QJsonParseError::NoError) {
+                //qDebug() << "monitors " << mons.size() << " data size bytes " << buffer.size();
+                emit monitors(mons, mons.size());
+            } else {
+                emit error(tr("Can not parse server's JSON response: %1").arg(jsonParseError.errorString()));
+            }
+        } else {
+            emit error(reply->errorString());
         }
 
         // prevent cancel call on already stopped requst

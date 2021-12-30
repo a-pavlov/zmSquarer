@@ -72,7 +72,7 @@ FocusScope {
             height: content_txt.implicitHeight + StyleHelperItem.item_padding
             property var style: StyleHelperItem.parseItemClass("stable")
 
-            Rectangle{
+            Rectangle {
                 anchors.fill: parent
                 anchors.margins: - StyleHelperItem.item_border_width
                 color: itemRoot.style.bg

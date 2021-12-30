@@ -141,7 +141,7 @@ FocusScope {
                     ToolTip.delay: 1000
                     ToolTip.timeout: 5000
                     ToolTip.visible: activeFocus
-                    ToolTip.text: qsTr("This tool tip is shown after hovering the button for a second.")
+                    ToolTip.text: qsTr("Enter ZM host url here with http or https and click connect")
                     text: prefs.url
                 }
 
