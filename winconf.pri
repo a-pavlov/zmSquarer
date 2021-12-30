@@ -1,6 +1,6 @@
 
 !isEmpty(TJPEG_ROOT) {
-    LIBS += -L$$(TJPEG_ROOT)/build turbojpeg-static.lib
+    LIBS += -L$$(TJPEG_ROOT)/build/Release turbojpeg-static.lib
     INCLUDEPATH += $$(TJPEG_ROOT)
 }
 
