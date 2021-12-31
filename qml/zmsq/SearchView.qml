@@ -5,6 +5,8 @@ import QtQuick.Layouts 1.1
 import "variables/fontawesome.js" as FontAwesome
 import "variables/colors.js" as ColorsHelper
 
+import ZMClient 0.1
+
 FocusScope {
     onActiveFocusChanged: {
         if (activeFocus)
@@ -13,11 +15,15 @@ FocusScope {
 
     property bool httpsEnabled: btnHttpsEnabled.checked
 
+    ZMClient {
+        id: zmc_ssl_support_only
+    }
+
     ButtonDefault {
         y: 10
+        enabled: zmc_ssl_support_only.supportsSsl
         id: btnHttpsEnabled
         checkable: true
-        focus: true
         checked: prefs.httpsEnabled
         text: qsTr("Https enabled")
         class_name: "balanced medium"
@@ -29,23 +35,23 @@ FocusScope {
     ButtonDefault {
         id: networkScan
         y: parseInt(parent.height / 3)
+        focus: true
         enabled: netmon.selectedCount > 0
         property bool startMode: true
         text: startMode ? qsTr("Start search ZM") : qsTr("Stop search ZM")
+        KeyNavigation.up: btnHttpsEnabled.enabled ? btnHttpsEnabled : setupView
         KeyNavigation.right: list2
         KeyNavigation.down: tilesView
         icon: startMode ? FontAwesome.icons.fa_search : FontAwesome.icons.fa_stop
         class_name: "positive medium"
 
         onClicked: {
-            if (event.key === Qt.Key_Space) {
-                if (startMode) {
-                    zmsearch.search(netmon.getSelected(), btnHttpsEnabled.checked)
-                } else {
-                    zmsearch.cancel()
-                }
-                startMode = !startMode
+            if (startMode) {
+                zmsearch.search(netmon.getSelected(), btnHttpsEnabled.checked)
+            } else {
+                zmsearch.cancel()
             }
+            startMode = !startMode
         }
     }
 
@@ -64,7 +70,8 @@ FocusScope {
         id: list2
         x: parseInt(parent.width / 3); width: parent.width / 3; height: parent.height - 20
         KeyNavigation.down: tilesView;
-        KeyNavigation.right : list3
+        KeyNavigation.right : list3.count > 0 ? list3 : networkScan
+        KeyNavigation.left: networkScan
         model: netmon
         cacheBuffer: 200
         header: Item {
