@@ -13,7 +13,6 @@ import QtMultimedia 5.0
 import CamVideoProducer 0.1
 
 import "qrc:/qml/zmsq/variables/fontawesome.js" as FontAwesome
-
 import "zmsq"
 
 ApplicationWindow {
@@ -102,7 +101,6 @@ ApplicationWindow {
 
         FocusScope {
             id: mainView
-
             width: parent.width; height: parent.height
             focus: true
 

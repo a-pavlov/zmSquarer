@@ -16,6 +16,7 @@
 #include "networksmodel.h"
 #include "zmsearch.h"
 #include "tilemodel.h"
+#include "platform.h"
 
 #ifdef Q_OS_WIN
 
@@ -66,6 +67,7 @@ int main(int argc, char *argv[]) {
     NetworksModel::registerQmlType();
     ZMSearch::registerQmlType();
     TileModel::registerQmlType();
+    Platform::registerQmlType();
 
     ZMSQApplication app(argc, argv);
     QQmlApplicationEngine engine;

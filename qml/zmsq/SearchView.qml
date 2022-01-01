@@ -136,6 +136,10 @@ FocusScope {
                 }
             }
 
+            Keys.onSelectPressed: {
+                model.selected = !model.selected
+            }
+
             states: State {
                 name: "active"; when: container.activeFocus
                 PropertyChanges { target: content; color: "black"; scale: 1.1 }
@@ -188,6 +192,12 @@ FocusScope {
 
         Behavior on y {
             NumberAnimation { duration: 600; easing.type: Easing.OutQuint }
+        }
+
+        Keys.onPressed: {
+            if (event.key === Qt.Key_Back || event.key === Qt.Key_Escape) {
+                wnd.close()
+            }
         }
     }
 }

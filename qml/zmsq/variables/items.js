@@ -93,6 +93,9 @@ var item_divider_bg                 = "#f5f5f5";
 var item_divider_color              = "#222";
 var item_divider_padding            = "5 15";
 
+var item_tooltip_delay              = 3000;
+var item_tooltip_timeout            = 5000;
+
 var itemStyles = {
     light: {
         bg                          : buttonStyles.light.bg,
