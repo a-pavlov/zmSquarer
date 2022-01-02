@@ -1,4 +1,11 @@
-# zmSquarer
+# zmSquarer TV version
+Squarer with UI updated for usage on Android TV devices. Navigation is available by arrow keys. Select by space key on Windows/Linux, select key on Android.
+
+### Screenshots
+![cfg_tv_1](images/cfg_tv_1.png)
+![cfg_tv_22](images/cfg_tv_2.png)
+
+# zmSquarer (obsolete). Branch version_1.
 Squarer for ZoneMinder.
 
 ### Limitations
