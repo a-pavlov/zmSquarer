@@ -133,10 +133,111 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
 #endif
     }
 
-    bufferStream << "}\n";
+    bufferStream << "}}\n";
 
 #ifdef TOFILE
     resStream << "}\n";
+    if (resFile.isOpen()) resFile.close();
+    qDebug() << "buffer size " << buffer.size();
+    qDebug() << "template " << readFile(":/text/template.txt");
+    qDebug() << "video provider " << readFile(":/text/camvideoproducer.txt");
+    qDebug() << "video output " << readFile(":/text/videooutput.txt");
+#endif
+
+    emit success(buffer);
+    return buffer;
+}
+
+QString SceneBuilder::buildScene(TileModel* tilemodel) const {
+    auto tiles = tilemodel->getNumeratedTiles();
+    QString camVideoProducer = readFile(":/text/camvideoproducer.txt");
+    QString camVideoOutput = readFile(":/text/videooutput.txt");
+    QString camViewHeader = readFile(":/text/header.txt");
+
+    int height = tiles.size();
+#ifdef TOFILE
+#ifdef Q_OS_LINUX
+    QFile resFile("/tmp/test.qml");
+#else
+    QFile resFile("c:/dev/test.qml");
+#endif
+    bool resOpened = resFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream resStream(&resFile);
+    resStream << camViewHeader << "\n";
+#endif
+
+    QString buffer;
+    QTextStream bufferStream(&buffer);
+    bufferStream << camViewHeader << "\n";
+    QString topAnchor("parent.top");
+
+    for(int i = 0; i < tiles.size(); ++i) {
+        auto m = tiles[i];
+        QStringList videoProducer;
+        std::transform(m.begin(), m.end(), std::back_inserter(videoProducer), [&](const TileModel::TILE_NUM& mon) ->
+                       QString {
+            return camVideoProducer
+                    .arg(mon.first) // index in screen
+                    .arg(ZMClient::getMonitorUrl(tilemodel->baseUrl(), mon.second.first))  // real mon id
+                    .arg(ZMClient::getMonitorUrl(tilemodel->baseUrl(), mon.second.second != -1?mon.second.second:mon.second.first));   // hi res mon if present
+        });
+
+        QString leftAnchor("parent.left");
+        QString output("output_%1.right");
+
+        QStringList videoOutput;
+        QString focus = "true";
+        for(int j = 0; j < m.size(); ++j) {
+            auto mon = m[j];
+            // navigation keys
+            QString backBtn_right_key = (j == (m.size() - 1)) ? "" : QString("KeyNavigation.right: backBtn_%1").arg(m[j+1].first);
+            QString zoomBtn_right_key = (j == (m.size() - 1)) ? "" : QString("KeyNavigation.right: zoomBtn_%1").arg(m[j+1].first);
+            QString exitBtn_right_key = (j == (m.size() - 1)) ? "" : QString("KeyNavigation.right: exitBtn_%1").arg(m[j+1].first);
+            QString exitBtn_down_key = (i == (tiles.size() - 1)) ? "" : QString("KeyNavigation.down: backBtn_%1").arg(tiles[i + 1][qMin(j, (tiles[i + 1].size() - 1))].first);
+
+            videoOutput.push_back(camVideoOutput
+                    .arg(mon.first)
+                    .arg(leftAnchor)
+                    .arg(topAnchor)
+                    .arg(m.size())
+                    .arg(height)
+                    .arg(focus)
+                    .arg(backBtn_right_key)
+                    .arg(zoomBtn_right_key)
+                    .arg(exitBtn_right_key)
+                    .arg(exitBtn_down_key));
+
+            focus = "false";
+            leftAnchor = QString("output_%1.right").arg(mon.first);
+
+            // obsolete code
+            /*std::transform(m.begin(), m.end(), std::back_inserter(videoOutput), [&](const TileModel::TILE_NUM& mon) ->
+                           QString {
+                QString res = camVideoOutput
+                            .arg(mon.first)
+                            .arg(leftAnchor)
+                            .arg(topAnchor)
+                            .arg(m.size())
+                            .arg(height)
+                            .arg(focus);
+                focus = "false";
+                leftAnchor = QString("output_%1.right").arg(mon.first);
+                return res;
+            });*/
+        }
+
+        topAnchor = QString("output_%1.bottom").arg(m.begin()->first);
+        bufferStream << videoProducer.join("\n") << "\n\n" << videoOutput.join("\n") << "\n";
+
+#ifdef TOFILE
+        resStream << videoProducer.join("\n") << "\n\n" << videoOutput.join("\n") << "\n";
+#endif
+    }
+
+    bufferStream << "} }\n";
+
+#ifdef TOFILE
+    resStream << "} }\n";
     if (resFile.isOpen()) resFile.close();
     qDebug() << "buffer size " << buffer.size();
     qDebug() << "template " << readFile(":/text/template.txt");

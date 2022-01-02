@@ -15,6 +15,8 @@ public:
     QByteArray buffer;
 };
 
+class QNetworkReply;
+
 /**
  * @brief The ZMClient class - simple one call in the same time client
  *
@@ -32,14 +34,17 @@ public:
     Q_PROPERTY(bool supportsSsl READ supportsSsl NOTIFY supportsSslChanged)
     Q_INVOKABLE QString getMonitors();
     Q_INVOKABLE QString getMonitorUrl(int monId) const;
+    Q_INVOKABLE void cancel();
+    static QString getMonitorUrl(const QString& url, int monId);
 signals:
-    void monitors(const QList<ZMMonitor>& mons);
+    void monitors(const QList<ZMMonitor>& mons, int mcount);
     void error(const QString& msg);
     void urlChanged(const QString& url);
     void supportsSslChanged(bool);
 public slots:
 private:
     QString baseUrl;
+    QNetworkReply* current_reply;
 };
 
 #endif // ZMCLIENT_H

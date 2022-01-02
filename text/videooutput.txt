@@ -5,36 +5,35 @@ VideoOutput {
     width: parent.width/%4
     height: parent.height/%5
     source: videoProducer_%1
-    focus: false
 
-    ImageButton {
+    ButtonDefault {
         id: backBtn_%1
-        width: 32
-        height: 32
-        anchors {
-            margins: base_margins*2
-            right: parent.right
-            top: parent.top
-        }
+        focus: %6
 
-        image:  "qrc:/images/Goback.png"
+        x: output_%1.contentRect.x + output_%1.contentRect.width - width - base_margins*2
+        y: output_%1.contentRect.y + height + base_margins
+
+        class_name: "outline small"
+        icon: FontAwesome.icons.fa_arrow_left
+        KeyNavigation.down: zoomBtn_%1
+        %7
 
         onClicked: {
             wnd.showStartScreen();
+            mainView.state = "showTilesView"
         }
     }
 
-    ImageButton {
+    ButtonDefault {
         id: zoomBtn_%1
-        width: 32
-        height: 32
-        anchors {
-            margins: base_margins*2
-            right: backBtn_%1.right
-            top: backBtn_%1.bottom
-        }
 
-        image:  "qrc:/images/Zoom.png"
+        x: output_%1.contentRect.x + output_%1.contentRect.width - width - base_margins*2
+        y: output_%1.contentRect.y + height*2 + base_margins*2
+
+        class_name: "outline small"
+        icon: FontAwesome.icons.fa_search
+        KeyNavigation.down: exitBtn_%1
+        %8
 
         onClicked: {
             wnd.hiResUrl = videoProducer_%1.hiResUrl
@@ -42,54 +41,27 @@ VideoOutput {
         }
     }
 
-    ImageButton {
+    ButtonDefault {
         id: exitBtn_%1
-        width: 32
-        height: 32
-        anchors {
-            margins: base_margins*2
-            right: zoomBtn_%1.right
-            top: zoomBtn_%1.bottom
-        }
 
-        image:  "qrc:/images/Exit.png"
+        x: output_%1.contentRect.x + output_%1.contentRect.width - width - base_margins*2
+        y: output_%1.contentRect.y + height*3 + base_margins*3
+
+        class_name: "outline small"
+        icon: FontAwesome.icons.fa_sign_out
+        %9
+        %10
 
         onClicked: {
-            wnd.saveParameters()
-            Qt.quit()
+            wnd.close()
         }
     }
-
-    /*Menu {
-        id: contextMenu_%1
-        MenuItem {
-            text: qsTr("Back")
-            onClicked: {
-                wnd.showStartScreen();
-            }
-        }
-
-        MenuItem {
-            text: qsTr("Show HI resolution")
-            onClicked: {
-                wnd.hiResUrl = videoProducer_%1.hiResUrl
-                wnd.runHiRes();
-            }
-        }
-
-        MenuItem {
-            text: qsTr("Quit application")
-            onClicked: {
-                wnd.saveParameters()
-                Qt.quit()
-            }
-        }
-    }*/
 
     Keys.onPressed: {
         if (event.key === Qt.Key_Escape || event.key === Qt.Key_Back) {
             event.accepted = true
             wnd.showStartScreen();
+            mainView.state = "showTilesView"
         }
     }
 

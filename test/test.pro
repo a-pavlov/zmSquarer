@@ -5,6 +5,7 @@ SOURCES = main.cpp \
     ../src/rbuffer.cpp \
     ../src/rsplitter.cpp \
     ../src/zmdata.cpp \
+    ../src/zmutils.cpp \
     httpparsertest.cpp \
     zmclienttest.cpp \
     colorarraytest.cpp \
@@ -21,6 +22,7 @@ HEADERS += \
     ../src/rbuffer.h \
     ../src/rsplitter.h \
     ../src/zmdata.h \
+    ../src/zmutils.h \
     httpparsertest.h \
     zmclienttest.h \
     colorarraytest.h \

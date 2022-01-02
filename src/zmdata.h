@@ -28,6 +28,19 @@ struct ZMMonitor {
       static ZMMonitor fromJson(const QJsonObject&);
 };
 
+struct ZMVersion {
+    QString version;
+    QString apiversion;
+    ZMVersion(const QString& ver, const QString& aver);
+    ZMVersion() = default;
+    ZMVersion(const ZMVersion&) = default;
+    ZMVersion& operator=(const ZMVersion&) = default;
+    bool isEmpty() const {
+        return version.isEmpty() && apiversion.isEmpty();
+    }
+    static ZMVersion fromJson(const QJsonDocument&);
+};
+
 Q_DECLARE_METATYPE(ZMMonitor)
 
 #endif // ZMDATA_H

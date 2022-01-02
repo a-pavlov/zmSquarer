@@ -1,0 +1,31 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/zmsq.qml</file>
+        <file>qml/zmsq/TilesView.qml</file>
+        <file>qml/zmsq/TilesViewHR.qml</file>
+        <file>qml/zmsq/SearchView.qml</file>
+        <file>qml/zmsq/ZMViewDelegate.qml</file>
+        <file>qml/zmsq/SetupView.qml</file>
+        <file>qml/zmsq/ButtonDefault.qml</file>
+        <file>qml/zmsq/TextContent.qml</file>
+        <file>qml/zmsq/Card.qml</file>
+        <file>qml/zmsq/TestModels.qml</file>
+        <file>qml/zmsq/styles/AvatarListViewStyle.qml</file>
+        <file>qml/zmsq/styles/CardStyle.qml</file>
+        <file>qml/zmsq/styles/DefaulListViewStyle.qml</file>
+        <file>qml/zmsq/styles/IconListViewStyle.qml</file>
+        <file>qml/zmsq/styles/ListDividerStyle.qml</file>
+        <file>qml/zmsq/styles/ThumbnailListViewStyle.qml</file>
+        <file>qml/zmsq/styles/TouchClearStyle.qml</file>
+        <file>qml/zmsq/styles/TouchOutlineStyle.qml</file>
+        <file>qml/zmsq/styles/TouchStyle.qml</file>
+        <file>qml/zmsq/variables/badges.js</file>
+        <file>qml/zmsq/variables/bars.js</file>
+        <file>qml/zmsq/variables/base.js</file>
+        <file>qml/zmsq/variables/buttons.js</file>
+        <file>qml/zmsq/variables/colors.js</file>
+        <file>qml/zmsq/variables/fontawesome.js</file>
+        <file>qml/zmsq/variables/items.js</file>
+        <file>qml/fonts/fontawesome-webfont.ttf</file>
+    </qresource>
+</RCC>

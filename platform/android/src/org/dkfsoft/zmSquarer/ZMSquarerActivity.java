@@ -22,11 +22,11 @@ public class ZMSquarerActivity extends QtActivity {
 
     @Override
     public void onResume() {
-        super.onResume();        
+        super.onResume();
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();        
-    }    
+        super.onDestroy();
+    }
 }

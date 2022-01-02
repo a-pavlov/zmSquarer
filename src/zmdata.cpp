@@ -86,3 +86,15 @@ ZMMonitor& ZMMonitor::operator=(const ZMMonitor& zmmon) {
 }
 
 ZMMonitor::~ZMMonitor(){}
+
+ZMVersion::ZMVersion(const QString& ver, const QString& aver) :
+    version(ver), apiversion(aver) {
+
+}
+
+ZMVersion ZMVersion::fromJson(const QJsonDocument& doc) {
+    ZMVersion zmversion;
+    zmversion.version = doc.object().value("version").toString();
+    zmversion.apiversion = doc.object().value("apiversion").toString();
+    return zmversion;
+}

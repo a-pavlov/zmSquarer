@@ -3,6 +3,9 @@
 #include <QDebug>
 #include <QMetaType>
 
+#include <QHostAddress>
+#include <QNetworkInterface>
+
 #include "zmsqapplication.h"
 #include "camvideoproducer.h"
 #include "zmclient.h"
@@ -10,6 +13,10 @@
 #include "zmdata.h"
 #include "preferences.h"
 #include "scenebuilder.h"
+#include "networksmodel.h"
+#include "zmsearch.h"
+#include "tilemodel.h"
+#include "platform.h"
 
 #ifdef Q_OS_WIN
 
@@ -31,10 +38,10 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
         break;
         case QtFatalMsg:
         txt = QString("Fatal: %1").arg(msg);
-		break;
-		default:
+        break;
+        default:
         abort();
-		
+
     }
 
     QFile outFile("debuglog.txt");
@@ -48,7 +55,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 int main(int argc, char *argv[]) {
 #ifdef Q_OS_WIN
-    qInstallMessageHandler(customMessageHandler);
+    //qInstallMessageHandler(customMessageHandler);
 #endif
     qDebug() << "zmSquarer started";
     CamVideoProducer::registerQmlType();
@@ -57,10 +64,14 @@ int main(int argc, char *argv[]) {
     MonitorModel::registerQmlType();
     Preferences::registerQmlType();
     SceneBuilder::registerQmlType();
+    NetworksModel::registerQmlType();
+    ZMSearch::registerQmlType();
+    TileModel::registerQmlType();
+    Platform::registerQmlType();
 
     ZMSQApplication app(argc, argv);
     QQmlApplicationEngine engine;
-    //engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
-    engine.load(QUrl(QStringLiteral("qrc:///zmSquarer2.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:///qml/zmsq.qml")));
+    //engine.load(QUrl(QStringLiteral("qrc:///zmSquarer2.qml")));
     return app.exec();
 }
