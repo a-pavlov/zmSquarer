@@ -10,7 +10,7 @@ Platform::Platform(QObject *parent) : QObject(parent) {}
 
 QString Platform::getName() const {
 #ifdef Q_OS_WIN
-    return "windows"
+    return "windows";
 #endif
 
 #ifdef Q_OS_ANDROID
