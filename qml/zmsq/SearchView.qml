@@ -53,6 +53,10 @@ FocusScope {
             }
             startMode = !startMode
         }
+
+        Keys.onEnterPressed: {
+            networkScan.clicked()
+        }
     }
 
     ProgressBar {
@@ -136,7 +140,7 @@ FocusScope {
                 }
             }
 
-            Keys.onSelectPressed: {
+            Keys.onEnterPressed: {
                 model.selected = !model.selected
             }
 

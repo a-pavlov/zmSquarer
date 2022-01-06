@@ -119,6 +119,10 @@ FocusScope {
                             zmc.cancel()
                         }
                     }
+
+                    Keys.onEnterPressed: {
+                        btnConnectZM.clicked()
+                    }
                 }
 
                 ButtonDefault {
@@ -133,6 +137,10 @@ FocusScope {
 
                     onClicked: {
                         sceneBuilder.buildScene(tilemodel)
+                    }
+
+                    Keys.onEnterPressed: {
+                        btnStartView.clicked()
                     }
                 }
 
@@ -160,6 +168,10 @@ FocusScope {
 
                     onClicked: {
                         wnd.close()
+                    }
+
+                    Keys.onEnterPressed: {
+                        btnExit.clicked()
                     }
                 }
             }

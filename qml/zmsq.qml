@@ -255,6 +255,13 @@ ApplicationWindow {
                         camsView.focus = true
                     }
                 }
+
+                Keys.onEnterPressed: {
+                    event.accepted = true
+                    hiResLoader.active = false
+                    camsView.visible = true
+                    camsView.focus = true
+                }
             }
         }
     }

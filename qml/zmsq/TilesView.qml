@@ -3,10 +3,15 @@ import "variables/fontawesome.js" as FontAwesome
 import "variables/colors.js" as ColorsHelper
 import "variables/items.js" as StyleHelperItem
 
+import Platform 0.1
 
 FocusScope {
     property alias interactive: gridView.interactive
     property alias cellWidth: gridView.cellWidth
+
+    Platform {
+        id: platform
+    }
 
     onActiveFocusChanged: {
         if (activeFocus)
@@ -33,7 +38,7 @@ FocusScope {
 
                 Text {
                     id: content_txt
-                    text: qsTr("Place low res cameras to squares")
+                    text: qsTr("Place low res cameras to squares. %1").arg(platform.name !== "android" ? "Click space to select cam" : "Enter to select cam")
                     color: itemRoot.style.text
                     font.pixelSize: StyleHelperItem.item_font_size
                     anchors.fill: parent
@@ -122,7 +127,7 @@ FocusScope {
                     }
                 }
 
-                Keys.onSelectPressed: {
+                Keys.onEnterPressed: {
                     upd = "test"
                 }
             }

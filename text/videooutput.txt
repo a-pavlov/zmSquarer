@@ -22,6 +22,10 @@ VideoOutput {
             wnd.showStartScreen();
             mainView.state = "showTilesView"
         }
+
+        Keys.onEnterPressed: {
+            backBtn_%1.clicked()
+        }
     }
 
     ButtonDefault {
@@ -39,6 +43,10 @@ VideoOutput {
             wnd.hiResUrl = videoProducer_%1.hiResUrl
             wnd.runHiRes();
         }
+
+        Keys.onEnterPressed: {
+            zoomBtn_%1.clicked()
+        }
     }
 
     ButtonDefault {
@@ -54,6 +62,10 @@ VideoOutput {
 
         onClicked: {
             wnd.close()
+        }
+
+        Keys.onEnterPressed: {
+            exitBtn_%1.clicked()
         }
     }
 

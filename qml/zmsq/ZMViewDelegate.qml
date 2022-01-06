@@ -45,7 +45,7 @@ Item {
         }
     }
 
-    Keys.onSelectPressed: {
+    Keys.onEnterPressed: {
         model.upd = "xx";
         if (model.check) {
             prefs.url = model.ip
