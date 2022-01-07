@@ -3,7 +3,7 @@ Squarer with UI updated for usage on Android TV devices. Navigation is available
 
 ### Binaries
 * ![Google Play](https://play.google.com/store/apps/details?id=org.dkfsoft.zmSquarerTV)
-* ![Win 64](https://github.com/a-pavlov/zmSquarer/releases/download/initial/release_win64_unsigned.zip)
+* ![Win 64](https://github.com/a-pavlov/zmSquarer/releases/download/initial/release_win64_unsigned.zip). MSVC redist included to archive. Please run it to install required libraries if you have not them yet.
 
 ### Screenshots
 ![cfg_tv_1](images/cfg_tv_1.png)
