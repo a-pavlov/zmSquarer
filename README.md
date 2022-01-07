@@ -1,6 +1,10 @@
 # zmSquarer TV version
 Squarer with UI updated for usage on Android TV devices. Navigation is available by arrow keys. Select by space key on Windows/Linux, select key on Android.
 
+# Binaries
+* ![Google Play](https://play.google.com/store/apps/details?id=org.dkfsoft.zmSquarerTV)
+* ![Win 64](https://github.com/a-pavlov/zmSquarer/releases/download/initial/release_win64_unsigned.zip)
+
 ### Screenshots
 ![cfg_tv_1](images/cfg_tv_1.png)
 ![cfg_tv_22](images/cfg_tv_2.png)
@@ -45,5 +49,3 @@ The project file is zmSquarer.pro.
 ![zmSquarer](images/zmSquarer.png)
 ![zmSquarer2](images/zmSquarer2.png)
 
-### Binaries
-[Win x64](https://disk.yandex.ru/d/acwBnyuOkU72Lw)
