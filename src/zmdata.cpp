@@ -98,3 +98,16 @@ ZMVersion ZMVersion::fromJson(const QJsonDocument& doc) {
     zmversion.apiversion = doc.object().value("apiversion").toString();
     return zmversion;
 }
+
+ZMToken ZMToken::fromJson(const QJsonDocument& doc) {
+    ZMToken tkn;
+    tkn.access_token            = doc.object().value("access_token").toString();
+    tkn.access_token_expires    = doc.object().value("access_token_expires").toInt();
+    tkn.refresh_token           = doc.object().value("refresh_token").toString();
+    tkn.refresh_token_expires   = doc.object().value("refresh_token_expires").toInt();
+    tkn.credentials             = doc.object().value("credentials").toString();
+    tkn.append_password         = doc.object().value("append_password").toString();
+    tkn.version                 = doc.object().value("version").toString();
+    tkn.apiversion              = doc.object().value("apiversion").toString();
+    return tkn;
+};

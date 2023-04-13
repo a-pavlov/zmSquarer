@@ -39,6 +39,17 @@ FocusScope {
             zmClientError.text = qsTr("Error: %1").arg(msg)
             zmClientError.visible = true
         }
+
+        onAuthentificationRequired: {
+            loginDialog.open()
+        }
+
+        onLogged: {
+            console.log("logged")
+            doConnect = true
+            zmUrlProgress.visible = false
+            zmClientError.color = ColorsHelper.color.assertive
+        }
     }
 
     Platform {
@@ -136,7 +147,7 @@ FocusScope {
                     KeyNavigation.down: searchView
 
                     onClicked: {
-                        sceneBuilder.buildScene(tilemodel)
+                        sceneBuilder.buildScene(tilemodel, zmc.getMonitorUrl())
                     }
 
                     Keys.onEnterPressed: {
@@ -174,6 +185,22 @@ FocusScope {
                         btnExit.clicked()
                     }
                 }
+
+                ButtonDefault {
+                    id: btnDlg
+                    text: qsTr("Dlg")
+                    class_name: "assertive medium"
+                    icon: FontAwesome.icons.fa_sign_out
+                    KeyNavigation.down: searchView
+
+                    onClicked: {
+                        loginDialog.open()
+                    }
+
+                    //Keys.onEnterPressed: {
+                    //    btnExit.clicked()
+                    //}
+                }
             }
 
             ProgressBar {
@@ -205,6 +232,95 @@ FocusScope {
     Keys.onPressed: {
         if (event.key === Qt.Key_Back || event.key === Qt.Key_Escape) {
             wnd.close()
+        }
+    }
+
+    Dialog {
+        id: loginDialog
+        //width: 300
+        //height: 200
+        anchors.centerIn: parent
+
+        Column {
+            spacing: 10
+
+            TextField {
+                id: zmLogin
+                focus: true
+                anchors.margins: 10
+                height: btnConnectZM.height
+                placeholderText: qsTr("login")
+                //KeyNavigation.right: btnConnectZM
+                //KeyNavigation.down: searchView
+                font.pixelSize: StyleHelperItem.item_font_size
+                ToolTip.delay: StyleHelperItem.item_tooltip_delay
+                ToolTip.timeout: StyleHelperItem.item_tooltip_timeout
+                ToolTip.visible: activeFocus
+                ToolTip.text: qsTr("Enter ZM host url here with http or https and click connect")
+                //text: prefs.url
+            }
+
+            TextField {
+                id: zmPassword
+                focus: false
+                anchors.margins: 10
+                height: btnConnectZM.height
+                placeholderText: qsTr("password")
+                //KeyNavigation.right: btnConnectZM
+                //KeyNavigation.down: searchView
+                font.pixelSize: StyleHelperItem.item_font_size
+                ToolTip.delay: StyleHelperItem.item_tooltip_delay
+                ToolTip.timeout: StyleHelperItem.item_tooltip_timeout
+                ToolTip.visible: activeFocus
+                ToolTip.text: qsTr("Enter ZM host url here with http or https and click connect")
+                //text: prefs.url
+                passwordCharacter: "*"
+                echoMode: TextInput.Password
+            }
+
+
+            Row {
+                spacing: 10
+
+                ButtonDefault {
+                    id: btnLogin
+                    enabled: zmLogin.text.length > 0 && zmPassword.text.length > 0
+                    text: qsTr("Login")
+                    //KeyNavigation.right: btnStartView
+                    //KeyNavigation.down: searchView
+                    icon: FontAwesome.icons.fa_external_link_square
+                    class_name: "positive medium"
+
+                    onClicked: {
+                        zmc.getLogin(zmLogin.text, zmPassword.text)
+                        loginDialog.close()
+                    }
+
+                    Keys.onEnterPressed: {
+                        //btnConnectZM.clicked()
+                    }
+                }
+
+                ButtonDefault {
+                    id: btnCancel
+                    checkable: false
+                    enabled: true
+                    text: qsTr("Cancel")
+                    icon: FontAwesome.icons.fa_play
+                    class_name: "balanced medium"
+                    KeyNavigation.right: btnFullScreen
+                    KeyNavigation.down: searchView
+
+                    onClicked: {
+                        loginDialog.close()
+                    }
+
+                    Keys.onEnterPressed: {
+                        loginDialog.close()
+                        //btnStartView.clicked()
+                    }
+                }
+            }
         }
     }
 }

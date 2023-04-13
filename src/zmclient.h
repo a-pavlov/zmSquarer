@@ -34,17 +34,21 @@ public:
     Q_PROPERTY(bool supportsSsl READ supportsSsl NOTIFY supportsSslChanged)
     Q_INVOKABLE QString getMonitors();
     Q_INVOKABLE QString getMonitorUrl(int monId) const;
-    Q_INVOKABLE void cancel();
-    static QString getMonitorUrl(const QString& url, int monId);
+    Q_INVOKABLE QString getMonitorUrl() const;
+    Q_INVOKABLE void getLogin(const QString& login, const QString& password);
+    Q_INVOKABLE void cancel();    
 signals:
     void monitors(const QList<ZMMonitor>& mons, int mcount);
     void error(const QString& msg);
+    void authentificationRequired();
     void urlChanged(const QString& url);
     void supportsSslChanged(bool);
+    void logged();
 public slots:
 private:
     QString baseUrl;
     QNetworkReply* current_reply;
+    ZMToken token;
 };
 
 #endif // ZMCLIENT_H

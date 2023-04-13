@@ -205,7 +205,7 @@ ApplicationWindow {
         focus: true
     }
 
-    FocusScope {
+    FocusScope {        
         id: hiResScope
         anchors.fill: parent
 

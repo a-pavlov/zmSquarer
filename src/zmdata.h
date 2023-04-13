@@ -41,6 +41,18 @@ struct ZMVersion {
     static ZMVersion fromJson(const QJsonDocument&);
 };
 
+struct ZMToken {
+    QString access_token;
+    uint access_token_expires;
+    QString refresh_token;
+    uint refresh_token_expires;
+    QString credentials;
+    QString append_password;
+    QString version;
+    QString apiversion;
+    static ZMToken fromJson(const QJsonDocument&);
+};
+
 Q_DECLARE_METATYPE(ZMMonitor)
 
 #endif // ZMDATA_H
