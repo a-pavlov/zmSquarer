@@ -41,14 +41,32 @@ FocusScope {
         }
 
         onAuthentificationRequired: {
+            doConnect = true
+            zmUrlProgress.visible = false
+            zmClientError.color = ColorsHelper.color.assertive
+            zmClientError.text = qsTr("Authentication required")
+            zmClientError.visible = true
+            loginDialog.open()
+        }
+
+        onInvalidCredentials: {
+            doConnect = true
+            zmUrlProgress.visible = false
+            zmClientError.color = ColorsHelper.color.assertive
+            zmClientError.text = qsTr("Invalid credentials provided")
+            zmClientError.visible = true
             loginDialog.open()
         }
 
         onLogged: {
-            console.log("logged")
-            doConnect = true
-            zmUrlProgress.visible = false
-            zmClientError.color = ColorsHelper.color.assertive
+            zmClientError.color = ColorsHelper.color.balanced
+            zmClientError.text = qsTr("Login successfull")
+            zmClientError.visible = true
+        }
+
+        onVersion: {
+            sceneBuilder.buildScene(tilemodel, zmc.getMonitorUrl())
+            zmClientError.visible = false
         }
     }
 
@@ -147,7 +165,8 @@ FocusScope {
                     KeyNavigation.down: searchView
 
                     onClicked: {
-                        sceneBuilder.buildScene(tilemodel, zmc.getMonitorUrl())
+                        // ping ZM to verify we have an access
+                        zmc.getVersion()
                     }
 
                     Keys.onEnterPressed: {
@@ -185,22 +204,6 @@ FocusScope {
                         btnExit.clicked()
                     }
                 }
-
-                ButtonDefault {
-                    id: btnDlg
-                    text: qsTr("Dlg")
-                    class_name: "assertive medium"
-                    icon: FontAwesome.icons.fa_sign_out
-                    KeyNavigation.down: searchView
-
-                    onClicked: {
-                        loginDialog.open()
-                    }
-
-                    //Keys.onEnterPressed: {
-                    //    btnExit.clicked()
-                    //}
-                }
             }
 
             ProgressBar {
@@ -236,28 +239,35 @@ FocusScope {
     }
 
     Dialog {
-        id: loginDialog
-        //width: 300
-        //height: 200
+        id: loginDialog        
         anchors.centerIn: parent
+        modal: true
+        //standardButtons: Dialog.Ok | Dialog.Cancel
 
         Column {
             spacing: 10
+
+            Text {
+                id: dlgTitle
+                text: qsTr("ZM requires authentication")
+                color: itemRoot.style.text
+                font.pixelSize: StyleHelperItem.item_font_size
+                wrapMode: Text.WordWrap
+            }
 
             TextField {
                 id: zmLogin
                 focus: true
                 anchors.margins: 10
                 height: btnConnectZM.height
-                placeholderText: qsTr("login")
-                //KeyNavigation.right: btnConnectZM
-                //KeyNavigation.down: searchView
+                placeholderText: qsTr("login")                
+                KeyNavigation.down: zmPassword
                 font.pixelSize: StyleHelperItem.item_font_size
                 ToolTip.delay: StyleHelperItem.item_tooltip_delay
                 ToolTip.timeout: StyleHelperItem.item_tooltip_timeout
                 ToolTip.visible: activeFocus
                 ToolTip.text: qsTr("Enter ZM host url here with http or https and click connect")
-                //text: prefs.url
+                //text: zmc.username
             }
 
             TextField {
@@ -266,50 +276,53 @@ FocusScope {
                 anchors.margins: 10
                 height: btnConnectZM.height
                 placeholderText: qsTr("password")
-                //KeyNavigation.right: btnConnectZM
-                //KeyNavigation.down: searchView
+                KeyNavigation.up: zmLogin
+                KeyNavigation.down: btnLoginOk
                 font.pixelSize: StyleHelperItem.item_font_size
                 ToolTip.delay: StyleHelperItem.item_tooltip_delay
                 ToolTip.timeout: StyleHelperItem.item_tooltip_timeout
                 ToolTip.visible: activeFocus
                 ToolTip.text: qsTr("Enter ZM host url here with http or https and click connect")
-                //text: prefs.url
                 passwordCharacter: "*"
+                //text: zmc.password
                 echoMode: TextInput.Password
             }
-
 
             Row {
                 spacing: 10
 
                 ButtonDefault {
-                    id: btnLogin
+                    id: btnLoginOk
                     enabled: zmLogin.text.length > 0 && zmPassword.text.length > 0
-                    text: qsTr("Login")
-                    //KeyNavigation.right: btnStartView
-                    //KeyNavigation.down: searchView
+                    text: qsTr("Ok")
+                    KeyNavigation.right: btnLoginCancel
+                    KeyNavigation.up: zmPassword
                     icon: FontAwesome.icons.fa_external_link_square
                     class_name: "positive medium"
 
                     onClicked: {
-                        zmc.getLogin(zmLogin.text, zmPassword.text)
+                        zmc.setCredentials(zmLogin.text, zmPassword.text)
+                        zmClientError.color = ColorsHelper.color.balanced
+                        zmClientError.text = qsTr("Please repeat")
+                        zmClientError.visible = true
                         loginDialog.close()
+
                     }
 
                     Keys.onEnterPressed: {
-                        //btnConnectZM.clicked()
+                        loginDialog.close()
                     }
                 }
 
                 ButtonDefault {
-                    id: btnCancel
+                    id: btnLoginCancel
                     checkable: false
                     enabled: true
                     text: qsTr("Cancel")
                     icon: FontAwesome.icons.fa_play
                     class_name: "balanced medium"
-                    KeyNavigation.right: btnFullScreen
-                    KeyNavigation.down: searchView
+                    KeyNavigation.left: btnLoginOk
+                    KeyNavigation.up: zmPassword
 
                     onClicked: {
                         loginDialog.close()
@@ -317,7 +330,6 @@ FocusScope {
 
                     Keys.onEnterPressed: {
                         loginDialog.close()
-                        //btnStartView.clicked()
                     }
                 }
             }

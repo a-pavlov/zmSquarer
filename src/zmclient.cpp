@@ -24,24 +24,19 @@ ZMClient::ZMClient(QObject *parent) :
 
 }
 
-QString ZMClient::getMonitors() {
+void ZMClient::getMonitors() {
     Q_ASSERT(!baseUrl.isEmpty());
-    QString strTkn = token.access_token.isEmpty()?QString():QString("?token=%1").arg(token.access_token);
-    QNetworkRequest request(baseUrl + "/zm/api/monitors.json" + strTkn);
-    //request.setOriginatingObject(new ZMAPIRequest());
+    if (token.access_token.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
+        getLogin([this](){getMonitors();});
+        return;
+    }
+
+    QNetworkRequest request(baseUrl + "/zm/api/monitors.json?" + getToken());
     QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
     current_reply = reply;
 
-    /*QObject::connect(reply, &QIODevice::readyRead, [reply]() {
-        Q_UNUSED(reply);
-        //ZMAPIRequest* originator = dynamic_cast<ZMAPIRequest*>(reply->request().originatingObject());
-        //Q_ASSERT(originator != nullptr);
-        //originator->buffer.append(reply->readAll());
-        // do nothing here
-    });*/    
-
+    /*
     QObject::connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), [this](QNetworkReply::NetworkError code) {
-        //qDebug() << "network error occurred " << code;
         switch (code) {
             case QNetworkReply::NetworkError::ConnectionRefusedError:       emit error(QString("Connection refused")); break;
             case QNetworkReply::NetworkError::RemoteHostClosedError:        emit error(QString("Remote host closed")); break;
@@ -57,7 +52,7 @@ QString ZMClient::getMonitors() {
             default:
                 emit error(QString::number(code));
         }
-    });
+    });*/
 
     QObject::connect(reply, &QNetworkReply::sslErrors, [reply](const QList<QSslError> &errors) {
         QList<QSslError> canBeIgnoredErrors;
@@ -69,7 +64,7 @@ QString ZMClient::getMonitors() {
         reply->ignoreSslErrors(errors);
     });
 
-    QObject::connect(reply, &QNetworkReply::finished, [reply, this]() {
+    QObject::connect(reply, &QNetworkReply::finished, this, [reply, this]() {
         //ZMAPIRequest* originator = dynamic_cast<ZMAPIRequest*>(reply->request().originatingObject());
         //Q_ASSERT(originator != nullptr);
         if (reply->error() == QNetworkReply::NoError) {
@@ -85,7 +80,6 @@ QString ZMClient::getMonitors() {
         } else if (reply->error() == QNetworkReply::AuthenticationRequiredError) {
             emit authentificationRequired();
         } else {
-            qDebug() << "error " << reply->error() << " str " << reply->errorString();
             emit error(reply->errorString());
         }
 
@@ -93,14 +87,13 @@ QString ZMClient::getMonitors() {
         current_reply = nullptr;
         reply->deleteLater();
     });
-
-    return QString();
 }
 
-void ZMClient::getLogin(const QString& login, const QString& password) {
+void ZMClient::getLogin(std::function<void()> callback) {
     Q_ASSERT(!baseUrl.isEmpty());
+
     auto reqUrl = QString{"/zm/api/host/login.json?user=%1&pass=%2"};
-    QNetworkRequest request(baseUrl + reqUrl.arg(login).arg(password));
+    QNetworkRequest request(baseUrl + reqUrl.arg(username, password));
     QByteArray data;
     QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->post(request, data);
     current_reply = reply;
@@ -115,18 +108,72 @@ void ZMClient::getLogin(const QString& login, const QString& password) {
         reply->ignoreSslErrors(errors);
     });
 
-    QObject::connect(reply, &QNetworkReply::finished, [reply, this]() {        
+    QObject::connect(reply, &QNetworkReply::finished, this, [callback, reply, this]() {
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray buffer = reply->readAll();
             QJsonParseError jsonParseError;
             token = ZMToken::fromJson(QJsonDocument::fromJson(buffer, &jsonParseError));
             if (jsonParseError.error == QJsonParseError::NoError) {
-                qDebug() << "token " << token.access_token;
+                callback();
             } else {
                 emit error(tr("Can not parse server's JSON response: %1").arg(jsonParseError.errorString()));
             }
+        } else if (reply->error() == QNetworkReply::AuthenticationRequiredError) {
+            username.clear();
+            password.clear();
+            emit invalidCredentials();
         } else {
-            qDebug() << "error on login " << reply->errorString();
+            emit error(reply->errorString());
+        }
+
+        // prevent cancel call on already stopped requst
+        current_reply = nullptr;
+        reply->deleteLater();
+    });
+}
+
+QString ZMClient::getToken() const {
+    if (!token.access_token.isEmpty()) {
+        return QString("token=") + token.access_token;
+    }
+    return QString();
+}
+
+void ZMClient::getVersion() {
+    if (token.access_token.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
+        getLogin([this](){getVersion();});
+        return;
+    }
+
+    auto reqUrl = QString{"/zm/api/host/getVersion.json?"} + getToken();
+    QNetworkRequest request(baseUrl + reqUrl);
+    QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
+    current_reply = reply;
+
+    QObject::connect(reply, &QNetworkReply::sslErrors, [reply](const QList<QSslError> &errors) {
+        QList<QSslError> canBeIgnoredErrors;
+        canBeIgnoredErrors << QSslError::HostNameMismatch << QSslError::SelfSignedCertificate;
+        for (const QSslError& sslError: errors) {
+            if (!canBeIgnoredErrors.contains(sslError.error())) return;
+        }
+
+        reply->ignoreSslErrors(errors);
+    });
+
+    QObject::connect(reply, &QNetworkReply::finished, this, [reply, this]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray buffer = reply->readAll();
+            QJsonParseError jsonParseError;
+            auto zmVersion = ZMVersion::fromJson(QJsonDocument::fromJson(buffer, &jsonParseError));
+            if (jsonParseError.error == QJsonParseError::NoError) {
+                emit version(zmVersion.version);
+            } else {
+                emit error(tr("Can not parse server's JSON response: %1").arg(jsonParseError.errorString()));
+            }
+        } else if (reply->error() == QNetworkReply::AuthenticationRequiredError) {
+            token.access_token.clear();
+            emit authentificationRequired();
+        } else {
             emit error(reply->errorString());
         }
 
@@ -151,8 +198,7 @@ bool ZMClient::supportsSsl() const {
 QString ZMClient::getMonitorUrl(int monId) const {
     Q_ASSERT(monId > 0);
     Q_ASSERT(!baseUrl.isEmpty());
-    QString strTkn = token.access_token.isEmpty()?QString():QString("&token=%1").arg(token.access_token);
-    return baseUrl + "/zm/cgi-bin/nph-zms?mode=jpeg&monitor=" + QString::number(monId) + "&scale=100&maxfps=30&buffer=1000" + strTkn;
+    return baseUrl + "/zm/cgi-bin/nph-zms?mode=jpeg&monitor=" + QString::number(monId) + "&scale=100&maxfps=30&buffer=1000&" + getToken();
 }
 
 void ZMClient::cancel() {
@@ -164,6 +210,20 @@ void ZMClient::cancel() {
 QString ZMClient::getMonitorUrl() const {
     QString strTkn = token.access_token.isEmpty()?QString():QString("&token=%1").arg(token.access_token);
     return baseUrl + "/zm/cgi-bin/nph-zms?mode=jpeg&monitor=%1&scale=100&maxfps=30&buffer=1000" + strTkn;
+}
+
+void ZMClient::setCredentials(const QString& u, const QString& p) {
+    username = u;
+    password = p;
+    token.access_token.clear();
+}
+
+QString ZMClient::getUsername() const {
+    return username;
+}
+
+QString ZMClient::getPassword() const {
+    return password;
 }
 
 

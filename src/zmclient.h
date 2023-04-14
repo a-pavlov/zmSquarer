@@ -2,6 +2,7 @@
 #define ZMCLIENT_H
 
 #include <QObject>
+#include <functional>
 #include "zmdata.h"
 
 
@@ -32,23 +33,34 @@ public:
     bool supportsSsl() const;
     Q_PROPERTY(QString url READ url WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(bool supportsSsl READ supportsSsl NOTIFY supportsSslChanged)
-    Q_INVOKABLE QString getMonitors();
+    Q_PROPERTY(QString username READ getUsername)
+    Q_PROPERTY(QString password READ getPassword)
+    Q_INVOKABLE void getMonitors();
+    Q_INVOKABLE void getVersion();
     Q_INVOKABLE QString getMonitorUrl(int monId) const;
     Q_INVOKABLE QString getMonitorUrl() const;
-    Q_INVOKABLE void getLogin(const QString& login, const QString& password);
-    Q_INVOKABLE void cancel();    
+    Q_INVOKABLE void setCredentials(const QString& login, const QString& password);
+    Q_INVOKABLE void cancel();
 signals:
     void monitors(const QList<ZMMonitor>& mons, int mcount);
-    void error(const QString& msg);
+    void version(const QString& ver);
+    void error(const QString& msg);  
     void authentificationRequired();
+    void invalidCredentials();
     void urlChanged(const QString& url);
     void supportsSslChanged(bool);
     void logged();
 public slots:
 private:
+    void getLogin(std::function<void()>);
+    QString getToken() const;
+    QString getUsername() const;
+    QString getPassword() const;
     QString baseUrl;
     QNetworkReply* current_reply;
     ZMToken token;
+    QString username;
+    QString password;
 };
 
 #endif // ZMCLIENT_H
