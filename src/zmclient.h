@@ -57,10 +57,12 @@ private:
     QString getUsername() const;
     QString getPassword() const;
     QString baseUrl;
-    QNetworkReply* current_reply;
+    QNetworkReply* reply;
+    bool requestAborted;
     ZMToken token;
     QString username;
     QString password;
+    friend void closeReply(QNetworkReply*);
 };
 
 #endif // ZMCLIENT_H

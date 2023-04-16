@@ -7,6 +7,14 @@
 #include "zmsqapplication.h"
 
 
+void closeReply(QNetworkReply* reply) {
+    auto zmc = static_cast<ZMClient*>(reply->request().originatingObject());
+    reply->deleteLater();
+    zmc->reply = nullptr;
+}
+
+using unique_reply_t = std::unique_ptr<QNetworkReply, decltype(&closeReply)>;
+
 ZMAPIRequest::ZMAPIRequest() {}
 
 void ZMClient::registerMetaType() {
@@ -20,20 +28,23 @@ void ZMClient::registerQmlType() {
 
 ZMClient::ZMClient(QObject *parent) :
     QObject(parent)
-  , current_reply(nullptr) {
+  , reply(nullptr)
+  , requestAborted(false) {
 
 }
 
 void ZMClient::getMonitors() {
     Q_ASSERT(!baseUrl.isEmpty());
+    Q_ASSERT(reply == nullptr);
     if (token.access_token.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
         getLogin([this](){getMonitors();});
         return;
     }
 
     QNetworkRequest request(baseUrl + "/zm/api/monitors.json?" + getToken());
-    QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
-    current_reply = reply;
+    request.setOriginatingObject(this);
+    requestAborted = false;
+    reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
 
     /*
     QObject::connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), [this](QNetworkReply::NetworkError code) {
@@ -54,7 +65,7 @@ void ZMClient::getMonitors() {
         }
     });*/
 
-    QObject::connect(reply, &QNetworkReply::sslErrors, [reply](const QList<QSslError> &errors) {
+    QObject::connect(reply, &QNetworkReply::sslErrors, this, [this](const QList<QSslError> &errors) {
         QList<QSslError> canBeIgnoredErrors;
         canBeIgnoredErrors << QSslError::HostNameMismatch << QSslError::SelfSignedCertificate;
         for (const QSslError& sslError: errors) {
@@ -64,7 +75,13 @@ void ZMClient::getMonitors() {
         reply->ignoreSslErrors(errors);
     });
 
-    QObject::connect(reply, &QNetworkReply::finished, this, [reply, this]() {
+    QObject::connect(reply, &QNetworkReply::finished, this, [this]() {
+        unique_reply_t ur(reply, &closeReply);
+
+        if (requestAborted) {
+            return;
+        }
+
         //ZMAPIRequest* originator = dynamic_cast<ZMAPIRequest*>(reply->request().originatingObject());
         //Q_ASSERT(originator != nullptr);
         if (reply->error() == QNetworkReply::NoError) {
@@ -82,10 +99,6 @@ void ZMClient::getMonitors() {
         } else {
             emit error(reply->errorString());
         }
-
-        // prevent cancel call on already stopped requst
-        current_reply = nullptr;
-        reply->deleteLater();
     });
 }
 
@@ -94,11 +107,12 @@ void ZMClient::getLogin(std::function<void()> callback) {
 
     auto reqUrl = QString{"/zm/api/host/login.json?user=%1&pass=%2"};
     QNetworkRequest request(baseUrl + reqUrl.arg(username, password));
+    request.setOriginatingObject(this);
     QByteArray data;
-    QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->post(request, data);
-    current_reply = reply;
+    requestAborted = false;
+    reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->post(request, data);
 
-    QObject::connect(reply, &QNetworkReply::sslErrors, [reply](const QList<QSslError> &errors) {
+    QObject::connect(reply, &QNetworkReply::sslErrors, this, [this](const QList<QSslError> &errors) {
         QList<QSslError> canBeIgnoredErrors;
         canBeIgnoredErrors << QSslError::HostNameMismatch << QSslError::SelfSignedCertificate;
         for (const QSslError& sslError: errors) {
@@ -108,12 +122,21 @@ void ZMClient::getLogin(std::function<void()> callback) {
         reply->ignoreSslErrors(errors);
     });
 
-    QObject::connect(reply, &QNetworkReply::finished, this, [callback, reply, this]() {
+    QObject::connect(reply, &QNetworkReply::finished, this, [callback, this]() {
+        unique_reply_t ur(reply, &closeReply);
+
+        if (requestAborted) {
+            return;
+        }
+
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray buffer = reply->readAll();
             QJsonParseError jsonParseError;
             token = ZMToken::fromJson(QJsonDocument::fromJson(buffer, &jsonParseError));
             if (jsonParseError.error == QJsonParseError::NoError) {
+                {
+                    unique_reply_t early = std::move(ur);
+                }
                 callback();
             } else {
                 emit error(tr("Can not parse server's JSON response: %1").arg(jsonParseError.errorString()));
@@ -125,10 +148,6 @@ void ZMClient::getLogin(std::function<void()> callback) {
         } else {
             emit error(reply->errorString());
         }
-
-        // prevent cancel call on already stopped requst
-        current_reply = nullptr;
-        reply->deleteLater();
     });
 }
 
@@ -147,10 +166,11 @@ void ZMClient::getVersion() {
 
     auto reqUrl = QString{"/zm/api/host/getVersion.json?"} + getToken();
     QNetworkRequest request(baseUrl + reqUrl);
-    QNetworkReply* reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
-    current_reply = reply;
+    request.setOriginatingObject(this);
+    requestAborted = false;
+    reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);    
 
-    QObject::connect(reply, &QNetworkReply::sslErrors, [reply](const QList<QSslError> &errors) {
+    QObject::connect(reply, &QNetworkReply::sslErrors, this, [this](const QList<QSslError> &errors) {
         QList<QSslError> canBeIgnoredErrors;
         canBeIgnoredErrors << QSslError::HostNameMismatch << QSslError::SelfSignedCertificate;
         for (const QSslError& sslError: errors) {
@@ -160,7 +180,13 @@ void ZMClient::getVersion() {
         reply->ignoreSslErrors(errors);
     });
 
-    QObject::connect(reply, &QNetworkReply::finished, this, [reply, this]() {
+    QObject::connect(reply, &QNetworkReply::finished, this, [this]() {
+        unique_reply_t ur(reply, &closeReply);
+
+        if (requestAborted) {
+            return;
+        }
+
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray buffer = reply->readAll();
             QJsonParseError jsonParseError;
@@ -176,10 +202,6 @@ void ZMClient::getVersion() {
         } else {
             emit error(reply->errorString());
         }
-
-        // prevent cancel call on already stopped requst
-        current_reply = nullptr;
-        reply->deleteLater();
     });
 }
 
@@ -202,8 +224,9 @@ QString ZMClient::getMonitorUrl(int monId) const {
 }
 
 void ZMClient::cancel() {
-    if (current_reply != nullptr) {
-        current_reply->abort();
+    if (reply != nullptr) {
+        requestAborted = true;
+        reply->abort();
     }
 }
 

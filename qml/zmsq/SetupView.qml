@@ -17,6 +17,8 @@ FocusScope {
     }
 
     property bool doConnect: true
+    property bool wantMonitors: false
+    property bool wantStart: false
 
     ZMClient {
         id: zmc
@@ -144,6 +146,7 @@ FocusScope {
                             zmc.getMonitors()
                             zmClientError.visible = false
                             doConnect = false
+                            wantMonitors = true
                         } else {
                             zmc.cancel()
                         }
@@ -166,6 +169,7 @@ FocusScope {
 
                     onClicked: {
                         // ping ZM to verify we have an access
+                        wantStart = true
                         zmc.getVersion()
                     }
 
@@ -306,11 +310,22 @@ FocusScope {
                         zmClientError.text = qsTr("Please repeat")
                         zmClientError.visible = true
                         loginDialog.close()
+                        if (wantMonitors) {
+                            btnConnectZM.clicked()
+                        }
 
+                        if (wantStart) {
+                            btnStartView.clicked()
+                        }
+
+                        wantMonitors = false
+                        wantStart = false
                     }
 
                     Keys.onEnterPressed: {
                         loginDialog.close()
+                        wantMonitors = false
+                        wantStart = false
                     }
                 }
 
@@ -326,10 +341,14 @@ FocusScope {
 
                     onClicked: {
                         loginDialog.close()
+                        wantMonitors = false
+                        wantStart = false
                     }
 
                     Keys.onEnterPressed: {
                         loginDialog.close()
+                        wantMonitors = false
+                        wantStart = false
                     }
                 }
             }
