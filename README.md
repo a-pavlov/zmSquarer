@@ -10,10 +10,7 @@ Squarer with UI updated for usage on Android TV devices. Navigation is available
 ![cfg_tv_22](images/cfg_tv_2.png)
 
 # zmSquarer (obsolete). Branch version_1.
-Squarer for ZoneMinder.
-
-### Limitations
-For now ZM no-authentication supported only.
+Squarer for ZoneMinder. OAuth2 authentification supported.
 
 ### The project goal
 * Showing multiple cameras in one window like ZoneMinder montage page.
