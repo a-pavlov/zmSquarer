@@ -13,7 +13,7 @@ CamController::~CamController() {
     networkThread.wait();
 }
 
-NetCam* CamController::createCam(const QString& url) {
+NetCam* CamController::createCam(int url) {
     NetCam* cam = new NetCam(url);
     cam->moveToThread(&networkThread);
     connect(&networkThread, &QThread::finished, cam, &QObject::deleteLater);

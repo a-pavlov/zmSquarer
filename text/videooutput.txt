@@ -40,7 +40,7 @@ VideoOutput {
         %8
 
         onClicked: {
-            wnd.hiResUrl = videoProducer_%1.hiResUrl
+            wnd.hiResMonId = videoProducer_%1.hiResMonId
             wnd.runHiRes();
         }
 

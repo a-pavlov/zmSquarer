@@ -67,7 +67,7 @@ FocusScope {
         }
 
         onVersion: {
-            sceneBuilder.buildScene(tilemodel, zmc.getMonitorUrl())
+            sceneBuilder.buildScene(tilemodel)
             zmClientError.visible = false
         }
     }
@@ -290,6 +290,10 @@ FocusScope {
                 passwordCharacter: "*"
                 //text: zmc.password
                 echoMode: TextInput.Password
+
+                Keys.onEnterPressed: {
+                    btnLoginOk.clicked()
+                }
             }
 
             Row {

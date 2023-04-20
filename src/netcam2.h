@@ -13,7 +13,7 @@ struct http_parser;
 class NetCam : public QObject {
     Q_OBJECT
 public:
-    explicit NetCam(const QString&, QObject *parent = nullptr);
+    explicit NetCam(int, QObject *parent = nullptr);
     ~NetCam();
     RSplitter& splitter() {
         return rsp;
@@ -26,7 +26,7 @@ private:
       static int header_value_callback(http_parser* p, const char* c, unsigned long len);
       static int headers_complete(http_parser* p);
       QTcpSocket* socket;
-      QUrl url;
+      int monitorId;
       size_t headersEndOffset;
       size_t headerBytesRead;
       std::vector<char> headersBuffer;
@@ -40,15 +40,16 @@ private:
       int failCount;
       QTimer* watchdog;
       QTime tmImgReq;
-      bool restartRequested;
+      QTime nextConnTime;
       void connect();
 signals:
-        void error();
-        void success();
-        void disconnected();
+      void error();
+      void success();
+      void disconnected();
 public slots:
       void start();
-      void restartConnection();
+private slots:
+      void checkState();
 };
 
 #endif // NETCAM_H

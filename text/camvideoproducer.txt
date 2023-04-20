@@ -1,5 +1,5 @@
 CamVideoProducer {
     id: videoProducer_%1
-    url: "%2"
-    property string hiResUrl: "%3"
+    monId: %2
+    property int hiResMonId: %3
 }

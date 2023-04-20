@@ -21,7 +21,6 @@ QString SceneBuilder::readFile(const QString & filename) {
 }
 
 SceneBuilder::SceneBuilder() {
-
 }
 
 QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
@@ -103,9 +102,9 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
                        QString {
             return camVideoProducer
                     .arg(mon.id)
-                    .arg(zmc->getMonitorUrl(mon.id.toInt()))
+                    .arg(mon.id.toInt())
                     // search from the end of monitors to the beginning by the color index. if no such index - self index returns
-                    .arg(zmc->getMonitorUrl((std::find_if(mons.rbegin(), mons.rend(), [&](const ZMMonitor& mon2) -> bool { return (mon.type==CamType::CAM&&mon2.type==CamType::CAM)?(monmod->camColorIndex(mon2.colorIndex) == monmod->camColorIndex(mon.colorIndex)):false;}))->id.toInt()));
+                    .arg((std::find_if(mons.rbegin(), mons.rend(), [&](const ZMMonitor& mon2) -> bool { return (mon.type==CamType::CAM&&mon2.type==CamType::CAM)?(monmod->camColorIndex(mon2.colorIndex) == monmod->camColorIndex(mon.colorIndex)):false;})->id.toInt()));
         });
 
         QString leftAnchor("parent.left");
@@ -148,7 +147,7 @@ QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
     return buffer;
 }
 
-QString SceneBuilder::buildScene(TileModel* tilemodel, QString monUrl) const {
+QString SceneBuilder::buildScene(TileModel* tilemodel) const {
     auto tiles = tilemodel->getNumeratedTiles();
     QString camVideoProducer = readFile(":/text/camvideoproducer.txt");
     QString camVideoOutput = readFile(":/text/videooutput.txt");
@@ -178,8 +177,8 @@ QString SceneBuilder::buildScene(TileModel* tilemodel, QString monUrl) const {
                        QString {
             return camVideoProducer
                     .arg(mon.first) // index in screen
-                    .arg(monUrl.arg(mon.second.first))  // real mon id
-                    .arg(monUrl.arg(mon.second.second != -1?mon.second.second:mon.second.first));   // hi res mon if present
+                    .arg(mon.second.first)  // real mon id
+                    .arg(mon.second.second != -1?mon.second.second:mon.second.first);   // hi res mon if present
         });
 
         QString leftAnchor("parent.left");

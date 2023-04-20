@@ -1,5 +1,6 @@
 #include "netcam2.h"
 #include "http_parser.h"
+#include "zmclient.h"
 #include <QTcpSocket>
 #include <QtGlobal>
 #include <QTimer>
@@ -47,30 +48,27 @@ int NetCam::header_value_callback(http_parser* p, const char* c, unsigned long l
 
 int NetCam::headers_complete(http_parser* p) {
     Q_UNUSED(p)
-    //qDebug() << "headers completed";
     return 0;
 }
 
-NetCam::NetCam(const QString& u, QObject *parent) : QObject(parent)
+NetCam::NetCam(int mid, QObject *parent) : QObject(parent)
     , socket(nullptr)
-    , url(u)
+    , monitorId(mid)
     , headersEndOffset(0)
     , headerBytesRead(0)
     , headersBuffer(1024)
     , lastHeaderValueOffset(0)
     , getCLValue(false)
-    , failCount(0)
-    , watchdog(nullptr)
-    , restartRequested(false) {
+    , failCount(0) {
+    watchdog = new QTimer(this);
+    QObject::connect(watchdog, SIGNAL(timeout()), this, SLOT(checkState()));
+    watchdog->start(2000);
 }
 
-NetCam::~NetCam() {
-    //qDebug() << "delete netcam";
-    if(socket != nullptr) {
-        socket->close();
+NetCam::~NetCam() {    
+    if(socket != nullptr) {        
         socket->deleteLater();
-    }
-    //qDebug() << "netcam removed";
+    }    
 }
 
 void NetCam::start() {
@@ -79,39 +77,13 @@ void NetCam::start() {
 
 void NetCam::connect() {
     //qDebug() << Q_FUNC_INFO;
-    Q_ASSERT(!url.isEmpty());
+    //Q_ASSERT(!url.isEmpty());
     // prepare for connection
     headerBytesRead = 0;
     rsp.reset();
+    nextConnTime = QTime();
 
-    if (watchdog == nullptr) {
-        watchdog = new QTimer(this);
-        QObject::connect(watchdog, &QTimer::timeout, [&] () {
-            const QTime& frameTime = rsp.getFrameTime();
-            if (!frameTime.isNull()) {
-                if ((frameTime.msecsTo(QTime::currentTime())) > 3*1000 && !restartRequested) {
-                    emit error();
-                    watchdog->stop();
-                    if (++failCount <= RETRY_COUNT) {
-                        QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
-                        rsp.reset();
-                        restartRequested = true;
-                        return;
-                    }
-                }
-            }
-
-            if (!tmImgReq.isNull()) {
-                if (tmImgReq.secsTo(QTime::currentTime()) > IMG_REQ_TIMEOUT) {
-                    qDebug() << "idle timeout reached, stop connection";
-                    // todo add payload
-                    watchdog->stop();
-                    socket->close();
-                    rsp.reset();
-                }
-            }
-        });
-    }
+    QUrl url = ZMClient::getMonitorUrl(monitorId);
 
     if (socket == nullptr) {
         socket = (url.scheme() == "https")?new QSslSocket:new QTcpSocket;
@@ -132,22 +104,20 @@ void NetCam::connect() {
             );
         }
 
-        QObject::connect(socket, &QTcpSocket::connected,[=](){
+        QObject::connect(socket, &QTcpSocket::connected, this, [=](){
            QByteArray array;
            array.append("GET ")
                    .append(url.path().toStdString().c_str())
                    .append("?")
                    .append(url.query().toStdString().c_str())
                    .append(" HTTP/1.0\r\nHost: " + url.host().toLocal8Bit() + "\r\nUser-Agent: zmSquarer-netcam/0.1\r\nConnection: close\r\n\r\n");
-
-           //qDebug() << "request " << array.constData();
+           failCount = 0;
            socket->write(array.constData(), array.size());
            emit success();
         });
 
-        QObject::connect(socket, &QTcpSocket::readyRead, [&]() {
+        QObject::connect(socket, &QTcpSocket::readyRead, this, [&]() {
             qint64 bytesAvailable = socket->bytesAvailable();
-            //failCount = 0;
             //qDebug() << "read ready, fail count reset";
             //qDebug() << "bytes available " << bytesAvailable;
 
@@ -206,13 +176,15 @@ void NetCam::connect() {
             }
         });
 
-        QObject::connect(socket, &QTcpSocket::disconnected, [=] () {
-            //qDebug()<< "disconnected";
+        QObject::connect(socket, &QTcpSocket::disconnected, this, [=] () {
             emit disconnected();
+            socket->deleteLater();
+            socket = nullptr;
         });
 
         QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
-        (&QAbstractSocket::error), [&](QAbstractSocket::SocketError socketError) {
+        (&QAbstractSocket::error), this, [&](QAbstractSocket::SocketError socketError) {
+            qDebug() << "socket error " << socket;
             switch (socketError) {
                 case QAbstractSocket::RemoteHostClosedError:
                     qDebug() << "remote host closed connection";
@@ -231,38 +203,39 @@ void NetCam::connect() {
             }
 
             emit error();
-            if (!restartRequested) {
-                Q_ASSERT(watchdog != nullptr);
-                rsp.reset();
-                watchdog->stop();
-                if (++failCount <= RETRY_COUNT) {
-                    qDebug() << "initiate restart in " << failCount*2 << " seconds";
-                    QTimer::singleShot(2000*failCount, this, SLOT(restartConnection()));
-                }
-            }
+            ++failCount;
+            auto secondsToReconn = failCount > 5?5*4:failCount*4;
+            nextConnTime = QTime::currentTime().addSecs(secondsToReconn);
         });
-    } else {
-        //qDebug() << "force close";
-        socket->abort();
     }
 
-    watchdog->start(WATCH_DOG_INTERVAL_SEC*1000);
 
     if (url.scheme() == "https") {
-        //qDebug() << "connect to host encrypted started " << url;
-        (dynamic_cast<QSslSocket*>(socket))->connectToHostEncrypted(url.host(), url.port(443));
+        (static_cast<QSslSocket*>(socket))->connectToHostEncrypted(url.host(), url.port(443));
     } else {
         socket->connectToHost(url.host(), url.port(80));
     }
 }
 
-void NetCam::restartConnection() {
-    //qDebug() << "restart connection to " << url;
-    connect();
-    restartRequested = false;
-}
-
 QSharedPointer<RBuffer> NetCam::getImageBuffer() {
     tmImgReq = QTime::currentTime();
     return splitter().getOutputBuffer();
+}
+
+void NetCam::checkState() {
+    if (!nextConnTime.isNull() && nextConnTime < QTime::currentTime()) {
+        nextConnTime = QTime();
+        start();
+    }
+
+    if (socket != nullptr) {
+        if (!tmImgReq.isNull()) {
+            if (tmImgReq.secsTo(QTime::currentTime()) > IMG_REQ_TIMEOUT) {
+                qDebug() << "idle timeout reached, stop connection";
+                socket->close();
+                rsp.reset();
+                tmImgReq = QTime();
+            }
+        }
+    }
 }

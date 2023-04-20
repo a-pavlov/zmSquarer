@@ -31,13 +31,13 @@ public:
     ~CamVideoProducer();
 
     Q_PROPERTY( QAbstractVideoSurface* videoSurface READ videoSurface WRITE setVideoSurface )
-    Q_PROPERTY(QString url READ url WRITE setUrl NOTIFY urlChanged)
+    Q_PROPERTY(int monId READ monId WRITE setMonId NOTIFY monIdChanged)
 
     QAbstractVideoSurface* videoSurface() const;
     void setVideoSurface( QAbstractVideoSurface* s );
 
-    QString url() const;
-    QString setUrl(const QString&);
+    int monId() const;
+    int setMonId(int);
 
     void drawNoSignal();
     Q_INVOKABLE void updateTimer(bool start);
@@ -52,7 +52,7 @@ private:
     QAbstractVideoSurface* _surface;
     QVideoSurfaceFormat _format;
     QStringList frames;
-    QString urlCurrent;
+    int monitorId;
     NetCam* netCam;
     BufferHolder* bufferHolder;
     int counter;
@@ -63,7 +63,9 @@ private:
     tjhandle _jpegDecompressor;
 #endif
 signals:
-    void urlChanged();
+    void monIdChanged();
+private slots:
+    void onError();
 };
 
 

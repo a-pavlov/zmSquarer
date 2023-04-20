@@ -30,7 +30,7 @@ ApplicationWindow {
     property int base_margins: 4
 
     property var camsView: ""
-    property string hiResUrl: ""
+    property int hiResMonId: 0
 
     visibility: setupView.fullScreen ? Qt.WindowFullScreen : Qt.WindowMinimized
     flags: setupView.fullScreen ? (Qt.FramelessWindowHint | Qt.Window) : Qt.Window
@@ -216,7 +216,7 @@ ApplicationWindow {
 
                 CamVideoProducer {
                     id: videoProducer_1
-                    url: hiResUrl
+                    monId: hiResMonId
                 }
 
                 VideoOutput {

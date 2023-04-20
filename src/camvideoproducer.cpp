@@ -71,16 +71,15 @@ QAbstractVideoSurface* CamVideoProducer::videoSurface() const {
     return _surface;
 }
 
-QString CamVideoProducer::url() const {
-    return urlCurrent;
+int CamVideoProducer::monId() const {
+    return monitorId;
 }
 
-QString CamVideoProducer::setUrl(const QString& u) {
-    if (u.isEmpty() || u.isNull()) return u;
-    ZMSQApplication* app = static_cast<ZMSQApplication*>(QApplication::instance());
-    //qDebug() << "video producer set url " << u << " thread ";
-    netCam = app->getCamController().createCam(u);
+int CamVideoProducer::setMonId(int monId) {    
+    auto app = static_cast<ZMSQApplication*>(QApplication::instance());
+    netCam = app->getCamController().createCam(monId);
 
+    connect(netCam, SIGNAL(error()), this, SLOT(onError()));
 
     /*
      * disabled. need to fix cam restarting when can not connect
@@ -97,8 +96,8 @@ QString CamVideoProducer::setUrl(const QString& u) {
         camDisconnected = true;
     });*/
 
-    urlCurrent = u;
-    return u;
+    monitorId = monId;
+    return monitorId;
 }
 
 void CamVideoProducer::setVideoSurface( QAbstractVideoSurface* s )
@@ -245,4 +244,8 @@ void CamVideoProducer::timerEvent( QTimerEvent* ) {
         _surface->present( QVideoFrame( screenImage ) );
     }
 #endif
+}
+
+void CamVideoProducer::onError() {
+    drawNoSignal();
 }

@@ -1,9 +1,9 @@
-#include "zmclient.h"
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include <QtNetwork>
 #include <QDebug>
 #include <QtQml/qqml.h>
 #include <QByteArray>
+#include <QTimer>
+#include "zmclient.h"
 #include "zmsqapplication.h"
 
 
@@ -14,6 +14,30 @@ void closeReply(QNetworkReply* reply) {
 }
 
 using unique_reply_t = std::unique_ptr<QNetworkReply, decltype(&closeReply)>;
+
+QMutex ZMClient::mutex;
+QString ZMClient::baseUrl;
+QString ZMClient::tokenQueryParam;
+ZMToken ZMClient::token;
+QString ZMClient::username;
+QString ZMClient::password;
+
+QString ZMClient::getMonitorUrl(int monId) {
+    Q_ASSERT(monId > 0);
+    Q_ASSERT(!baseUrl.isEmpty());
+    QMutexLocker locker(&mutex);
+    return baseUrl + "/zm/cgi-bin/nph-zms?mode=jpeg&monitor=" + QString::number(monId) + "&scale=100&maxfps=30&buffer=1000&" + tokenQueryParam;
+}
+
+void ZMClient::setToken(ZMToken && t) {
+    QMutexLocker locker(&mutex);
+    token = t;
+    if (!token.access_token.isEmpty()) {
+        tokenQueryParam = QString("token=") + token.access_token;
+    } else {
+        tokenQueryParam.clear();
+    }
+}
 
 ZMAPIRequest::ZMAPIRequest() {}
 
@@ -30,7 +54,8 @@ ZMClient::ZMClient(QObject *parent) :
     QObject(parent)
   , reply(nullptr)
   , requestAborted(false) {
-
+    tokenRefreshTimer = new QTimer(this);
+    connect(tokenRefreshTimer, SIGNAL(timeout()), this, SLOT(refreshToken()));
 }
 
 void ZMClient::getMonitors() {
@@ -41,7 +66,7 @@ void ZMClient::getMonitors() {
         return;
     }
 
-    QNetworkRequest request(baseUrl + "/zm/api/monitors.json?" + getToken());
+    QNetworkRequest request(baseUrl + "/zm/api/monitors.json?" + tokenQueryParam);
     request.setOriginatingObject(this);
     requestAborted = false;
     reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->get(request);
@@ -82,14 +107,12 @@ void ZMClient::getMonitors() {
             return;
         }
 
-        //ZMAPIRequest* originator = dynamic_cast<ZMAPIRequest*>(reply->request().originatingObject());
-        //Q_ASSERT(originator != nullptr);
+
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray buffer = reply->readAll();
             QJsonParseError jsonParseError;
             QList<ZMMonitor> mons = ZMMonitor::fromJson(QJsonDocument::fromJson(buffer, &jsonParseError));
-            if (jsonParseError.error == QJsonParseError::NoError) {
-                //qDebug() << "monitors " << mons.size() << " data size bytes " << buffer.size();
+            if (jsonParseError.error == QJsonParseError::NoError) {                
                 emit monitors(mons, mons.size());
             } else {
                 emit error(tr("Can not parse server's JSON response: %1").arg(jsonParseError.errorString()));
@@ -108,6 +131,7 @@ void ZMClient::getLogin(std::function<void()> callback) {
     auto reqUrl = QString{"/zm/api/host/login.json?user=%1&pass=%2"};
     QNetworkRequest request(baseUrl + reqUrl.arg(username, password));
     request.setOriginatingObject(this);
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/x-www-form-urlencoded"));
     QByteArray data;
     requestAborted = false;
     reply = dynamic_cast<ZMSQApplication*>(QApplication::instance())->getNetMan()->post(request, data);
@@ -133,11 +157,18 @@ void ZMClient::getLogin(std::function<void()> callback) {
             QByteArray buffer = reply->readAll();
             QJsonParseError jsonParseError;
             token = ZMToken::fromJson(QJsonDocument::fromJson(buffer, &jsonParseError));
+            if (token.access_token_expires > 10) {
+                tokenRefreshTimer->start((token.access_token_expires - 10)*1000);
+            }
+
+            setToken(std::move(token));
             if (jsonParseError.error == QJsonParseError::NoError) {
                 {
                     unique_reply_t early = std::move(ur);
                 }
-                callback();
+                if (callback != nullptr) {
+                    callback();
+                }
             } else {
                 emit error(tr("Can not parse server's JSON response: %1").arg(jsonParseError.errorString()));
             }
@@ -151,20 +182,13 @@ void ZMClient::getLogin(std::function<void()> callback) {
     });
 }
 
-QString ZMClient::getToken() const {
-    if (!token.access_token.isEmpty()) {
-        return QString("token=") + token.access_token;
-    }
-    return QString();
-}
-
 void ZMClient::getVersion() {
     if (token.access_token.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
         getLogin([this](){getVersion();});
         return;
     }
 
-    auto reqUrl = QString{"/zm/api/host/getVersion.json?"} + getToken();
+    auto reqUrl = QString{"/zm/api/host/getVersion.json?"} + tokenQueryParam;
     QNetworkRequest request(baseUrl + reqUrl);
     request.setOriginatingObject(this);
     requestAborted = false;
@@ -217,12 +241,6 @@ bool ZMClient::supportsSsl() const {
     return QSslSocket::supportsSsl();
 }
 
-QString ZMClient::getMonitorUrl(int monId) const {
-    Q_ASSERT(monId > 0);
-    Q_ASSERT(!baseUrl.isEmpty());
-    return baseUrl + "/zm/cgi-bin/nph-zms?mode=jpeg&monitor=" + QString::number(monId) + "&scale=100&maxfps=30&buffer=1000&" + getToken();
-}
-
 void ZMClient::cancel() {
     if (reply != nullptr) {
         requestAborted = true;
@@ -249,4 +267,8 @@ QString ZMClient::getPassword() const {
     return password;
 }
 
+
+void ZMClient::refreshToken() {
+    getLogin(nullptr);
+}
 
