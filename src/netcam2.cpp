@@ -76,9 +76,6 @@ void NetCam::start() {
 }
 
 void NetCam::connect() {
-    //qDebug() << Q_FUNC_INFO;
-    //Q_ASSERT(!url.isEmpty());
-    // prepare for connection
     headerBytesRead = 0;
     rsp.reset();
     nextConnTime = QTime();
@@ -183,20 +180,16 @@ void NetCam::connect() {
         });
 
         QObject::connect(socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>
-        (&QAbstractSocket::error), this, [&](QAbstractSocket::SocketError socketError) {
-            qDebug() << "socket error " << socket;
+        (&QAbstractSocket::error), this, [&](QAbstractSocket::SocketError socketError) {            
             switch (socketError) {
                 case QAbstractSocket::RemoteHostClosedError:
-                    qDebug() << "remote host closed connection";
+                    qDebug() << QTime::currentTime() << " The remote host closed connection for monitor: " << monitorId;
                     break;
                 case QAbstractSocket::HostNotFoundError:
-                    qDebug() << "The host was not found. Please check the host name and port settings.";
+                    qDebug() << QTime::currentTime() << " The host was not found. Please check the host name and port settings. monitor: " << monitorId;
                     break;
                 case QAbstractSocket::ConnectionRefusedError:
-                    qDebug() << "The connection was refused by the peer. "
-                                                "Make sure the fortune server is running, "
-                                                "and check that the host name and port "
-                                                "settings are correct.";
+                    qDebug() << QTime::currentTime() << " The connection was refused by the peer. monitor: " << monitorId;
                     break;
                 default:
                     qDebug() << socket->errorString();
@@ -231,7 +224,7 @@ void NetCam::checkState() {
     if (socket != nullptr) {
         if (!tmImgReq.isNull()) {
             if (tmImgReq.secsTo(QTime::currentTime()) > IMG_REQ_TIMEOUT) {
-                qDebug() << "idle timeout reached, stop connection";
+                qDebug() << "idle timeout reached, stop connection, monitor: " << monitorId;
                 socket->close();
                 rsp.reset();
                 tmImgReq = QTime();

@@ -4,4 +4,4 @@
     INCLUDEPATH += $$(TJPEG_ROOT)
 }
 
-QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic -Wformat-security
+QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic -Wformat-security -Wno-deprecated-copy

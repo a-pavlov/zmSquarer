@@ -110,4 +110,4 @@ ZMToken ZMToken::fromJson(const QJsonDocument& doc) {
     tkn.version                 = doc.object().value("version").toString();
     tkn.apiversion              = doc.object().value("apiversion").toString();
     return tkn;
-};
+}

@@ -24,6 +24,7 @@ SceneBuilder::SceneBuilder() {
 }
 
 QString SceneBuilder::buildScene(ZMClient* zmc, MonitorModel* monmod) const {
+    Q_UNUSED(zmc);
     QList<ZMMonitor> mons;
     mons.append(monmod->getMonitors());
     std::sort(mons.begin(), mons.end(), [](const ZMMonitor& a, const ZMMonitor& b) -> bool { return a.visualIndex < b.visualIndex; });
